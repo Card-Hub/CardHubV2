@@ -1,4 +1,4 @@
-﻿namespace FresherVueAsp.Server.Hubs;
+﻿namespace WebApi.Hubs;
 
 using Microsoft.AspNetCore.SignalR;
 

@@ -5,9 +5,9 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
 <!--    <InvariantGlobalization>true</InvariantGlobalization>-->
-<!--    <SpaRoot>..\freshervueasp.nuxt</SpaRoot>-->
+<!--    <SpaRoot>..\Client</SpaRoot>-->
 <!--    <SpaProxyLaunchCommand>npm run dev</SpaProxyLaunchCommand>-->
-<!--    <SpaProxyServerUrl>https://localhost:5173</SpaProxyServerUrl>-->
+<!--    <SpaProxyServerUrl>http://localhost:3000</SpaProxyServerUrl>-->
   </PropertyGroup>
 
   <ItemGroup>
@@ -25,7 +25,7 @@
 
 
 <!--  <ItemGroup>-->
-<!--    <ProjectReference Include="..\freshervueasp.client\freshervueasp.client.esproj">-->
+<!--    <ProjectReference Include="..\Client\Client.esproj">-->
 <!--      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>-->
 <!--    </ProjectReference>-->
 <!--  </ItemGroup>-->

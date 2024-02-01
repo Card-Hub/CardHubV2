@@ -4,7 +4,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace FresherVueAsp.Server.Controllers;
+namespace WebApi.Controllers;
 
 public class CardDbContext: DbContext
 {

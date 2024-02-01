@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace FresherVueAsp.Server.Controllers
+namespace WebApi.Controllers
 {
     [ApiController]
     [Route("[controller]")]

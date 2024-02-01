@@ -1,5 +1,5 @@
-using FresherVueAsp.Server.Controllers;
-using FresherVueAsp.Server.Hubs;
+using WebApi.Controllers;
+using WebApi.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 

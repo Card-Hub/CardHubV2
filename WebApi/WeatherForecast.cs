@@ -1,4 +1,4 @@
-namespace FresherVueAsp.Server
+namespace WebApi
 {
     public class WeatherForecast
     {

@@ -9,10 +9,4 @@
 <!--    &lt;!&ndash; Folder where production build objects will be placed &ndash;&gt;-->
 <!--    <BuildOutputFolder>$(MSBuildProjectDirectory)\dist</BuildOutputFolder>-->
 <!--  </PropertyGroup>-->
-
-
-  <ItemGroup>
-    <Folder Include="assets\icons\" />
-    <Folder Include="components\" />
-  </ItemGroup>
 </Project>

@@ -1,3 +1,4 @@
+using FresherVueAsp.Server.Controllers;
 using FresherVueAsp.Server.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -28,7 +29,7 @@ builder.Services.AddCors(options =>
     });
 });
 builder.Services.AddSingleton<IDictionary<string, UserConnection>>(options => new Dictionary<string, UserConnection>());
-
+builder.Services.AddSingleton<CardDbContext>();
 
 var app = builder.Build();
 

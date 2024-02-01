@@ -1,14 +1,21 @@
-<script setup>
+<script setup lang="ts">
+
 import { ref, onMounted } from 'vue';
+import PlayingCard from "~/components/PlayingCard.vue";
 
-const cards = ref([]);
+type Card = {
+  id: number
+  value: string
+  suit: string
+}
 
+const cards = ref<Array<Card> | null>(null);
+
+//https://vuejs.org/guide/essentials/component-basics.html#passing-props
 onMounted(async () => {
   try {
     const response = await fetch('https://localhost:7085/Cards');
-    const data = await response.json();
-    cards.value = data;
-    console.log("cardssssss", data);
+    cards.value = await response.json();
   } catch (error) {
     console.error('Error fetching cards:', error);
   }
@@ -90,11 +97,13 @@ onMounted(async () => {
 <!--    </div>-->
 <!--  </div>-->
   <div>
+    <h1>Playing Cards</h1>
+    <PlayingCard :playingCards="cards"></PlayingCard>
     <h2>Card Data from C# Backend</h2>
-    <ul>
-      <li v-for="card in cards" :key="card.id">
-        {{ card.value }} of {{ card.suit }}
-      </li>
-    </ul>
+<!--    <ul>-->
+<!--      <li v-for="card in cards" :key="card.id">-->
+<!--        {{ card.value }} of {{ card.suit }}-->
+<!--      </li>-->
+<!--    </ul>-->
   </div>
 </template>

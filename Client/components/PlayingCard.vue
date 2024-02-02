@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { defineProps } from 'vue';
+// Rubi worked on this component
 
-  // props are passed from the parent component
-  type Card = {
+import { defineProps } from 'vue';
+ type Card = {
     id: number
     value: string
     suit: string
@@ -32,16 +32,17 @@ import { defineProps } from 'vue';
 
 // https://stackoverflow.com/questions/56624817/passing-and-binding-img-src-from-props-in-vue-js
 const getSuitIcon = (suit: string) => {
-  console.log(`../assets/icons/${suit.toLowerCase()}.svg`);
   return new URL(`../assets/icons/${suit.toLowerCase()}.svg`, import.meta.url);
 };
 
 const getSuitColor = (suit: string) => {
-  if (suit === 'Hearts' || suit === 'Diamonds') {
-    return 'red';
-  } else {
-    return 'black';
-  }
+  return suit === 'Hearts' || suit === 'Diamonds' ? 'red' : 'black';
+};
+
+// Deals with the card selection
+const cardSelected = ref<Card | null>(null);
+const handleCardClick = (card: Card) => {
+  cardSelected.value = card;
 };
 </script>
 
@@ -52,6 +53,7 @@ const getSuitColor = (suit: string) => {
         :key="card.id"
         class="relative w-20 h-32 m-2 bg-white rounded-md shadow-md p-2"
         style="box-shadow: 6px -6px 3px rgba(200, 200, 200, 0.4);"
+        @click="handleCardClick(card)"
     >
       <img
           :src="getSuitIcon(card.suit)"
@@ -62,6 +64,23 @@ const getSuitColor = (suit: string) => {
           class="absolute top-2 left-2 text-4xl font-bold"
           :style="{ color: getSuitColor(card.suit) }" 
           >{{ getDisplayValue(card.value) }}</div>
+    </div>
+  </div>
+  
+  <div v-if="cardSelected" class="flex flex-wrap justify-center items-center">
+    <h2>Card Selected</h2>
+    <div class="relative w-20 h-32 m-2 bg-white rounded-md shadow-md p-2"
+        style="box-shadow: 6px -6px 3px rgba(200, 200, 200, 0.4);"
+    >
+      <img
+          :src="getSuitIcon(cardSelected.suit)"
+          alt="suit icon"
+          class="absolute bottom-2 right-2 w-14 h-14"
+      />
+      <div
+          class="absolute top-2 left-2 text-4xl font-bold"
+          :style="{ color: getSuitColor(cardSelected.suit) }"
+      >{{ getDisplayValue(cardSelected.value) }}</div>
     </div>
   </div>
 </template>

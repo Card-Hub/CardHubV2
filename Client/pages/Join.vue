@@ -1,79 +1,31 @@
 ﻿<script setup lang="ts">
-import { HttpTransportType, type HubConnection, HubConnectionBuilder, LogLevel } from '@microsoft/signalr'
-import { ref } from 'vue'
+import { ref } from 'vue';
+import { storeToRefs } from 'pinia'
+import {useWebSocketStore} from "~/stores/webSocketStore";
 
-interface UserMessage {
-  user: string
-  message: string
-}
+const isValidRoomCode = ref<boolean | null>(null);
 
-const connection = ref<HubConnection | null>(null)
-const messages = ref<UserMessage[]>([])
-const users = ref<string[]>([])
-const user = ref('')
-const room = ref('')
+const store = useWebSocketStore();
+const { connection, messages, cards, users, user, room } = storeToRefs(store);
+const { createRoom, tryJoinRoom } = store;
 
-const joinRoom = async (user: string, room: string): Promise<void> => {
-  try {
-    const runtimeConfig = useRuntimeConfig();
-    const webSocketUrl = `${ runtimeConfig.public.baseURL }/game`;
-
-    const joinConnection = new HubConnectionBuilder()
-        .withUrl(webSocketUrl, {
-          skipNegotiation: true,
-          transport: HttpTransportType.WebSockets
-        })
-        .configureLogging(LogLevel.Information)
-        .build();
-
-    joinConnection.on('ReceiveCard', (user: string, message: string) => {
-      messages.value.push({ user, message });
-      console.log(messages.value);
-    })
-
-    joinConnection.on('UsersInRoom', (users) => {
-      users.value = users;
-    })
-
-    joinConnection.onclose(() => {
-      connection.value = null;
-      messages.value = [];
-      users.value = [];
-    })
-
-    await joinConnection.start();
-    await joinConnection.invoke('JoinRoom', { user, room });
-    connection.value = joinConnection;
-  } catch (e) {
-    console.log('HubConnection ERR --- ', e);
-  }
-}
-
-const sendMessage = async (message: string): Promise<void> => {
-  try {
-    if (connection.value !== null) { await connection.value.invoke('SendCard', message) }
-  } catch (e) {
-    console.log(e)
-  }
-}
-
-const closeConnection = async (): Promise<void> => {
-  try {
-    if (connection.value !== null) { await connection.value.stop() }
-  } catch (e) {
-    console.log(e)
-  }
-}
 </script>
 
 <template>
+  <Toast/>
   <div class="app">
     <h2></h2>
     <template v-if="connection === null">
-      <div class="flex flex-col gap-2">
+      <div class="flex flex-col gap-4">
         <InputText type="text" v-model="user" placeholder="Name"/>
         <InputText type="text" v-model="room" placeholder="Game Pin"/>
-        <Button type="submit" @click="joinRoom(user, room)" :disabled="!user || !room">Enter</Button>
+        <Button type="submit" @click="tryJoinRoom" :disabled="!user || !room">Enter</Button>
+      </div>
+      <div>
+        <Button @click="createRoom">Create Room</Button>
+        <template v-if="isValidRoomCode">
+          <NuxtLink to="/WeatherForecast"/>
+        </template>
       </div>
     </template>
     <template v-else>

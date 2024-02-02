@@ -24,6 +24,11 @@
   </ItemGroup>
 
 
+
+  <ItemGroup>
+    <Folder Include="Services\" />
+  </ItemGroup>
+
 <!--  <ItemGroup>-->
 <!--    <ProjectReference Include="..\Client\Client.esproj">-->
 <!--      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>-->

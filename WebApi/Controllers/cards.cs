@@ -3,12 +3,13 @@
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using WebApi.Models;
 
 namespace WebApi.Controllers;
 
 public class CardDbContext: DbContext
 {
-    public DbSet<Card> cards { get; set; }
+    public DbSet<PlayingCard> cards { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -18,12 +19,6 @@ public class CardDbContext: DbContext
             .Build();
         optionsBuilder.UseNpgsql(config.GetConnectionString("WebApiDatabase"));
     }
-}
-
-public class Card {
-    public int id { get; set; }
-    public string suit { get; set; }
-    public string value { get; set; }
 }
 
 [ApiController]
@@ -38,7 +33,7 @@ public class CardsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Card>>> GetCards()
+    public async Task<ActionResult<IEnumerable<PlayingCard>>> GetCards()
     {
         var cards = await _context.cards.ToListAsync();
         return Ok(cards);

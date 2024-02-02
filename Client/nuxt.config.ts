@@ -12,6 +12,9 @@ export default defineNuxtConfig({
       baseURL: process.env.BASE_URL
     },
   },
+  pinia: {
+    storesDirs: ['./stores/**'],
+  },
   primevue: {
     options: {
       ripple: true,

@@ -1,15 +1,13 @@
-import { defineStore } from 'pinia'
-import { HttpTransportType, type HubConnection, HubConnectionBuilder, LogLevel } from '@microsoft/signalr'
-import { ref } from 'vue'
+import {defineStore} from 'pinia'
+import {HttpTransportType, type HubConnection, HubConnectionBuilder, LogLevel} from '@microsoft/signalr'
+import {ref} from 'vue'
+import PlayingCard from "~/components/PlayingCard.vue";
 
-export const useWebSockets = defineStore('webSockets', () => {
-    interface UserMessage {
-        user: string
-        message: string
-    }
+export const useWebSocketStore = defineStore('webSocket', () => {
 
     const connection = ref<HubConnection | null>(null)
     const messages = ref<UserMessage[]>([])
+    const cards = ref<Card[]>([]);
     const users = ref<string[]>([])
     const user = ref('')
     const room = ref('')
@@ -20,7 +18,7 @@ export const useWebSockets = defineStore('webSockets', () => {
         if (data.value) {
             room.value = data.value;
             console.log('Room created: ', room.value);
-            await joinRoom(user.value, room.value);
+            await joinRoom(user.value, room.value, UserType.Gameboard);
         }
     }
 
@@ -29,7 +27,7 @@ export const useWebSockets = defineStore('webSockets', () => {
         if (user.value && room.value) {
             const { data } = await useApi<boolean>(`game/verifycode/${ room.value }`, { method: 'GET' });
             if (data.value) {
-                await joinRoom(user.value, room.value);
+                await joinRoom(user.value, room.value, UserType.Player);
                 return true;
             }
             console.log('Invalid room code');
@@ -37,7 +35,7 @@ export const useWebSockets = defineStore('webSockets', () => {
         return false;
     }
 
-    const joinRoom = async (user: string, room: string): Promise<void> => {
+    const joinRoom = async (user: string, room: string, userType: UserType): Promise<void> => {
         try {
             const runtimeConfig = useRuntimeConfig();
             const webSocketUrl = `${ runtimeConfig.public.baseURL }/gamehub`;
@@ -49,9 +47,12 @@ export const useWebSockets = defineStore('webSockets', () => {
                 .configureLogging(LogLevel.Information)
                 .build();
 
-            joinConnection.on('ReceiveCard', (user: string, message: string) => {
-                messages.value.push({ user, message });
-                console.log(messages.value);
+            joinConnection.on('ReceiveMessage', (userMessage: UserMessage) => {
+                messages.value.push(userMessage);
+            })
+
+            joinConnection.on('ReceiveCard', (fromUser: string, card: Card) => {
+                cards.value.push(card);
             })
 
             joinConnection.on('UsersInRoom', (users) => {
@@ -65,16 +66,24 @@ export const useWebSockets = defineStore('webSockets', () => {
             })
 
             await joinConnection.start();
-            await joinConnection.invoke('JoinRoom', { user, room });
+            await joinConnection.invoke('JoinRoom', { user, room, userType });
             connection.value = joinConnection;
         } catch (e) {
-            console.log('HubConnection ERR --- ', e);
+            console.log('HubConnection Error:', e);
+        }
+    }
+
+    const sendCard = async (card: Card): Promise<void> => {
+        try {
+            if (connection.value !== null) { await connection.value.invoke('SendCard', card) }
+        } catch (e) {
+            console.log(e)
         }
     }
 
     const sendMessage = async (message: string): Promise<void> => {
         try {
-            if (connection.value !== null) { await connection.value.invoke('SendCard', message) }
+            if (connection.value !== null) { await connection.value.invoke('SendMessage', message) }
         } catch (e) {
             console.log(e)
         }
@@ -88,5 +97,6 @@ export const useWebSockets = defineStore('webSockets', () => {
         }
     }
 
-    return {  }
+    return { connection, messages, cards, users, user, room,
+        createRoom, tryJoinRoom, sendCard, sendMessage, closeConnection  }
 })

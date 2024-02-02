@@ -1,12 +1,6 @@
-<Project Sdk="Microsoft.VisualStudio.JavaScript.Sdk/0.5.94-alpha"><!--  <PropertyGroup>-->
-<!--    <StartupCommand>npm run dev</StartupCommand>-->
-<!--    <JavaScriptTestRoot>.\</JavaScriptTestRoot>-->
-<!--    <JavaScriptTestFramework>Jest</JavaScriptTestFramework>-->
-<!--    &lt;!&ndash; Allows the build (or compile) script located on package.json to run on Build &ndash;&gt;-->
-<!--    <ShouldRunBuildScript>false</ShouldRunBuildScript>-->
-<!--    &lt;!&ndash; Command to create an optimized build of the project that's ready for publishing &ndash;&gt;-->
-<!--    <ProductionBuildCommand>npm run build</ProductionBuildCommand>-->
-<!--    &lt;!&ndash; Folder where production build objects will be placed &ndash;&gt;-->
-<!--    <BuildOutputFolder>$(MSBuildProjectDirectory)\dist</BuildOutputFolder>-->
-<!--  </PropertyGroup>-->
+<Project Sdk="Microsoft.VisualStudio.JavaScript.Sdk/0.5.94-alpha">
+  <PropertyGroup>
+    <ShouldRunNpmInstall>false</ShouldRunNpmInstall>
+    <ShouldRunBuildScript>false</ShouldRunBuildScript>
+  </PropertyGroup>
 </Project>

@@ -30,6 +30,7 @@ public class GameHub : Hub
 
     public async Task JoinRoom(UserConnection userConnection)
     {
+        _userConnections[Context.ConnectionId] = userConnection;//fixing bug
         await Groups.AddToGroupAsync(Context.ConnectionId, userConnection.Room);
         await Clients.Group(userConnection.Room).SendAsync("ReceiveCard", BotUser,
             $"{userConnection.User} has joined the room {userConnection.Room}");

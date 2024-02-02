@@ -1,6 +1,7 @@
 ﻿<script setup lang="ts">
 import { HttpTransportType, type HubConnection, HubConnectionBuilder, LogLevel } from '@microsoft/signalr'
 import { ref } from 'vue'
+// import Chat from "@/components/Chat.vue";
 
 interface UserMessage {
   user: string
@@ -12,6 +13,7 @@ const messages = ref<UserMessage[]>([])
 const users = ref<string[]>([])
 const user = ref('')
 const room = ref('')
+const newMessage = ref('');
 
 const joinRoom = async (user: string, room: string): Promise<void> => {
   try {
@@ -48,7 +50,10 @@ const joinRoom = async (user: string, room: string): Promise<void> => {
 
 const sendMessage = async (message: string): Promise<void> => {
   try {
-    if (connection.value !== null) { await connection.value.invoke('SendCard', message) }
+    if (connection.value !== null) {
+      await connection.value.invoke('SendCard', message)
+      newMessage.value = '';
+    }
   } catch (e) {
     console.log(e)
   }
@@ -73,11 +78,15 @@ const closeConnection = async (): Promise<void> => {
         <Button type="submit" @click="joinRoom(user, room)" :disabled="!user || !room">Enter</Button>
       </div>
     </template>
-    <template v-else>
+    <template v-else> <!-- Here is where we go after they have pressed join -->
       <p>In chat</p>
       <div v-for="(m, index) in messages" :key="index">
         <div class="bg-primary">{{ m.message }}</div>
         <div>{{ m.user }}</div>
+      </div>
+      <div>
+        <InputText v-model="newMessage" placeholder="Type your message..." />
+        <Button @click="() => sendMessage(newMessage)" :disabled="!newMessage">Send</button>
       </div>
     </template>
   </div>

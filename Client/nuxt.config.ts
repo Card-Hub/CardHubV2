@@ -18,5 +18,5 @@ export default defineNuxtConfig({
       inputStyle: 'filled'
     }
   },
-  css: ['primevue/resources/themes/aura-dark-noir/theme.css']
+  css: ['primevue/resources/themes/aura-dark-noir/theme.css', "~/assets/css/cardhub.css"]
 })

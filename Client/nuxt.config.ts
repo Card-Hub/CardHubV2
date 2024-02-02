@@ -18,5 +18,5 @@ export default defineNuxtConfig({
       inputStyle: 'filled'
     }
   },
-  css: ['primevue/resources/themes/fluent-light/theme.css']
+  css: ['primevue/resources/themes/card-hub-theme/theme.css']
 })

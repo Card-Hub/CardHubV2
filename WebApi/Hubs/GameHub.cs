@@ -11,7 +11,7 @@ public class UserConnection
 
 public class GameHub : Hub
 {
-    private const string BotUser = "Bot";
+    // private const string BotUser = "Bot";
     private IDictionary<string, UserConnection> _userConnections;
     
     public GameHub(IDictionary<string, UserConnection> userConnections)
@@ -24,7 +24,7 @@ public class GameHub : Hub
         if (_userConnections.TryGetValue(Context.ConnectionId, out var userConnection))
         {
             await Clients.Group(userConnection.Room)
-                .SendAsync("ReceiveCard", userConnection.User, message);
+                .SendAsync("ReceiveCard", $"from {userConnection.User}", message);
         }
     }
 
@@ -32,7 +32,7 @@ public class GameHub : Hub
     {
         _userConnections[Context.ConnectionId] = userConnection;//fixing bug
         await Groups.AddToGroupAsync(Context.ConnectionId, userConnection.Room);
-        await Clients.Group(userConnection.Room).SendAsync("ReceiveCard", BotUser,
+        await Clients.Group(userConnection.Room).SendAsync("ReceiveCard",
             $"{userConnection.User} has joined the room {userConnection.Room}");
         await SendConnectedUsers(userConnection.Room);
     }
@@ -49,7 +49,7 @@ public class GameHub : Hub
             return base.OnDisconnectedAsync(exception);
         
         _userConnections.Remove(Context.ConnectionId);
-        Clients.Group(userConnection.Room).SendAsync("ReceiveCard", BotUser,
+        Clients.Group(userConnection.Room).SendAsync("ReceiveCard",
             $"{userConnection.User} has left the room {userConnection.Room}");
         SendConnectedUsers(userConnection.Room);
 

@@ -24,7 +24,7 @@ builder.Services.AddCors(options =>
     {
         policyBuilder.AllowAnyMethod()
             .AllowAnyHeader()
-            .WithOrigins("https://fresher-vue-asp.vercel.app")
+            .WithOrigins("https://playcardhub.vercel.app")
             .AllowCredentials();
     });
 });

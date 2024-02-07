@@ -6,11 +6,14 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   ssr: false,
   // spaLoadingTemplate: true,
-  modules: ['nuxt-primevue', 'nuxt-svgo', '@nuxtjs/tailwindcss'],
+  modules: ['@pinia/nuxt', '@nuxtjs/tailwindcss', 'nuxt-primevue', 'nuxt-svgo'],
   runtimeConfig: {
     public: {
       baseURL: process.env.BASE_URL
     },
+  },
+  pinia: {
+    storesDirs: ['./stores/**'],
   },
   primevue: {
     options: {

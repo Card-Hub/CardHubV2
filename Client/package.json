@@ -16,10 +16,13 @@
     "nuxt-svgo": "^4.0.0",
     "typescript": "^5.3.3",
     "vue": "^3.4.3",
+    "vue-gtag-next": "^1.14.0",
     "vue-router": "^4.2.5"
   },
   "dependencies": {
     "@microsoft/signalr": "^8.0.0",
+    "@pinia/nuxt": "^0.5.1",
+    "pinia": "^2.1.7",
     "primevue": "^3.47.2"
   },
   "description": "Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.",

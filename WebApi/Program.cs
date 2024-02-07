@@ -2,6 +2,8 @@ using WebApi.Controllers;
 using WebApi.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
 
 // Add services to the container.
 
@@ -29,6 +31,7 @@ builder.Services.AddCors(options =>
     });
 });
 builder.Services.AddSingleton<IDictionary<string, UserConnection>>(options => new Dictionary<string, UserConnection>());
+builder.Services.AddSingleton<HashSet<string>>(options => new HashSet<string>());
 builder.Services.AddSingleton<CardDbContext>();
 
 var app = builder.Build();
@@ -48,6 +51,6 @@ else
 
 app.UseAuthorization();
 app.MapControllers();
-app.MapHub<GameHub>("/game");
+app.MapHub<GameHub>("/gamehub");
 
 app.Run();

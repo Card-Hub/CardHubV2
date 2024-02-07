@@ -41,8 +41,9 @@ public class GameHub : Hub
         }
     }
 
-    public async Task SendCard(PlayingCard card)
+    public async Task SendCard(StandardCard card)
     {
+        Console.WriteLine("Send Card", card);
         if (_userConnections.TryGetValue(Context.ConnectionId, out var userConnection))
         {
             try
@@ -54,24 +55,29 @@ public class GameHub : Hub
                 {
                     throw new Exception("Gameboard not found");
                 }
-                await Clients.Client(gameboardId).SendAsync("ReceiveCard", card);
+
+                await Clients.Client(gameboardId).SendAsync("ReceiveCard", userConnection.User, card);
             }
             catch (Exception e)
             {
                 Console.WriteLine("Send Card Error:", e);
                 throw;
             }
-            
         }
     }
 
     public async Task JoinRoom(UserConnection userConnection)
     {
+        Console.WriteLine("Join Room", userConnection);
         await Groups.AddToGroupAsync(Context.ConnectionId, userConnection.Room);
         userConnection.ConnectionId = Context.ConnectionId;
         _userConnections[Context.ConnectionId] = userConnection;
-        await Clients.Group(userConnection.Room).SendAsync("ReceiveMessage", BotUser,
-            $"{userConnection.User} has joined the room {userConnection.Room}");
+        await Clients.Group(userConnection.Room).SendAsync("ReceiveMessage",
+            new UserMessage()
+            {   
+                User = BotUser,
+                Message = $"{userConnection.User} has joined the room {userConnection.Room}"
+            });
         await SendConnectedUsers(userConnection.Room);
     }
 

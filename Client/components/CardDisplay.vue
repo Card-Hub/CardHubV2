@@ -4,15 +4,9 @@ import { defineProps, defineEmits } from 'vue';
 // https://vuejs.org/guide/typescript/composition-api.html
 // this source apples to many of the components in this .vue file, playerhand.vue
 
-interface Card {
-  id: number
-  value: string
-  suit: string
-}
-
 const props = defineProps<{
   card: {
-    type: Card,
+    type: StandardCard,
     required: true
   };
   isSelected: {

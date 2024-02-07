@@ -1,17 +1,9 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  // devServer: {
-  //   https: true
-  // },
+  css: ['primevue/resources/themes/aura-dark-noir/theme.css', "~/assets/css/cardhub.css"],
   devtools: { enabled: true },
-  ssr: false,
   // spaLoadingTemplate: true,
   modules: ['@pinia/nuxt', '@nuxtjs/tailwindcss', 'nuxt-primevue', 'nuxt-svgo'],
-  runtimeConfig: {
-    public: {
-      baseURL: process.env.BASE_URL
-    },
-  },
   pinia: {
     storesDirs: ['./stores/**'],
   },
@@ -21,5 +13,13 @@ export default defineNuxtConfig({
       inputStyle: 'filled'
     }
   },
-  css: ['primevue/resources/themes/aura-dark-noir/theme.css', "~/assets/css/cardhub.css"]
+  runtimeConfig: {
+    public: {
+      baseURL: process.env.BASE_URL
+    },
+  },
+  ssr: false,
+  svgo: {
+    autoImportPath: './assets/icons/'
+  }
 })

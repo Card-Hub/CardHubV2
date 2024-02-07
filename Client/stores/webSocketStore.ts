@@ -1,13 +1,23 @@
 import {defineStore} from 'pinia'
-import {HttpTransportType, type HubConnection, HubConnectionBuilder, LogLevel} from '@microsoft/signalr'
+import {
+    HttpTransportType,
+    type HubConnection,
+    HubConnectionBuilder,
+    HubConnectionState,
+    LogLevel
+} from '@microsoft/signalr'
 import {ref} from 'vue'
-import PlayingCard from "~/components/PlayingCard.vue";
 
 export const useWebSocketStore = defineStore('webSocket', () => {
 
+    enum UserType {
+        Gameboard,
+        Player
+    }
+
     const connection = ref<HubConnection | null>(null)
+    const cards = ref<StandardCard[]>([]);
     const messages = ref<UserMessage[]>([])
-    const cards = ref<Card[]>([]);
     const users = ref<string[]>([])
     const user = ref('')
     const room = ref('')
@@ -51,29 +61,35 @@ export const useWebSocketStore = defineStore('webSocket', () => {
                 messages.value.push(userMessage);
             })
 
-            joinConnection.on('ReceiveCard', (fromUser: string, card: Card) => {
+            joinConnection.on('ReceiveCard', (fromUser: string, card: StandardCard) => {
                 cards.value.push(card);
+                console.log(card);
             })
 
-            joinConnection.on('UsersInRoom', (users) => {
-                users.value = users;
+            joinConnection.on('UsersInRoom', (groupUsers: string[]) => {
+                users.value = groupUsers;
             })
 
             joinConnection.onclose(() => {
                 connection.value = null;
                 messages.value = [];
                 users.value = [];
+                console.log("DISCONNECTED FROM SERVER")
             })
 
             await joinConnection.start();
             await joinConnection.invoke('JoinRoom', { user, room, userType });
             connection.value = joinConnection;
+
+            if (joinConnection.state === HubConnectionState.Connected) {
+                console.log("User connected")
+            }
         } catch (e) {
             console.log('HubConnection Error:', e);
         }
     }
 
-    const sendCard = async (card: Card): Promise<void> => {
+    const sendCard = async (card: StandardCard): Promise<void> => {
         try {
             if (connection.value !== null) { await connection.value.invoke('SendCard', card) }
         } catch (e) {

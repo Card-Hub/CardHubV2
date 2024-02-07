@@ -1,5 +1,13 @@
 <script setup lang="ts">
 
+  const getLogo = () => {
+    return new URL('../assets/icons/logos/combination.svg', import.meta.url);
+  };
+
+  const getPearl = () => {
+    return new URL('../assets/icons/logos/pearl.svg', import.meta.url);
+  };
+
 </script>
 
 <template>
@@ -8,7 +16,8 @@
     <br> <br>
     
     <div class="starter">
-      <img class="cardhub-logo" alt="Cardhub logo" src="../assets/icons/logos/combination.svg"/>
+      <img class="cardhub-logo" alt="Cardhub logo" 
+           :src= 'getLogo()' />
       <h3 class="basic-info"> CS 426 Senior Projects | Spring 2024
         <br> University of Nevada, Reno | CSE Department
         <!--      <img alt="Pearl logo" src="../assets/icons/logos/pearl.svg" style="width: 50px; height: 50px;"/>-->
@@ -35,7 +44,8 @@
     <br> <br>
     
     <div class="team">
-      <img alt="Team Pearl" src="../assets/icons/logos/pearl.svg" style="width: 200px; height: 90px;"/>
+      <img alt="Team Pearl" 
+           :src="getPearl()" style="width: 300px; height: 90px;"/>
       <h2> Meet the Team! </h2>
       <p> Pictures to be uploaded later </p>
     </div>
@@ -98,7 +108,7 @@
   }
   
   .cardhub-logo{
-    width: 300px;
+    width: 400px;
     height: 200px;
   }
 

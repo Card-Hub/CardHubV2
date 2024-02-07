@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import {
-    HttpTransportType,
+    // HttpTransportType,
     type HubConnection,
     HubConnectionBuilder,
     HubConnectionState,
@@ -78,7 +78,7 @@ export const useWebSocketStore = defineStore("webSocket", () => {
             // HubConnection configuration
             // https://learn.microsoft.com/en-us/aspnet/core/signalr/configuration?view=aspnetcore-8.0&tabs=dotnet#configure-client-options
             const joinConnection = new HubConnectionBuilder()
-                .withUrl(webSocketUrl, { transport: HttpTransportType.WebSockets, accessTokenFactory: () => "" })
+                .withUrl(webSocketUrl)
                 .withStatefulReconnect()
                 .withAutomaticReconnect()
                 .configureLogging(LogLevel.Debug)

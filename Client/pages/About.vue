@@ -1,5 +1,7 @@
 <script setup lang="ts">
 
+  import Header from "~/components/Header.vue";
+
   const getLogo = () => {
     return new URL('../assets/icons/logos/combination.svg', import.meta.url);
   };
@@ -12,6 +14,7 @@
 
 <template>
 <!--  <div class="flex flex-wrap justify-center items-center">-->
+  <Header2 />
   <div class="all-info">
     <br> <br>
     
@@ -65,7 +68,7 @@
         <br> <a href="https://www.w3.org/WAI/WCAG22/quickref/"> WCAG Guidelines </a> </p>
     </div>
   </div>
-  
+  <Footer />
 </template>
 
 <style scoped>

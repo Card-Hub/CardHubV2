@@ -2,12 +2,7 @@
 
 import { ref, onMounted } from 'vue';
 import PlayingCard from "~/components/PlayingCard.vue";
-
-type Card = {
-  id: number
-  value: string
-  suit: string
-}
+import type { Card } from "../typescript/types"
 
 const cards = ref<Array<Card> | null>(null);
 

@@ -1,11 +1,12 @@
 <script setup lang="ts">
-  // props are passed from the parent component
-  
-  type Card = {
-    id: number
-    value: string
-    suit: string
-  }
+  // props are passed from the parent component containing all child components.
+  import type { Card }from "../typescript/types"
+
+  // type Card = {
+  //   id: number
+  //   value: string
+  //   suit: string
+  // }
   
   const props = defineProps({
     playingCards: {
@@ -44,7 +45,7 @@
       />
       <div class="absolute top-2 left-2 text-Slg font-bold text-black">{{ card.value }}</div>
 <!--      <div class="absolute bottom-2 right-2 text-lg font-bold text-black">{{ card.value }}</div>-->
-    </div>
+  </div>
   </div>
 </template>
 

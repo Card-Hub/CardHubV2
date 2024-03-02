@@ -1,26 +1,21 @@
 <script setup lang="ts">
 import { defineProps, defineEmits, ref } from 'vue';
-import CardDisplay from './CardDisplay.vue';
-
-type Card = {
-  id: number
-  value: string
-  suit: string
-};
 
 const props = defineProps({
   playerHand: {
-    type: Array as PropType<Card[]>,
+    type: Array as PropType<StandardCard[]>,
     required: true
   },
 });
 
-const selectedCard = ref<Card | null>(null);
-const emits = defineEmits();
+const selectedCard = ref<StandardCard | null>(null);
+const emit = defineEmits<{
+  cardClick: [card: StandardCard]
+}>()
 
-const handleCardClick = (card: Card) => {
+const handleCardClick = (card: StandardCard) => {
   selectedCard.value = card;
-  emits('cardClick', card);
+  emit('cardClick', card);
 };
 </script>
 

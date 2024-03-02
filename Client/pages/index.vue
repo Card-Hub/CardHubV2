@@ -38,10 +38,10 @@ const getPearl = () => {
       </div>
     </transition>
     
-    
     <div v-if="!showText" class="join-button">
       <NuxtLink href="/join"> <Button>Play Now</Button> </NuxtLink>
     </div>
+
   </div>
 </template>
 

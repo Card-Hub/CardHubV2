@@ -1,3 +1,15 @@
-﻿p {
-    color: red;
+﻿:root {
+    --header-background-color: rgb(23, 2, 5);
+    --cardhub-red: #D60E26;
+    --cardhub-red-light: #f54c60; 
+}
+.p-button.p-component {
+    background-color: var(--cardhub-red);
+    border: none;
+}
+.p-button.p-component:hover{
+    background-color: var(--cardhub-red-light);
+}
+body {
+    margin: 0;
 }

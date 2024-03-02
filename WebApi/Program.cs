@@ -33,7 +33,7 @@ builder.Services.AddCors(options =>
     {
         policyBuilder.AllowAnyMethod()
             .AllowAnyHeader()
-            .WithOrigins("https://playcardhub.vercel.app", "https://playcardhub.com")
+            .WithOrigins("https://playcardhub.vercel.app", "https://www.playcardhub.com")
             .AllowCredentials();
     });
 });

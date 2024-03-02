@@ -1,7 +1,7 @@
 ﻿export { };
 
 declare global {
-    interface Card {
+    interface StandardCard {
         id: number
         value: string
         suit: string
@@ -10,11 +10,6 @@ declare global {
     interface UserMessage {
         user: string
         message: string
-    }
-
-    enum UserType {
-        Gameboard,
-        Player
     }
 
 }

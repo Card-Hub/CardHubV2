@@ -1,12 +1,12 @@
 ﻿<script setup lang="ts">
-import { storeToRefs } from 'pinia'
+import { storeToRefs } from "pinia";
 import { useWebSocketStore } from "~/stores/webSocketStore";
-import toast from '@/utils/toast'
+import toast from "@/utils/toast";
 
 
 const store = useWebSocketStore();
-const { connection, messages, cards, users, user, room } = storeToRefs(store);
-const { createRoom, tryJoinRoom } = store;
+const { connection, isConnected, messages, user, room } = storeToRefs(store);
+const { tryCreateRoom, tryJoinRoom } = store;
 
 const isValidRoomCode = computed(() => {
   const digitRegex = /^\d+$/;
@@ -14,24 +14,30 @@ const isValidRoomCode = computed(() => {
 });
 
 const connectPlayer = async (): Promise<void> => {
-  const isValidRoomCode = await tryJoinRoom();
-  if (isValidRoomCode) {
-    await navigateTo('/playerview');
+  const isCorrectRoomCode = await tryJoinRoom();
+  if (isCorrectRoomCode) {
+    // await navigateTo('/playerview');
+    await navigateTo("/lobby");
   } else {
     toast.add({
-      severity: 'error',
-      summary: 'That pin doesn\'t look right',
-      detail: 'Please check and try again',
+      severity: "error",
+      summary: "That pin doesn't look right",
+      detail: "Please check and try again",
       life: 5000
     });
   }
-}
+};
 
 const connectGameboard = async (): Promise<void> => {
-  await createRoom();
-  await navigateTo('/playerview');
-}
+  const isRoomCreated = await tryCreateRoom();
+  if (isRoomCreated) {
+    // await navigateTo('/playerview');
+    await navigateTo("/lobby");
+  }
+};
 
+console.log("check here for connectivity", isConnected.value);
+console.log("check here for obj", connection.value);
 </script>
 
 <template>

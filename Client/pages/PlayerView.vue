@@ -3,10 +3,9 @@ import { ref, onMounted } from 'vue';
 import { useWebSocketStore } from "~/stores/webSocketStore";
 
 const store = useWebSocketStore();
-const { connection, messages, cards, users, user, room } = storeToRefs(store);
-const { sendCard } = store;
+const { connection, isConnected, cards, messages, users, user, room } = storeToRefs(store);
+const { tryJoinRoom, sendCard } = store;
 
-// const cards = ref<Array<Card> | null>(null);
 const playerHand = ref<StandardCard[]>([]);
 const selectedCard = ref<StandardCard | null>(null);
 
@@ -32,6 +31,9 @@ const handleCardClick = (card: StandardCard) => {
   selectedCard.value = card;
   sendCard(card)
 };
+
+console.log("check here for connectivity", isConnected.value);
+console.log("check here for obj", connection.value);
 </script>
 
 <template>

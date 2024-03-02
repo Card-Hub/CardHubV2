@@ -9,7 +9,7 @@ namespace WebApi.Controllers;
 
 public class CardDbContext: DbContext
 {
-    public DbSet<PlayingCard> cards { get; set; }
+    public DbSet<StandardCard> cards { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -33,7 +33,7 @@ public class CardsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<PlayingCard>>> GetCards()
+    public async Task<ActionResult<IEnumerable<StandardCard>>> GetCards()
     {
         var cards = await _context.cards.ToListAsync();
         return Ok(cards);

@@ -1,26 +1,80 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
+import Header2 from "~/components/Header2.vue";
 
-const cards = ref<Array<StandardCard> | null>(null);
+const showText = ref(true);
 
-onMounted(async () => {
-  try {
-    const response = await fetch('https://localhost:7085/Cards');
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-    cards.value = await response.json();
-  } catch (error) {
-    console.error('Error fetching cards:', error);
-  }
+onMounted(() => {
+  // Show initial message for a certain duration
+  setTimeout(() => {
+    showText.value = false;
+  }, 2000); // duration
 });
+const getLogo = () => {
+  return new URL('../assets/icons/logos/combination.svg', import.meta.url);
+};
 
+const getPearl = () => {
+  return new URL('../assets/icons/logos/pearl.svg', import.meta.url);
+};
 </script>
 
 <template>
-  <div>
-    <h1>Playing Cards</h1>
-    <PlayingCard :playingCards="cards"></PlayingCard>
-    <h2>Card Data from C# Backend</h2>
+  <Header2 v-if="!showText"/>
+  <div class="home-page">
+    <transition name="fade">
+      <div v-if="showText" class="initial-message">
+        <img class="pearl-logo" alt="pearl logo" 
+             :src= 'getPearl()' />
+        <br> <h1> Presents... </h1>
+      </div>
+    </transition>
+    
+    <transition name="fade">
+      <div v-if="!showText" class="main-info"> 
+<!--        <h1> Welcome to </h1> <br>-->
+        <img class="cardhub-logo" alt="Cardhub logo"
+             :src= 'getLogo()' />
+      </div>
+    </transition>
+    
+    
+    <div v-if="!showText" class="join-button">
+      <NuxtLink href="/join"> <Button>Play Now</Button> </NuxtLink>
+    </div>
   </div>
 </template>
+
+<style scoped>
+.home-page {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  height: 90vh;
+}
+
+.initial-message, .main-info {
+  text-align: center;
+  
+}
+
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.5s;
+}
+
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+}
+
+.cardhub-logo {
+  align-items: center;
+  width: 100%;
+}
+
+.join-button{
+  text-align: center;
+  margin-top: 50px;
+}
+</style>

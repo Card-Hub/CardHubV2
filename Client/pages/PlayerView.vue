@@ -11,6 +11,7 @@ const { tryJoinRoom, sendCard } = store;
 const playerHand = ref<StandardCard[]>([]);
 const selectedCard = ref<StandardCard | null>(null);
 
+//https://vuejs.org/guide/essentials/component-basics.html#passing-props
 onMounted(async () => {
   console.log("in the onMounted for PlayerView");
   try {

@@ -9,7 +9,11 @@ const { sendMessage } = store;
 </script>
 
 <template>
-
+  <NuxtLink to="/playerview">
+    <Button>
+      Player View
+    </Button>
+  </NuxtLink>
 </template>
 
 <style scoped>

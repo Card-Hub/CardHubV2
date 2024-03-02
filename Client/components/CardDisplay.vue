@@ -9,10 +9,7 @@ const props = defineProps<{
     type: StandardCard,
     required: true
   };
-  isSelected: {
-    type: Boolean;
-    default: false;
-  };
+  isSelected: Boolean;
 }>();
 // console.log(props.card);
 

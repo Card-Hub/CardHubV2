@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { onMounted, ref } from "vue";
 import { useWebSocketStore } from "~/stores/webSocketStore";
+
+const { $api } = useNuxtApp();
 
 const store = useWebSocketStore();
 const { connection, isConnected, cards, messages, users, user, room } = storeToRefs(store);
@@ -10,12 +12,9 @@ const playerHand = ref<StandardCard[]>([]);
 const selectedCard = ref<StandardCard | null>(null);
 
 onMounted(async () => {
+  console.log("in the onMounted for PlayerView");
   try {
-    const response = await fetch('https://localhost:7085/Cards');
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-    cards.value = await response.json();
+    cards.value = await $api("Cards", { method: "GET" });
 
     // For illustration purposes, add all fetched cards to the player's hand
     playerHand.value = cards.value || [];

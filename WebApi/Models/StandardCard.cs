@@ -1,6 +1,6 @@
 ﻿namespace WebApi.Models;
 
-public class PlayingCard
+public class StandardCard
 {
     public int id { get; set; }
     public string suit { get; set; }

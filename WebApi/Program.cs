@@ -1,3 +1,4 @@
+using WebApi.Common;
 using WebApi.Controllers;
 using WebApi.Hubs;
 
@@ -12,21 +13,27 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddSignalR();
+builder.Services.AddSignalR(hubOptions =>
+{
+    if (builder.Environment.IsDevelopment())
+    {
+        hubOptions.EnableDetailedErrors = true;
+    }
+});
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("DevelopmentPolicy", policyBuilder =>
     {
         policyBuilder.AllowAnyMethod()
             .AllowAnyHeader()
-            .WithOrigins("https://localhost:5173", "http://localhost:3000")
+            .WithOrigins("http://localhost:3000")
             .AllowCredentials();
     });
     options.AddPolicy("ProductionPolicy", policyBuilder =>
     {
         policyBuilder.AllowAnyMethod()
             .AllowAnyHeader()
-            .WithOrigins("https://playcardhub.vercel.app")
+            .WithOrigins("https://playcardhub.vercel.app", "https://playcardhub.com")
             .AllowCredentials();
     });
 });
@@ -51,6 +58,9 @@ else
 
 app.UseAuthorization();
 app.MapControllers();
-app.MapHub<GameHub>("/gamehub");
+app.MapHub<BaseHub>("/basehub", options =>
+{
+    options.AllowStatefulReconnects = true;
+});
 
 app.Run();

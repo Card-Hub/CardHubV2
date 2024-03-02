@@ -36,12 +36,6 @@ public class GameController : ControllerBase
     [HttpGet("VerifyCode/{id}")]
     public ActionResult<bool> VerifyCode(string id)
     {
-        // Console.WriteLine($"Room code entered: --{id}--");
-        // Console.WriteLine(id);
-        // foreach (var roomCode in _roomCodes)
-        // {
-        //     Console.WriteLine(roomCode);
-        // }
         return Ok(_roomCodes.Contains(id));
     }
 }

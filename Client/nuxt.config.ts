@@ -1,25 +1,27 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  // devServer: {
-  //   https: true
-  // },
-  devtools: { enabled: true },
-  ssr: false,
-  // spaLoadingTemplate: true,
-  modules: ['@pinia/nuxt', '@nuxtjs/tailwindcss', 'nuxt-primevue', 'nuxt-svgo'],
-  runtimeConfig: {
-    public: {
-      baseURL: process.env.BASE_URL
+    css: ["primevue/resources/themes/aura-dark-noir/theme.css", "~/assets/css/cardhub.css"],
+    devtools: { enabled: true },
+    // spaLoadingTemplate: true,
+    modules: ["@pinia/nuxt", "@nuxtjs/tailwindcss", "nuxt-primevue", "nuxt-svgo"],
+    pinia: {
+        storesDirs: ["./stores/**"]
     },
-  },
-  pinia: {
-    storesDirs: ['./stores/**'],
-  },
-  primevue: {
-    options: {
-      ripple: true,
-      inputStyle: 'filled'
+    primevue: {
+        options: {
+            ripple: true,
+            inputStyle: "filled"
+        }
+    },
+    runtimeConfig: {
+        public: {
+            baseURL: process.env.BASE_URL,
+            hubPath: "basehub", // SignalR hub path, must be same as one in Program.cs
+            reconnectTimeout: 30 // Seconds
+        }
+    },
+    ssr: false,
+    svgo: {
+        autoImportPath: "./assets/icons/"
     }
-  },
-  css: ['primevue/resources/themes/aura-dark-noir/theme.css', "~/assets/css/cardhub.css"]
-})
+});

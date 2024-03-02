@@ -1,102 +1,169 @@
-import {defineStore} from 'pinia'
-import {HttpTransportType, type HubConnection, HubConnectionBuilder, LogLevel} from '@microsoft/signalr'
-import {ref} from 'vue'
-import PlayingCard from "~/components/PlayingCard.vue";
+import { defineStore } from "pinia";
+import {
+    HttpTransportType,
+    type HubConnection,
+    HubConnectionBuilder,
+    HubConnectionState,
+    LogLevel
+} from "@microsoft/signalr";
+import { ref } from "vue";
 
-export const useWebSocketStore = defineStore('webSocket', () => {
+export const useWebSocketStore = defineStore("webSocket", () => {
+    const { $api } = useNuxtApp();
 
-    const connection = ref<HubConnection | null>(null)
-    const messages = ref<UserMessage[]>([])
-    const cards = ref<Card[]>([]);
-    const users = ref<string[]>([])
-    const user = ref('')
-    const room = ref('')
-
-    // Allows Gameboard device to join Group
-    const createRoom = async (): Promise<void> => {
-        const { data } = await useApi<string>("game/createroom", { method: 'POST' });
-        if (data.value) {
-            room.value = data.value;
-            console.log('Room created: ', room.value);
-            await joinRoom(user.value, room.value, UserType.Gameboard);
-        }
+    enum UserType {
+        Gameboard,
+        Player
     }
 
-    // Allows Player device to join Group
+    const connection = ref<HubConnection | null>(null);
+    const isConnected = computed(() => connection.value !== null && connection.value.state === HubConnectionState.Connected);
+
+    const cards = ref<StandardCard[]>([]);
+    const messages = ref<UserMessage[]>([]);
+    const users = ref<string[]>([]);
+
+    const user = ref("");
+    const room = ref("");
+
+    const runtimeConfig = useRuntimeConfig();
+    const reconnectTimeout = runtimeConfig.public.reconnectTimeout;
+
+    // Users have 60 seconds to reconnect to the server
+    // using client-side cookies
+    const cookieUser = useCookie<string>("user", { maxAge: reconnectTimeout });
+    const cookieRoom = useCookie<string>("room", { maxAge: reconnectTimeout });
+
+
+    // Attempt to create a new room for the Gameboard device
+    const tryCreateRoom = async (): Promise<boolean> => {
+        try {
+            room.value = await $api<string>("game/createroom", { method: "POST" });
+            console.log("Room created: ", room.value);
+            await joinRoom(user.value, room.value, UserType.Gameboard);
+            return true;
+        } catch (e) {
+            console.log(e);
+        }
+
+        console.log("Failed to create room");
+        return false;
+    };
+
+    // Attempt to join an existing room as a Player device
     const tryJoinRoom = async (): Promise<boolean> => {
+        if (isConnected.value) return true;
+
         if (user.value && room.value) {
-            const { data } = await useApi<boolean>(`game/verifycode/${ room.value }`, { method: 'GET' });
-            if (data.value) {
+            try {
+                const roomCodeExists = await $api<boolean>(`game/verifycode/${ room.value }`, { method: "GET" });
+                if (!roomCodeExists) {
+                    console.log("Invalid room code");
+                    return false;
+                }
                 await joinRoom(user.value, room.value, UserType.Player);
                 return true;
+            } catch (e) {
+                console.log(e);
             }
-            console.log('Invalid room code');
         }
+
+        console.log("Failed to join room");
         return false;
-    }
+    };
 
     const joinRoom = async (user: string, room: string, userType: UserType): Promise<void> => {
+        const webSocketUrl = `${ runtimeConfig.public.baseURL }/${ runtimeConfig.public.hubPath }`;
         try {
-            const runtimeConfig = useRuntimeConfig();
-            const webSocketUrl = `${ runtimeConfig.public.baseURL }/gamehub`;
+            // HubConnection configuration
+            // https://learn.microsoft.com/en-us/aspnet/core/signalr/configuration?view=aspnetcore-8.0&tabs=dotnet#configure-client-options
             const joinConnection = new HubConnectionBuilder()
-                .withUrl(webSocketUrl, {
-                    skipNegotiation: true,
-                    transport: HttpTransportType.WebSockets
-                })
-                .configureLogging(LogLevel.Information)
+                .withUrl(webSocketUrl, { transport: HttpTransportType.WebSockets, accessTokenFactory: () => "" })
+                .withStatefulReconnect()
+                .withAutomaticReconnect()
+                .configureLogging(LogLevel.Debug)
                 .build();
 
-            joinConnection.on('ReceiveMessage', (userMessage: UserMessage) => {
+            joinConnection.on("ReceiveMessage", (userMessage: UserMessage) => {
                 messages.value.push(userMessage);
-            })
+                console.log(userMessage);
+            });
 
-            joinConnection.on('ReceiveCard', (fromUser: string, card: Card) => {
+            joinConnection.on("ReceiveCard", (fromUser: string, card: StandardCard) => {
                 cards.value.push(card);
-            })
+                console.log(card);
+            });
 
-            joinConnection.on('UsersInRoom', (users) => {
-                users.value = users;
-            })
+            joinConnection.on("UsersInRoom", (groupUsers: string[]) => {
+                users.value = groupUsers;
+            });
 
-            joinConnection.onclose(() => {
-                connection.value = null;
-                messages.value = [];
-                users.value = [];
-            })
+            joinConnection.onclose(async () => {
+                // connection.value = null;
+                // messages.value = [];
+                // users.value = [];
+                // await sendMessage("Reconnected to server");
+                console.log("DISCONNECTED FROM SERVER");
+                await joinConnection.start();
+            });
+
+            joinConnection.onreconnecting(() => {
+                console.log("RECONNECTING TO SERVER");
+            });
+
+            joinConnection.onreconnected(() => {
+                console.log("RECONNECTED TO SERVER");
+                connection.value = joinConnection;
+            });
 
             await joinConnection.start();
-            await joinConnection.invoke('JoinRoom', { user, room, userType });
+            await joinConnection.invoke("JoinRoom", { user, room, userType });
             connection.value = joinConnection;
-        } catch (e) {
-            console.log('HubConnection Error:', e);
-        }
-    }
 
-    const sendCard = async (card: Card): Promise<void> => {
-        try {
-            if (connection.value !== null) { await connection.value.invoke('SendCard', card) }
+            if (joinConnection.state === HubConnectionState.Connected) {
+                console.log("User connected");
+                cookieUser.value = user;
+                cookieRoom.value = room;
+            }
         } catch (e) {
-            console.log(e)
+            console.log("HubConnection Error:", e);
         }
-    }
+    };
+
+    const sendCard = async (card: StandardCard): Promise<void> => {
+        try {
+            if (connection.value !== null) {
+                await connection.value.invoke("SendCard", card);
+            }
+        } catch (e) {
+            console.log(e);
+        }
+    };
 
     const sendMessage = async (message: string): Promise<void> => {
         try {
-            if (connection.value !== null) { await connection.value.invoke('SendMessage', message) }
+            if (connection.value !== null) {
+                await connection.value.invoke("SendMessage", message);
+            }
         } catch (e) {
-            console.log(e)
+            console.log(e);
         }
-    }
+    };
 
     const closeConnection = async (): Promise<void> => {
         try {
-            if (connection.value !== null) { await connection.value.stop() }
+            if (connection.value !== null) {
+                await connection.value.stop();
+            }
         } catch (e) {
-            console.log(e)
+            console.log(e);
         }
-    }
+    };
 
-    return { connection, messages, cards, users, user, room,
-        createRoom, tryJoinRoom, sendCard, sendMessage, closeConnection  }
-})
+    // Must return all state properties
+    // https://pinia.vuejs.org/core-concepts/
+    return {
+        connection, isConnected, cards, messages, users, user, room, cookieUser, cookieRoom,
+        tryCreateRoom, tryJoinRoom, sendCard, sendMessage, closeConnection
+    };
+});

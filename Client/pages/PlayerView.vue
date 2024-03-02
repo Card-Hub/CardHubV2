@@ -13,6 +13,7 @@ const cards = ref<Array<Card> | null>(null);
 const playerHand = ref<Card[]>([]);
 const selectedCard = ref<Card | null>(null);
 
+//https://vuejs.org/guide/essentials/component-basics.html#passing-props
 onMounted(async () => {
   try {
     const response = await fetch('https://localhost:7085/Cards');

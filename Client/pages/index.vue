@@ -1,112 +1,80 @@
 <script setup lang="ts">
-
 import { ref, onMounted } from 'vue';
-import PlayingCard from "~/components/PlayingCard.vue";
+import Header2 from "~/components/Header2.vue";
 
-type Card = {
-  id: number
-  value: string
-  suit: string
-}
+const showText = ref(true);
 
-const cards = ref<Array<Card> | null>(null);
-
-//https://vuejs.org/guide/essentials/component-basics.html#passing-props
-onMounted(async () => {
-  try {
-    const response = await fetch('https://localhost:7085/Cards');
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-    cards.value = await response.json();
-  } catch (error) {
-    console.error('Error fetching cards:', error);
-  }
+onMounted(() => {
+  // Show initial message for a certain duration
+  setTimeout(() => {
+    showText.value = false;
+  }, 2000); // duration
 });
+const getLogo = () => {
+  return new URL('../assets/icons/logos/combination.svg', import.meta.url);
+};
 
-// import { defineComponent } from 'vue'
-//
-// const URL = 'https://localhost:7085'
-// console.log(URL)
-//
-// type Forecasts = Array<{
-//   date: string
-//   temperatureC: string
-//   temperatureF: string
-//   summary: string
-// }>
-//
-// interface Data {
-//   loading: boolean
-//   post: null | Forecasts
-// }
-//
-// export default defineComponent({
-//   data (): Data {
-//     return {
-//       loading: false,
-//       post: null as Forecasts | null
-//     }
-//   },
-//   created () {
-//     // fetch the data when the view is created and the data is
-//     // already being observed
-//     this.fetchData()
-//   },
-//   watch: {
-//     // call again the method if the route changes
-//     $route: 'fetchData'
-//   },
-//   methods: {
-//     fetchData (): void {
-//       this.post = null
-//       this.loading = true
-//
-//       fetch(`${URL}/weatherforecast`)
-//         .then(async r => await r.json())
-//         .then(json => {
-//           this.post = json as Forecasts
-//           this.loading = false
-//         }).catch(e => { console.error(e) })
-//     }
-//   }
-// })
+const getPearl = () => {
+  return new URL('../assets/icons/logos/pearl.svg', import.meta.url);
+};
 </script>
 
 <template>
-<!--  <div>-->
-<!--    <h1>Weather forecast</h1>-->
-<!--    <p>This component demonstrates fetching data from the server.</p>-->
-<!--    <div v-if="loading">Loading...</div>-->
-<!--    <div>-->
-<!--      <table>-->
-<!--        <thead>-->
-<!--        <tr>-->
-<!--          <th>Date</th>-->
-<!--          <th>Temp. (C)</th>-->
-<!--          <th>Temp. (F)</th>-->
-<!--          <th>Summary</th>-->
-<!--        </tr>-->
-<!--        </thead>-->
-<!--        <tbody>-->
-<!--        <tr v-for="forecast in post" :key="forecast.date">-->
-<!--          <td>{{ forecast.date }}</td>-->
-<!--          <td>{{ forecast.temperatureC }}</td>-->
-<!--          <td>{{ forecast.temperatureF }}</td>-->
-<!--          <td>{{ forecast.summary }}</td>-->
-<!--        </tr>-->
-<!--        </tbody>-->
-<!--      </table>-->
-<!--    </div>-->
-<!--  </div>-->
-  <div>
-    <h1>Playing Cards</h1>
-    <PlayingCard :playingCards="cards"></PlayingCard>
-    <h2>Card Data from C# Backend</h2>
-<!--    <ul>-->
-<!--      <li v-for="card in cards" :key="card.id">-->
-<!--        {{ card.value }} of {{ card.suit }}-->
-<!--      </li>-->
-<!--    </ul>-->
+  <Header2 v-if="!showText"/>
+  <div class="home-page">
+    <transition name="fade">
+      <div v-if="showText" class="initial-message">
+        <img class="pearl-logo" alt="pearl logo" 
+             :src= 'getPearl()' />
+        <br> <h1> Presents... </h1>
+      </div>
+    </transition>
+    
+    <transition name="fade">
+      <div v-if="!showText" class="main-info"> 
+<!--        <h1> Welcome to </h1> <br>-->
+        <img class="cardhub-logo" alt="Cardhub logo"
+             :src= 'getLogo()' />
+      </div>
+    </transition>
+    
+    
+    <div v-if="!showText" class="join-button">
+      <NuxtLink href="/join"> <Button>Play Now</Button> </NuxtLink>
+    </div>
   </div>
 </template>
+
+<style scoped>
+.home-page {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  height: 90vh;
+}
+
+.initial-message, .main-info {
+  text-align: center;
+  
+}
+
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.5s;
+}
+
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+}
+
+.cardhub-logo {
+  align-items: center;
+  width: 100%;
+}
+
+.join-button{
+  text-align: center;
+  margin-top: 50px;
+}
+</style>

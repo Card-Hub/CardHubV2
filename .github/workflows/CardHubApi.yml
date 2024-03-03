@@ -3,6 +3,11 @@ on:
   push:
     branches:
     - main
+    paths:
+    - 'WebApi/**'
+  pull_request:
+    paths: 
+    - 'WebApi/**'
 env:
   AZURE_WEBAPP_NAME: CardHubApi
   AZURE_WEBAPP_PACKAGE_PATH: WebApi\publish

@@ -21,10 +21,18 @@ public class CardDbContext: DbContext
 }
 
 public class Card {
-    public int id { get; set; }
-    public string suit { get; set; }
-    public string value { get; set; }
+    public int Id { get; set; }
+    public string? Suit { get; set; }
+    public string? Value { get; set; }
 }
+
+// public class Card
+// {
+//     public string? Suit { get; set; }
+//     public string? Value { get; set; }
+    
+//     // Rest of your class
+// }
 
 [ApiController]
 [Route("[controller]")]

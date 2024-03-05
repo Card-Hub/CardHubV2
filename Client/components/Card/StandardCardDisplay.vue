@@ -35,7 +35,7 @@ const getDisplayValue = (value: string) => {
 
 // https://stackoverflow.com/questions/56624817/passing-and-binding-img-src-from-props-in-vue-js
 const getSuitIcon = (suit: string) => {
-  return new URL(`../assets/icons/${suit.toLowerCase()}.svg`, import.meta.url);
+  return new URL(`../../assets/icons/standardDeck/${suit.toLowerCase()}.svg`, import.meta.url);
 };
 
 

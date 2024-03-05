@@ -1,5 +1,10 @@
 import { defineVitestConfig } from '@nuxt/test-utils/config'
 
 export default defineVitestConfig({
-    testDir: './tests/unit', // path to test files
+    test: {
+        environmentMatchGlobs: [
+            // all tests in tests/ will run in jsdom
+            ['tests/**', 'jsdom']
+        ]
+    }
 })

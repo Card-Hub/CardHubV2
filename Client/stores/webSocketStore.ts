@@ -43,17 +43,13 @@ export const useWebSocketStore = defineStore("webSocket", () => {
             await joinRoom(user.value, room.value, UserType.Gameboard);
             return true;
         } catch (e) {
-            console.log(e);
+            console.log("Failed to create room", e);
         }
-
-        console.log("Failed to create room");
         return false;
     };
 
     // Attempt to join an existing room as a Player device
     const tryJoinRoom = async (): Promise<boolean> => {
-        if (isConnected.value) return true;
-
         if (user.value && room.value) {
             try {
                 const roomCodeExists = await $api<boolean>(`game/verifycode/${ room.value }`, { method: "GET" });
@@ -114,6 +110,18 @@ export const useWebSocketStore = defineStore("webSocket", () => {
             joinConnection.onreconnected(() => {
                 console.log("RECONNECTED TO SERVER");
                 connection.value = joinConnection;
+
+                if (cookieUser.value && cookieRoom.value) {
+                    console.log("Reconnecting to group in store");
+                    try {
+                        const joinedRoom = tryJoinRoom();
+                        if (!joinedRoom) {
+                            navigateTo("/join");
+                        }
+                    } catch (error) {
+                        console.log("Unable to connect in middleware:", error);
+                    }
+                }
             });
 
             await joinConnection.start();

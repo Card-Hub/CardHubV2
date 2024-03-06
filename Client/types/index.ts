@@ -7,15 +7,11 @@ declare global {
         value: string
     }
     
-    interface StandardCard {
-        id: number
-        value: string
+    interface StandardCard extends Card {
         suit: string
     }
     
-    interface UNOCard {
-        id: number
-        value: string
+    interface UNOCard extends Card {
         color: string
     }
 

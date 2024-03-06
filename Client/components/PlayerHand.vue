@@ -1,28 +1,52 @@
 <script setup lang="ts">
 import { defineProps, defineEmits, ref } from 'vue';
+import StandardCardDisplay from './Card/StandardCardDisplay.vue';
+import UNOCardDisplay from "~/components/Card/UNOCardDisplay.vue";
 
 const props = defineProps({
   playerHand: {
-    type: Array as PropType<StandardCard[]>,
+    type: Array as PropType<Card[]>,
     required: true
   },
 });
 
-const selectedCard = ref<StandardCard | null>(null);
+const selectedCard = ref<Card | null>(null);
 const emit = defineEmits<{
-  cardClick: [card: StandardCard]
+  cardClick: [card: Card]
 }>()
 
-const handleCardClick = (card: StandardCard) => {
+const handleCardClick = (card: Card) => {
   selectedCard.value = card;
   emit('cardClick', card);
 };
+
+// determine which type of card to display
+const getCardComponent = (card: Card) => {
+  if (isStandardCard(card)) {
+    return StandardCardDisplay;
+  } else if (isUNOCard(card)) {
+    return UNOCardDisplay;
+  } else {
+    throw new Error('Invalid card type');
+  }
+};
+
+// helper functions to determine card type
+const isStandardCard = (card: Card): card is StandardCard => {
+  return 'suit' in card && 'value' in card;
+};
+
+const isUNOCard = (card: Card): card is UNOCard => {
+  return 'color' in card && 'value' in card;
+};
+
 </script>
 
 <template>
   <div class="player-hand">
-    <CardDisplay v-for="card in playerHand"
+    <component v-for="card in playerHand"
                  :key="card.id"
+                 :is="getCardComponent(card)"
                  :card="card"
                  :isSelected="selectedCard === card"
                   @cardClicked="handleCardClick"
@@ -32,6 +56,7 @@ const handleCardClick = (card: StandardCard) => {
 
 
 <style scoped>
+
   .player-hand {
     display: flex;
     justify-content: space-evenly;

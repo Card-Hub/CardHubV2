@@ -7,7 +7,7 @@ const menuItems = ref([
   { label: 'Home', icon: 'pi pi-home', to: '/' },
   { label: 'Our Games', icon: 'pi pi-th-large', to: '/games' },
   { label: 'Join Game', icon: 'pi pi-users', to: '/join' },
-  { label: 'Host Game', icon: 'pi pi-user-plus', to: '/host' }, // need to perhaps change this
+  { label: 'Host Game', icon: 'pi pi-user-plus', to: '/games' }, // need to perhaps change this
   { label: 'About', icon: 'pi pi-info-circle', to: '/about' }
 ]);
 

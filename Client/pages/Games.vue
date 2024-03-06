@@ -1,0 +1,99 @@
+<script setup lang="ts">
+import {ref} from 'vue';
+import Header2 from "../components/Header2.vue";
+
+// https://primevue.org/iconfield/
+import IconField from 'primevue/iconfield';
+import InputIcon from 'primevue/inputicon';
+
+
+const getLogo = () => {
+  return new URL('../assets/icons/logos/combination.svg', import.meta.url);
+};
+
+const popularGames = [
+  {
+    title: 'Uné',
+    // description: 'A classic card game that is easy to learn and fun to play!',
+    image: new URL('../assets/icons/unoDeck/UNE.svg', import.meta.url),
+    deckColor: '#151515',
+    link: '/games/une'
+    },
+    {
+      title: 'Blackjack',
+      description: 'A classic casino game that is easy to learn and fun to play!',
+      image: new URL('../assets/icons/unoDeck/UNE.svg', import.meta.url),
+      deckColor: 'white',
+      link: '/games/blackjack'
+  }]; // add more as necessary
+
+const searchQuery = ref('');
+const searchResult = ref('');
+
+const searchGame = () => {
+  if (searchQuery.value) {
+    const game = popularGames.find(game => game.title.toLowerCase() === searchQuery.value.toLowerCase());
+    searchResult.value = game || 'Game not found';
+  } else {
+    searchResult.value = '';
+  }
+};
+
+</script>
+
+<template>
+  <Header2/>
+  <div id="decklibrary-page">
+    <img class="cd-logo" alt="Cardhub logo"
+         :src='getLogo()'/>
+
+    <IconField iconPosition="left" class="bottom-5">
+      <InputIcon class="pi pi-search"></InputIcon>
+      <InputText v-model="searchQuery" @input="searchGame" placeholder="Search for games"/>
+    </IconField>
+
+    <div v-if="searchResult">
+      <h2>{{ searchResult }}</h2>
+    </div>
+    <div v-else>
+      <p v-if="searchQuery" class="text-red-600">Card game not found.</p>
+    </div>
+    
+    <h1 class="text-3xl mt-8 mb-4 text-white">Made by CardHub</h1>
+
+    <div class="flex flex-wrap justify-start items-start">
+      <div v-for="game in popularGames"
+           :key="game.title" class="m-2">
+        <NuxtLink :to="game.link">
+          <div class="flex justify-center items-center w-28 h-44 rounded-md shadow-md mb-2" :style="{ backgroundColor: game.deckColor }">
+            <img :src="game.image"
+                 alt="game icon"
+                 class="absolute align-center"/>
+          </div>
+        </NuxtLink>
+        <div class="text-1xl"> {{ game.title }} </div>
+        
+      </div>
+    </div>
+
+  </div>
+
+</template>
+
+<style scoped>
+#decklibrary-page {
+  background: linear-gradient(20deg, #000000 0%, #313134 100%);
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.cd-logo {
+  padding-top: 50px;
+  padding-bottom: 50px;
+  width: 30%;
+}
+
+</style>

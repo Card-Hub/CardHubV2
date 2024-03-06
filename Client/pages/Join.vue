@@ -9,10 +9,10 @@ const messages = ref<UserMessage[]>([])
 const users = ref<string[]>([])
 const user = ref('')
 const room = ref('')
-const handleReceiveMessage = (user: string, message: string): void => {
-  messages.value.push({ user, message });
-  console.log("in handlereceivemessage",messages.value);
-};
+// const handleReceiveMessage = (user: string, message: string): void => {
+//   messages.value.push({ user, message });
+//   console.log("in handlereceivemessage",messages.value);
+// };
 // const newMessage = ref('');
 // const props = defineProps(['connection'])
 
@@ -74,7 +74,8 @@ const closeConnection = async (): Promise<void> => {
       </div>
     </template>
     <template v-else> <!-- Here is where we go after they have pressed join. May need to send them to new page adn take code from here -->
-      <Chat :connection="connection" :onReceiveMessage="handleReceiveMessage" />
+      <!--Chat :connection="connection" :onReceiveMessage="handleReceiveMessage" /-->
+      <Chat :connection="connection"/>
     </template>
   </div>
 </template>

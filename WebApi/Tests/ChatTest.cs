@@ -38,8 +38,7 @@ namespace WebApi.Hubs.Tests
             // Act
             await gameHub.SendMessage("TestMessage");
 
-            // Assert
-
+            // ReceiveNessage is a vue function, i wonder if thats why?
             mockClientProxy.Verify(c => c.SendAsync("ReceiveMessage", It.IsAny<object[]>(), It.IsAny<System.Threading.CancellationToken>()), Times.Once);
         }   
     }

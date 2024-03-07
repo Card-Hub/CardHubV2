@@ -11,6 +11,13 @@ const getLogo = () => {
   return new URL('../assets/icons/logos/combination.svg', import.meta.url);
 };
 
+interface Game {
+  title: string;
+  image: URL;
+  deckColor: string;
+  link: string;
+}
+
 const popularGames = [
   {
     title: 'UNE', // Uné
@@ -26,14 +33,13 @@ const popularGames = [
   }]; // add more as necessary
 
 const searchQuery = ref('');
-const searchResult = ref('');
+const searchResult = ref({} as Game);
 
 const searchGame = () => {
   if (searchQuery.value) {
-    const game = popularGames.find(game => game.title.toLowerCase() === searchQuery.value.toLowerCase());
-    searchResult.value = game || 'Game not found';
+    searchResult.value = popularGames.find(game => game.title.toLowerCase() === searchQuery.value.toLowerCase());
   } else {
-    searchResult.value = '';
+    searchResult.value = null;
   }
 };
 
@@ -50,25 +56,25 @@ const searchGame = () => {
       <InputText v-model="searchQuery" @input="searchGame" placeholder="Search for games"/>
     </IconField>
 
-    <div v-if="searchResult">
-      <h2>{{ searchResult }}</h2>
-<!--      <div class="flex flex-wrap justify-start items-start">-->
-<!--        <div v-for='{{ searchResult }}'-->
-<!--             :key="searchResult.title" class="m-2">-->
-<!--          <NuxtLink :to="searchResult.link">-->
-<!--            <div class="flex justify-center items-center w-28 h-44 rounded-md shadow-md mb-2" :style="{ backgroundColor: searchResult.deckColor }">-->
-<!--              <img :src="searchResult.image"-->
-<!--                   alt="game icon"-->
-<!--                   class="deck-view"/>-->
-<!--            </div>-->
-<!--          </NuxtLink>-->
-<!--          <div class="text-1xl"> {{ searchResult.title }} </div>-->
-<!--        </div>-->
-<!--      </div>-->
+    <div v-if="searchResult !== null">
+      <div class="flex flex-wrap justify-start items-start">
+        <div
+             :key="searchResult.title" class="m-2">
+          <NuxtLink :to="searchResult.link">
+            <div class="flex justify-center items-center w-28 h-44 rounded-md shadow-md mb-2" :style="{ backgroundColor: searchResult.deckColor }">
+              <img :src="searchResult.image"
+                   alt="game icon"
+                   class="deck-view"/>
+            </div>
+          </NuxtLink>
+          <div class="text-1xl"> {{ searchResult.title }} </div>
+        </div>
+      </div>
+      
     </div>
     <div v-else>
-      <p v-if="searchQuery" class="text-red-600">Card game not found.</p>
-      <div v-else>
+      <p v-if="searchQuery" class="text-red-600">Game Not Found</p>
+      <div v-else-if="searchQuery !== 'Game not found'">
         <h1 class="text-3xl mt-8 mb-4 text-white">Made by CardHub</h1>
 
         <div class="flex flex-wrap justify-start items-start">
@@ -85,6 +91,8 @@ const searchGame = () => {
           </div>
         </div>
       </div>
+      
+        
     </div>
     
     

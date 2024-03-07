@@ -22,12 +22,23 @@
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0" />
     <PackageReference Include="NRedisStack" Version="0.11.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+    <PackageReference Include="xunit" Version="2.7.0" />
   </ItemGroup>
 
 
 
   <ItemGroup>
     <Folder Include="Services\" />
+  </ItemGroup>
+
+
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Testing\bin\Debug\net8.0\Testing.deps.json" />
+    <_ContentIncludedByDefault Remove="Testing\bin\Debug\net8.0\Testing.runtimeconfig.json" />
+    <_ContentIncludedByDefault Remove="Testing\obj\Debug\net8.0\Testing.sourcelink.json" />
+    <_ContentIncludedByDefault Remove="Testing\obj\project.assets.json" />
+    <_ContentIncludedByDefault Remove="Testing\obj\Testing.csproj.nuget.dgspec.json" />
   </ItemGroup>
 
 <!--  <ItemGroup>-->

@@ -39,6 +39,7 @@ public class UnoGame : IBaseGame {
         newCard.value = wildCardValue;
         newCard.color = "wild";
         deck.Add(newCard);
+        cardId++;
       }
     }
   }
@@ -51,6 +52,10 @@ public class UnoGame : IBaseGame {
   }
   public List<String> GetPlayerList() {
     return playerList;
+    throw new NotImplementedException();
+  }
+   public List<UnoCard> GetDeck() {
+    return deck;
     throw new NotImplementedException();
   }
 
@@ -86,7 +91,7 @@ public class UnoGame : IBaseGame {
   public void EndGame(String playerName) {
     throw new NotImplementedException();
   }
-  public static String GetUnoCardString(UnoCard card) {
+  public String GetUnoCardString(UnoCard card) {
     String str =  "Uno Card with id: " + card.id.ToString() + ", value: " + card.value + ", color: " + card.color;
     return str;
   }

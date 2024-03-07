@@ -16,6 +16,7 @@ public class UnoGame : IBaseGame {
     //this.SetUpHands();
   }
   public void InitDeck() {
+    deck.Clear();
     // Add cards to deck
     String[] colors = ["red", "blue", "yellow", "green"];
     String[] coloredValues = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "1", "2", "3", "4", "5", "6", "7", "8", "9", "Draw 2", "Draw 2", "Reverse", "Reverse", "Skip", "Skip"];
@@ -48,6 +49,7 @@ public class UnoGame : IBaseGame {
     // Randomize list of players
     // Player whose turn it is, is first player
     Console.WriteLine("Hi");
+    //InitDeck();
     //throw new NotImplementedException();
   }
   public List<String> GetPlayerList() {

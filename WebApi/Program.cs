@@ -81,7 +81,11 @@ game.shufflePlayers();
 foreach (string player in game.GetPlayerList()) {
   Console.WriteLine("Random order: " + player);
 }
-game.InitDeck();
+Console.WriteLine("~~!");
+foreach (UnoCard card in game.GetDeck()) {
+  Console.WriteLine(game.GetUnoCardString(card));
+}
+game.shuffleDeck();
 foreach (UnoCard card in game.GetDeck()) {
   Console.WriteLine(game.GetUnoCardString(card));
 }

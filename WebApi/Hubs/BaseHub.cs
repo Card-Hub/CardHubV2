@@ -70,7 +70,7 @@ public partial class BaseHub : Hub
         }
     }
 
-    public async Task SendCard(StandardCard card)
+    public async Task SendCard(UnoCard card)
     {
         if (_userConnections.TryGetValue(Context.ConnectionId, out var userConnection))
         {

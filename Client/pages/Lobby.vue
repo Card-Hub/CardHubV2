@@ -11,11 +11,16 @@ const { sendMessage } = store;
 <template>
   <div id="dimScreen">
     <div v-if="isPlayer">
-
+      <NuxtLink to="/playerview">
+        <Button label="Secondary" severity="secondary">Player View</Button>
+      </NuxtLink>
     </div>
-    <NuxtLink to="/playerview">
-      <Button label="Secondary" severity="secondary">Player View</Button>
-    </NuxtLink>
+    <div v-else>
+      <NuxtLink to="/gameboard">
+        <Button label="Secondary" severity="secondary">Gameboard</Button>
+      </NuxtLink>
+    </div>
+    
   </div>
 </template>
 

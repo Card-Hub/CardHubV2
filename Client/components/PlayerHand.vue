@@ -10,12 +10,22 @@ const props = defineProps({
   },
 });
 
-const selectedCard = ref<Card | null>(null);
+// const selectedCard = ref<Card | null>(null);
+// const emit = defineEmits<{
+//   cardClick: [card: Card]
+// }>()
+
+const selectedCard = ref<UNOCard | null>(null);
 const emit = defineEmits<{
   cardClick: [card: Card]
 }>()
 
-const handleCardClick = (card: Card) => {
+// const handleCardClick = (card: Card) => {
+//   selectedCard.value = card;
+//   emit('cardClick', card);
+// };
+
+const handleCardClick = (card: UNOCard) => {
   selectedCard.value = card;
   emit('cardClick', card);
 };
@@ -44,13 +54,19 @@ const isUNOCard = (card: Card): card is UNOCard => {
 
 <template>
   <div class="player-hand">
-    <component v-for="card in playerHand"
-                 :key="card.id"
-                 :is="getCardComponent(card)"
-                 :card="card"
-                 :isSelected="selectedCard === card"
-                  @cardClicked="handleCardClick"
-                  />
+<!--    <component v-for="card in playerHand"-->
+<!--                 :key="card.id"-->
+<!--                 :is="getCardComponent(card)"-->
+<!--                 :card="card"-->
+<!--                 :isSelected="selectedCard === card"-->
+<!--                  @cardClicked="handleCardClick"-->
+<!--                  />-->
+    <UNOCardDisplay v-for="card in playerHand"
+               :key="card.id"
+               :card="card"
+               :isSelected="selectedCard === card"
+               @cardClicked="handleCardClick"
+    />
   </div>
 </template>
 

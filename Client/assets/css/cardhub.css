@@ -1,0 +1,4 @@
+﻿/* Import custom css files here*/
+/* If you wish to disable theme, go to nuxt.config.ts
+and comment out the theme file in the css property */
+@import "customcss1.css";

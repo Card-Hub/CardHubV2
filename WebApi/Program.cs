@@ -1,7 +1,11 @@
 using WebApi.Controllers;
+using WebApi.GameLogic;
 using WebApi.Hubs;
+using WebApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
 
 // Add services to the container.
 
@@ -10,26 +14,34 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddSignalR();
+builder.Services.AddSignalR(hubOptions =>
+{
+    if (builder.Environment.IsDevelopment())
+    {
+        hubOptions.EnableDetailedErrors = true;
+    }
+});
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("DevelopmentPolicy", policyBuilder =>
     {
         policyBuilder.AllowAnyMethod()
             .AllowAnyHeader()
-            .WithOrigins("https://localhost:5173", "http://localhost:3000")
+            .WithOrigins("http://localhost:3000")
             .AllowCredentials();
     });
     options.AddPolicy("ProductionPolicy", policyBuilder =>
     {
         policyBuilder.AllowAnyMethod()
             .AllowAnyHeader()
-            .WithOrigins("https://fresher-vue-asp.vercel.app")
+            .WithOrigins("https://playcardhub.vercel.app", "https://playcardhub.com")
             .AllowCredentials();
     });
 });
-builder.Services.AddSingleton<IDictionary<string, UserConnection>>(options => new Dictionary<string, UserConnection>());
+builder.Services.AddSingleton<IDictionary<string, Room>>(options => new Dictionary<string, Room>());
+builder.Services.AddSingleton<HashSet<string>>(options => new HashSet<string>());
 builder.Services.AddSingleton<CardDbContext>();
+builder.Services.AddSingleton<IBaseGame>(options => new UnoGame());
 
 var app = builder.Build();
 
@@ -48,6 +60,10 @@ else
 
 app.UseAuthorization();
 app.MapControllers();
-app.MapHub<GameHub>("/game");
+app.MapHub<BaseHub>("/basehub", options =>
+{
+    options.AllowStatefulReconnects = true;
+});
 
 app.Run();
+public partial class Program { }

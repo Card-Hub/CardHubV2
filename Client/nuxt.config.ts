@@ -1,22 +1,35 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  // devServer: {
-  //   https: true
-  // },
-  devtools: { enabled: true },
-  ssr: false,
-  // spaLoadingTemplate: true,
-  modules: ['nuxt-primevue', 'nuxt-svgo', '@nuxtjs/tailwindcss'],
-  runtimeConfig: {
-    public: {
-      baseURL: process.env.BASE_URL
+    // Fixes display sizing with Chrome DevTools
+    // https://stackoverflow.com/a/40346515/18790415
+    app: {
+        head: {
+            charset: 'utf-8',
+            viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0'
+        }
     },
-  },
-  primevue: {
-    options: {
-      ripple: true,
-      inputStyle: 'filled'
+    css: ["primevue/resources/themes/aura-dark-noir/theme.css", "~/assets/css/cardhub.css"],
+    devtools: { enabled: true },
+    // spaLoadingTemplate: true,
+    modules: ["@pinia/nuxt", "@nuxt/test-utils/module", "@nuxtjs/tailwindcss", "nuxt-primevue", "nuxt-svgo"],
+    pinia: {
+        storesDirs: ["./stores/**"]
+    },
+    primevue: {
+        options: {
+            ripple: true,
+            inputStyle: "filled"
+        }
+    },
+    runtimeConfig: {
+        public: {
+            baseURL: process.env.BASE_URL,
+            hubPath: "basehub", // SignalR hub path, must be same as one in Program.cs
+            reconnectTimeout: 30 // Seconds
+        }
+    },
+    ssr: false,
+    svgo: {
+        autoImportPath: "./assets/icons/"
     }
-  },
-  css: ['primevue/resources/themes/card-hub-theme/theme.css']
-})
+});

@@ -50,7 +50,7 @@ public partial class BaseHub : Hub
         await Clients.Group(userConnection.Room).SendAsync("ReceiveMessage",
             new UserMessage
             {
-                User = userConnection.User,
+                User = "System",
                 Message = $"{userConnection.User} has joined the room {userConnection.Room}"
             });
         await SendConnectedUsers(userConnection.Room);
@@ -79,7 +79,7 @@ public partial class BaseHub : Hub
         {
             Console.WriteLine($"C# Sending message from {userConnection.User} to group {userConnection.Room}: {message}");
             await Clients.Group(userConnection.Room)
-                .SendAsync("ReceiveMessage",
+                .SendAsync("ReceiveMessage", 
                     new UserMessage
                     {
                         User = userConnection.User,

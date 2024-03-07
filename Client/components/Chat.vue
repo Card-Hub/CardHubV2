@@ -13,8 +13,8 @@ const handleSendMessage = () => {
 </script>
 
 <template>
-  <div>
-    <p>In chat</p>
+  <div class="chat w-80 rounded-xl margin p-2">
+    <h2 class="title text-center">Chat</h2>
     <div v-for="(m, index) in messages" :key="index">
       <div class="bg-primary"> <span class="user">{{ m.user }}:</span> {{ m.message }}</div>
       <!-- <div>{{ m.user }}</div> -->
@@ -28,4 +28,10 @@ const handleSendMessage = () => {
 
 <style scoped>
 /* Add your styling here */
+.chat {
+    background-color: black;
+}
+.user {
+    color: var(--cardhub-red);
+}
 </style>

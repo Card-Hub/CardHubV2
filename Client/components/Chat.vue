@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang="ts">//this needs to be updated to not have props
 
 import type { UserMessage } from "../typescript/types"
 // import { HttpTransportType, type HubConnection, HubConnectionBuilder, LogLevel } from '@microsoft/signalr'

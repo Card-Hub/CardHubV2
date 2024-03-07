@@ -50,16 +50,34 @@ public partial class BaseHub : Hub
         await Clients.Group(userConnection.Room).SendAsync("ReceiveMessage",
             new UserMessage
             {
-                User = BotUser,
+                User = userConnection.User,
                 Message = $"{userConnection.User} has joined the room {userConnection.Room}"
             });
         await SendConnectedUsers(userConnection.Room);
     }
 
+
+    // public async Task SendMessage(string message)
+    // {
+    //     Console.WriteLine($"C# connection id{Context.ConnectionId}");
+    //     if (_userConnections.TryGetValue(Context.ConnectionId, out var userConnection) && userConnection != null)
+    //     {
+    //         Console.WriteLine($"C# Sending message from {userConnection.User} to group {userConnection.Room}: {message}");
+    //         await Clients.Group(userConnection.Room)
+    //             .SendAsync("ReceiveMessage", $"from {userConnection.User}", message);
+    //     }
+    //     else
+    //     {
+    //         Console.WriteLine($"C# Unable to send message. UserConnection not found for ConnectionId: {Context.ConnectionId}");
+    //     }
+    // }
+
     public async Task SendMessage(string message)
     {
+        Console.WriteLine($"C# connection id{Context.ConnectionId}");
         if (_userConnections.TryGetValue(Context.ConnectionId, out var userConnection))
         {
+            Console.WriteLine($"C# Sending message from {userConnection.User} to group {userConnection.Room}: {message}");
             await Clients.Group(userConnection.Room)
                 .SendAsync("ReceiveMessage",
                     new UserMessage

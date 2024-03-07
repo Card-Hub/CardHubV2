@@ -23,6 +23,7 @@ export const useWebSocketStore = defineStore("webSocket", () => {
     const cards = ref<UNOCard[]>([]);
     const messages = ref<UserMessage[]>([]);
     const users = ref<string[]>([]);
+    const newMessage = ref("");
 
     const user = ref("");
     const room = ref("");
@@ -41,6 +42,7 @@ export const useWebSocketStore = defineStore("webSocket", () => {
         try {
             room.value = await $api<string>("game/createroom", { method: "POST" });
             console.log("Room created: ", room.value);
+            console.log("\n\n\n!!!!!!!!AFTER!!!!!!\n\n\n");
             await joinRoom(user.value, room.value, UserType.Gameboard);
             isPlayer.value = false;
             return true;
@@ -85,7 +87,7 @@ export const useWebSocketStore = defineStore("webSocket", () => {
 
             joinConnection.on("ReceiveMessage", (userMessage: UserMessage) => {
                 messages.value.push(userMessage);
-                console.log(userMessage);
+                console.log("\n\nWe in receive message\n\n",userMessage);
             });
 
             joinConnection.on("ReceiveCard", (fromUser: string, card: UNOCard) => {
@@ -172,6 +174,7 @@ export const useWebSocketStore = defineStore("webSocket", () => {
 
     const sendMessage = async (message: string): Promise<void> => {
         try {
+            console.log("Now in deeper sendmessage");
             if (connection.value !== null) {
                 await connection.value.invoke("SendMessage", message);
             }
@@ -193,7 +196,7 @@ export const useWebSocketStore = defineStore("webSocket", () => {
     // Must return all state properties
     // https://pinia.vuejs.org/core-concepts/
     return {
-        connection, isConnected, isPlayer, cards, messages, users, user, room, cookieUser, cookieRoom,
+        connection, isConnected, isPlayer, cards, messages, users, user, room, cookieUser, cookieRoom, newMessage,
         tryCreateRoom, tryJoinRoom, sendCard, drawCard, sendMessage, closeConnection
     };
 });

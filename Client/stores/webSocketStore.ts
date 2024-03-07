@@ -18,8 +18,9 @@ export const useWebSocketStore = defineStore("webSocket", () => {
 
     const connection = ref<HubConnection | null>(null);
     const isConnected = computed(() => connection.value !== null && connection.value.state === HubConnectionState.Connected);
+    const isPlayer = ref<boolean | null>(null);
 
-    const cards = ref<StandardCard[]>([]);
+    const cards = ref<UNOCard[]>([]);
     const messages = ref<UserMessage[]>([]);
     const users = ref<string[]>([]);
 
@@ -41,6 +42,7 @@ export const useWebSocketStore = defineStore("webSocket", () => {
             room.value = await $api<string>("game/createroom", { method: "POST" });
             console.log("Room created: ", room.value);
             await joinRoom(user.value, room.value, UserType.Gameboard);
+            isPlayer.value = false;
             return true;
         } catch (e) {
             console.log("Failed to create room", e);
@@ -58,6 +60,7 @@ export const useWebSocketStore = defineStore("webSocket", () => {
                     return false;
                 }
                 await joinRoom(user.value, room.value, UserType.Player);
+                isPlayer.value = true;
                 return true;
             } catch (e) {
                 console.log(e);
@@ -85,7 +88,7 @@ export const useWebSocketStore = defineStore("webSocket", () => {
                 console.log(userMessage);
             });
 
-            joinConnection.on("ReceiveCard", (fromUser: string, card: StandardCard) => {
+            joinConnection.on("ReceiveCard", (fromUser: string, card: UNOCard) => {
                 cards.value.push(card);
                 console.log(card);
             });
@@ -94,13 +97,16 @@ export const useWebSocketStore = defineStore("webSocket", () => {
                 users.value = groupUsers;
             });
 
+            joinConnection.on("StartedGame", (gameCards: UNOCard[]) => {
+                cards.value = gameCards;
+            });
+
             joinConnection.onclose(async () => {
                 // connection.value = null;
                 // messages.value = [];
                 // users.value = [];
                 // await sendMessage("Reconnected to server");
                 console.log("DISCONNECTED FROM SERVER");
-                await joinConnection.start();
             });
 
             joinConnection.onreconnecting(() => {
@@ -138,7 +144,7 @@ export const useWebSocketStore = defineStore("webSocket", () => {
         }
     };
 
-    const sendCard = async (card: StandardCard): Promise<void> => {
+    const sendCard = async (card: UNOCard): Promise<void> => {
         try {
             if (connection.value !== null) {
                 await connection.value.invoke("SendCard", card);
@@ -154,6 +160,14 @@ export const useWebSocketStore = defineStore("webSocket", () => {
         }
 
         await connection.value.invoke("DrawCard");
+    }
+
+    const startGame = async (): Promise<void> => {
+        if (connection.value === null) {
+            return;
+        }
+
+        await connection.value.invoke("StartGame");
     }
 
     const sendMessage = async (message: string): Promise<void> => {
@@ -179,7 +193,7 @@ export const useWebSocketStore = defineStore("webSocket", () => {
     // Must return all state properties
     // https://pinia.vuejs.org/core-concepts/
     return {
-        connection, isConnected, cards, messages, users, user, room, cookieUser, cookieRoom,
-        tryCreateRoom, tryJoinRoom, sendCard, sendMessage, closeConnection
+        connection, isConnected, isPlayer, cards, messages, users, user, room, cookieUser, cookieRoom,
+        tryCreateRoom, tryJoinRoom, sendCard, drawCard, sendMessage, closeConnection
     };
 });

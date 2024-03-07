@@ -3,14 +3,19 @@
 import { storeToRefs } from "pinia";
 
 const store = useWebSocketStore();
-const { messages, users, room } = storeToRefs(store);
+const { isPlayer, messages, users, room } = storeToRefs(store);
 const { sendMessage } = store;
 
 </script>
 
 <template>
   <div id="dimScreen">
+    <div v-if="isPlayer">
 
+    </div>
+    <NuxtLink to="/playerview">
+      <Button label="Secondary" severity="secondary">Player View</Button>
+    </NuxtLink>
   </div>
 </template>
 

@@ -91,9 +91,16 @@ public partial class BaseHub : Hub
         
         // Check if it's the user's turn
         //
-        var card = _game.drawCard();
+        var card = _game.popTopCard();
 
         return Clients.Caller.SendAsync("ReceiveCard", "Gameboard", card);
+    }
+    
+    public Task StartGame()
+    {
+        _game.StartGame();
+        var hand = _game.GetPlayerHand(_userConnections[Context.ConnectionId].User);
+        return Clients.Group(_userConnections[Context.ConnectionId].Room).SendAsync("StartedGame", hand);
     }
 
     public Task SendConnectedUsers(string room)

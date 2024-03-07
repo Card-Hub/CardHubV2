@@ -56,6 +56,7 @@ const { tryJoinRoom, sendCard, drawCard } = store;
 // }
 
 // const playerHand = ref<UNOCard[]>(unoDeck);
+// const selectedCard = ref<Card | null>(null);
 const selectedCard = ref<UNOCard | null>(null);
 
 //https://vuejs.org/guide/essentials/component-basics.html#passing-props
@@ -79,15 +80,15 @@ const selectedCard = ref<UNOCard | null>(null);
 //   sendCard(card)
 // };
 
-const handleCardClick = <C extends Card>(card: C) => {
-  selectedCard.value = card;
-  sendCard(card);
-};
-
-// const handleCardClick = (card: UNOCard) => {
+// const handleCardClick = <C extends Card>(card: C) => {
 //   selectedCard.value = card;
 //   sendCard(card);
 // };
+
+const handleCardClick = (card: UNOCard) => {
+  selectedCard.value = card;
+  sendCard(card);
+};
 
 // Websockets stuff
 console.log("check here for connectivity", isConnected.value);

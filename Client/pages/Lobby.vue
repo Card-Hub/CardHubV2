@@ -1,4 +1,4 @@
-﻿<script setup lang="ts">
+<script setup lang="ts">
 
 import { storeToRefs } from "pinia";
 import Une from "~/pages/games/Une.vue";

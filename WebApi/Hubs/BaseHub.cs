@@ -54,6 +54,8 @@ public partial class BaseHub : Hub
                 Message = $"{userConnection.User} has joined the room {userConnection.Room}"
             });
         await SendConnectedUsers(userConnection.Room);
+        
+        _game.AddPlayer(userConnection.User);
     }
 
     public async Task SendMessage(string message)
@@ -88,24 +90,37 @@ public partial class BaseHub : Hub
 
     public Task DrawCard()
     {
-        
-        // Check if it's the user's turn
-        //
-        var card = _game.popTopCard();
+        if (_userConnections.TryGetValue(Context.ConnectionId, out var userConnection))
+        {
+            var card = _game.DrawCard(userConnection.User);
+            return Clients.Caller.SendAsync("ReceiveCard", "Gameboard", card);
+        }
 
-        return Clients.Caller.SendAsync("ReceiveCard", "Gameboard", card);
+        return Task.CompletedTask;
     }
     
     public Task StartGame()
     {
+        _game.ShuffleDeck();
         _game.StartGame();
-        var hand = _game.GetPlayerHand(_userConnections[Context.ConnectionId].User);
-        return Clients.Group(_userConnections[Context.ConnectionId].Room).SendAsync("StartedGame", hand);
+        
+        var roomConnections = _userConnections.Values.Where(x => x.Room == _userConnections[Context.ConnectionId].Room);
+        
+        foreach (var conn in roomConnections.Where(x => x.UserType == UserType.Player))
+        {
+            var userName = conn.User;
+            var hand = _game.GetPlayerHand(userName);
+            Clients.Client(conn.ConnectionId!).SendAsync("StartedGame", hand);
+        }
+        
+        return Task.CompletedTask;
     }
 
     public Task SendConnectedUsers(string room)
     {
-        var users = _userConnections.Values.Where(x => x.Room == room).Select(x => x.User);
+        var users = _userConnections.Values.Where(x => x.Room == room && x.UserType == UserType.Player)
+            .Select(x => x.User);
+        Console.WriteLine("in send connected: ", users);
         return Clients.Group(room).SendAsync("UsersInRoom", users);
     }
 
@@ -113,6 +128,8 @@ public partial class BaseHub : Hub
     {
         if (!_userConnections.TryGetValue(Context.ConnectionId, out var userConnection))
             return base.OnDisconnectedAsync(exception);
+
+        _game.RemovePlayer(userConnection.User);
         
         Console.WriteLine($"Disconnected", userConnection.ToString());
         

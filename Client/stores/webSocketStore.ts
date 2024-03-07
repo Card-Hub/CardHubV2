@@ -99,6 +99,7 @@ export const useWebSocketStore = defineStore("webSocket", () => {
 
             joinConnection.on("StartedGame", (gameCards: UNOCard[]) => {
                 cards.value = gameCards;
+                navigateTo("/playerview");
             });
 
             joinConnection.onclose(async () => {
@@ -194,6 +195,6 @@ export const useWebSocketStore = defineStore("webSocket", () => {
     // https://pinia.vuejs.org/core-concepts/
     return {
         connection, isConnected, isPlayer, cards, messages, users, user, room, cookieUser, cookieRoom,
-        tryCreateRoom, tryJoinRoom, sendCard, drawCard, sendMessage, closeConnection
+        tryCreateRoom, tryJoinRoom, sendCard, drawCard, startGame, sendMessage, closeConnection
     };
 });

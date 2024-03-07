@@ -33,7 +33,7 @@ const popularGames = [
   }]; // add more as necessary
 
 const searchQuery = ref('');
-const searchResult = ref({} as Game);
+const searchResult = ref(null);
 
 const searchGame = () => {
   if (searchQuery.value) {
@@ -56,7 +56,7 @@ const searchGame = () => {
       <InputText v-model="searchQuery" @input="searchGame" placeholder="Search for games"/>
     </IconField>
 
-    <div v-if="searchResult !== null">
+    <div v-if="searchResult">
       <div class="flex flex-wrap justify-start items-start">
         <div
              :key="searchResult.title" class="m-2">
@@ -74,7 +74,7 @@ const searchGame = () => {
     </div>
     <div v-else>
       <p v-if="searchQuery" class="text-red-600">Game Not Found</p>
-      <div v-else-if="searchQuery !== 'Game not found'">
+      <div v-else>
         <h1 class="text-3xl mt-8 mb-4 text-white">Made by CardHub</h1>
 
         <div class="flex flex-wrap justify-start items-start">

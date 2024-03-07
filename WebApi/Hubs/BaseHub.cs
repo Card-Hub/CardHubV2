@@ -1,4 +1,5 @@
-﻿using WebApi.Models;
+﻿using WebApi.GameLogic;
+using WebApi.Models;
 
 namespace WebApi.Hubs;
 
@@ -24,19 +25,19 @@ public partial class BaseHub : Hub
 {
     private const string BotUser = "Bot";
     private IDictionary<string, UserConnection> _userConnections;
+    private UnoGame _game;
 
-    public BaseHub(IDictionary<string, UserConnection> userConnections)
+    public BaseHub(IDictionary<string, UserConnection> userConnections, IBaseGame game)
     {
         _userConnections = userConnections;
+        _game = (UnoGame) game;
     }
-    
+
     public override Task OnConnectedAsync()
     {
         Console.WriteLine("Connected");
         return base.OnConnectedAsync();
     }
-    
-    
 
     public async Task JoinRoom(UserConnection userConnection)
     {
@@ -83,6 +84,16 @@ public partial class BaseHub : Hub
 
             await Clients.Client(gameboardId).SendAsync("ReceiveCard", userConnection.User, card);
         }
+    }
+
+    public Task DrawCard()
+    {
+        
+        // Check if it's the user's turn
+        //
+        var card = _game.drawCard();
+
+        return Clients.Caller.SendAsync("ReceiveCard", "Gameboard", card);
     }
 
     public Task SendConnectedUsers(string room)

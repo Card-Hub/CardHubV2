@@ -148,6 +148,14 @@ export const useWebSocketStore = defineStore("webSocket", () => {
         }
     };
 
+    const drawCard = async (): Promise<void> => {
+        if (connection.value === null) {
+            return;
+        }
+
+        await connection.value.invoke("DrawCard");
+    }
+
     const sendMessage = async (message: string): Promise<void> => {
         try {
             if (connection.value !== null) {

@@ -5,6 +5,5 @@
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="assets\icons\standardDeck\" />
-    <Folder Include="tests\unit\" />
   </ItemGroup>
 </Project>

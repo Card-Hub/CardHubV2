@@ -7,6 +7,7 @@ public class UnoGame : IBaseGame {
   // constructor
   private List<String> playerList = new List<String>();
   private List<UnoCard> deck = new List<UnoCard>();
+  private int directionInt = 1;
   public UnoGame() {
     playerList = [];
     this.InitDeck();
@@ -89,5 +90,10 @@ public class UnoGame : IBaseGame {
   }
   public void EndGame() {
     throw new NotImplementedException();
+  }
+  public UnoCard drawCard() {
+    UnoCard card = deck.ElementAt(0);
+    deck.RemoveAt(0);
+    return card;
   }
 }

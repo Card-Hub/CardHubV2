@@ -23,8 +23,8 @@ for (const suit of suits) {
   }
 }
 
-// const playerHand = ref<StandardCard[]>(standardDeck);
-// const selectedCard = ref<StandardCard | null>(null);
+const playerHand = ref<StandardCard[]>(standardDeck);
+const selectedCard = ref<StandardCard | null>(null);
 
 // create uno deck of cards
 const unoDeck = [];
@@ -55,8 +55,8 @@ for (let i = 0; i < 4; i++) {
   });
 }
 
-const playerHand = ref<UNOCard[]>(unoDeck);
-const selectedCard = ref<UNOCard | null>(null);
+// const playerHand = ref<UNOCard[]>(unoDeck);
+// const selectedCard = ref<UNOCard | null>(null);
 
 //https://vuejs.org/guide/essentials/component-basics.html#passing-props
 // onMounted(async () => {

@@ -60,7 +60,19 @@ const getIcon = (value: string) => {
 // };
 
 const cardColor = (color: string) => {
-  return {backgroundColor: color};
+  if (color.toLowerCase() === 'red') {
+    return {backgroundColor: '#d12c15'};
+  } else if (color.toLowerCase() === 'yellow') {
+    return {backgroundColor: '#ffce30'};
+  } else if (color.toLowerCase() === 'green') {
+    return {backgroundColor: '#7abb18'};
+  } else if (color.toLowerCase() === 'blue') {
+    return {backgroundColor: '#1166ac'};
+  } else if (color.toLowerCase() === 'black') {
+    return {backgroundColor: '#151515'};
+  }else{
+    return {backgroundColor: color};
+  }
 };
 
 </script>

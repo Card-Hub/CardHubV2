@@ -13,16 +13,14 @@ const getLogo = () => {
 
 const popularGames = [
   {
-    title: 'Uné',
-    // description: 'A classic card game that is easy to learn and fun to play!',
+    title: 'UNE', // Uné
     image: new URL('../assets/icons/unoDeck/UNE.svg', import.meta.url),
     deckColor: '#151515',
     link: '/games/une'
     },
     {
       title: 'Blackjack',
-      description: 'A classic casino game that is easy to learn and fun to play!',
-      image: new URL('../assets/icons/unoDeck/UNE.svg', import.meta.url),
+      image: new URL('../assets/icons/standardDeck/spades.svg', import.meta.url),
       deckColor: 'white',
       link: '/games/blackjack'
   }]; // add more as necessary
@@ -54,27 +52,42 @@ const searchGame = () => {
 
     <div v-if="searchResult">
       <h2>{{ searchResult }}</h2>
+<!--      <div class="flex flex-wrap justify-start items-start">-->
+<!--        <div v-for='{{ searchResult }}'-->
+<!--             :key="searchResult.title" class="m-2">-->
+<!--          <NuxtLink :to="searchResult.link">-->
+<!--            <div class="flex justify-center items-center w-28 h-44 rounded-md shadow-md mb-2" :style="{ backgroundColor: searchResult.deckColor }">-->
+<!--              <img :src="searchResult.image"-->
+<!--                   alt="game icon"-->
+<!--                   class="deck-view"/>-->
+<!--            </div>-->
+<!--          </NuxtLink>-->
+<!--          <div class="text-1xl"> {{ searchResult.title }} </div>-->
+<!--        </div>-->
+<!--      </div>-->
     </div>
     <div v-else>
       <p v-if="searchQuery" class="text-red-600">Card game not found.</p>
-    </div>
-    
-    <h1 class="text-3xl mt-8 mb-4 text-white">Made by CardHub</h1>
+      <div v-else>
+        <h1 class="text-3xl mt-8 mb-4 text-white">Made by CardHub</h1>
 
-    <div class="flex flex-wrap justify-start items-start">
-      <div v-for="game in popularGames"
-           :key="game.title" class="m-2">
-        <NuxtLink :to="game.link">
-          <div class="flex justify-center items-center w-28 h-44 rounded-md shadow-md mb-2" :style="{ backgroundColor: game.deckColor }">
-            <img :src="game.image"
-                 alt="game icon"
-                 class="absolute align-center"/>
+        <div class="flex flex-wrap justify-start items-start">
+          <div v-for="game in popularGames"
+               :key="game.title" class="m-2">
+            <NuxtLink :to="game.link">
+              <div class="flex justify-center items-center w-28 h-44 rounded-md shadow-md mb-2" :style="{ backgroundColor: game.deckColor }">
+                <img :src="game.image"
+                     alt="game icon"
+                     class="deck-view"/>
+              </div>
+            </NuxtLink>
+            <div class="text-1xl"> {{ game.title }} </div>
           </div>
-        </NuxtLink>
-        <div class="text-1xl"> {{ game.title }} </div>
-        
+        </div>
       </div>
     </div>
+    
+    
 
   </div>
 
@@ -94,6 +107,14 @@ const searchGame = () => {
   padding-top: 50px;
   padding-bottom: 50px;
   width: 30%;
+}
+
+.deck-view {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 50%;
 }
 
 </style>

@@ -96,4 +96,7 @@ public class UnoGame : IBaseGame {
     deck.RemoveAt(0);
     return card;
   }
+  public bool tryPlayCard(UnoCard card) {
+    return true;
+  }
 }

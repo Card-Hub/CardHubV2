@@ -22,7 +22,7 @@ public class UnoGame : IBaseGame {
   /// <summary>
   /// Initialize the deck. Resets it to the 100 something cards.
   /// </summary>
-  public void InitDeck() {
+  private void InitDeck() {
     Deck.Clear();
     // Add cards to deck
     String[] colors = ["red", "blue", "yellow", "green"];
@@ -74,9 +74,8 @@ public class UnoGame : IBaseGame {
     return playerList;
     throw new NotImplementedException();
   }
-   public List<UnoCard> GetDeck() {
+  public List<UnoCard> GetDeck() {
     return Deck;
-    throw new NotImplementedException();
   }
 
   /// <summary>
@@ -130,10 +129,7 @@ public class UnoGame : IBaseGame {
     Random rng = new Random();
     playerList = playerList.OrderBy(_ => rng.Next()).ToList();
   }
-  public void EndGame() {
-    throw new NotImplementedException();
-  }
-  public UnoCard PopTopCard() {
+  private UnoCard PopTopCard() {
     UnoCard card = Deck.ElementAt(0);
     Deck.RemoveAt(0);
     return card;
@@ -144,9 +140,6 @@ public class UnoGame : IBaseGame {
       return true;
     }
     return false;
-  }
-  public bool TryPlayCard(UnoCard card) {
-    return true;
   }
   public bool ReverseDirection() {
     DirectionInt /= -1; // -1 -> 1, or 1 -> -1
@@ -161,7 +154,7 @@ public class UnoGame : IBaseGame {
       DrawCard(playerName);
     }
   }
-  public void SetUpHands() {
+  private void SetUpHands() {
     for (int i = 0; i < playerList.Count; i++) {
       Console.WriteLine("Assigning card to " + playerList.ElementAt(i));
       Assign7CardsToPlayer(playerList.ElementAt(i));
@@ -195,10 +188,7 @@ public class UnoGame : IBaseGame {
   public UnoCard GetTopCardInDiscardPile() {
     return DiscardPile.ElementAt(0);
   }
-  public void updateWildColor(string color) {
-    WildColor = color;
-    PlayerWhoNeedsToPickWildColor = "";
-  }
+  
   public bool CardCanBePlayed(UnoCard cardToPlay) {
     bool cardCanBePlayed = false;
     bool cardMatchesValue = GetTopCardInDiscardPile().value == cardToPlay.value;
@@ -270,10 +260,7 @@ public class UnoGame : IBaseGame {
     }
     return false;
   }
-  public void SetPlayerNeedsToPickWildColor(string playerName) {
-    PlayerWhoNeedsToPickWildColor = playerName;
-  }
-
+  
   public bool PlayerNeedsToPickWildColor(string playerName) {
     return playerName == PlayerWhoNeedsToPickWildColor;
   }
@@ -296,10 +283,24 @@ public class UnoGame : IBaseGame {
       return false;
     }
   }
-  public void ResetWildColor() {
-    WildColor = "";
-  }
+  
   public bool IsOngoing() {
     return !someoneHasWon;
+  }
+  public bool DrawAndMoveOn(string playerName) {
+    DrawCard(playerName);
+    Console.WriteLine(playerName + " drew a card : " + GetUnoCardString(GetPlayerHand(playerName).Last()));
+    NextTurn();
+    return true;
+  }
+  private void SetPlayerNeedsToPickWildColor(string playerName) {
+    PlayerWhoNeedsToPickWildColor = playerName;
+  }
+  private void ResetWildColor() {
+    WildColor = "";
+  }
+  private void updateWildColor(string color) {
+    WildColor = color;
+    PlayerWhoNeedsToPickWildColor = "";
   }
 }

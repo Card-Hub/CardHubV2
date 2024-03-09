@@ -159,7 +159,7 @@ export const useWebSocketStore = defineStore("webSocket", () => {
         if (connection.value === null) {
             return;
         }
-
+        cards.value = [];
         await connection.value.invoke("DrawCard");
     }
 

@@ -98,7 +98,7 @@ console.log("check here for obj", connection.value);
 <template>
   <div id="dimScreen">
     <Button @click="drawCard">Draw Card</Button>
-    <PlayerHand :playerHand="cards" @cardClick="handleCardClick" />
+    <PlayerHand />
     <h2 class="text-center text-2xl font-bold my-4">Selected Card</h2>
     <SelectedCard :selectedCard="selectedCard" />
   </div>

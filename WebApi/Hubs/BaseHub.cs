@@ -92,8 +92,15 @@ public partial class BaseHub : Hub
     {
         if (_userConnections.TryGetValue(Context.ConnectionId, out var userConnection))
         {
-            var card = _game.DrawCard(userConnection.User);
-            return Clients.Caller.SendAsync("ReceiveCard", "Gameboard", card);
+            var userName = userConnection.User;
+            var card = _game.DrawCard(userName);
+            var playerHand = _game.GetPlayerHand(userName);
+            
+            foreach (var pCard in playerHand)
+            {
+                Console.WriteLine(pCard);
+                return Clients.Caller.SendAsync("ReceiveCard", "Gameboard", pCard);
+            }
         }
 
         return Task.CompletedTask;
@@ -101,6 +108,7 @@ public partial class BaseHub : Hub
     
     public Task StartGame()
     {
+        _game = new UnoGame();
         _game.ShuffleDeck();
         _game.StartGame();
         

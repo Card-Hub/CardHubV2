@@ -1,10 +1,18 @@
 ﻿export { };
 
 declare global {
-    interface StandardCard {
+    
+    interface Card {
         id: number
         value: string
+    }
+    
+    interface StandardCard extends Card {
         suit: string
+    }
+    
+    interface UNOCard extends Card {
+        color: string
     }
 
     interface UserMessage {

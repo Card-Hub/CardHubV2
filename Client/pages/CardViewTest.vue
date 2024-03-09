@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
 import { ref, onMounted } from 'vue';
-import PlayingCard from "~/components/PlayingCard.vue";
+import PlayingCardTest from "~/components/PlayingCardTest.vue";
 
 type Card = {
   id: number
@@ -29,7 +29,7 @@ onMounted(async () => {
 <template>
   <div>
     <h1>Playing Cards</h1>
-    <PlayingCard :playingCards="cards"></PlayingCard>
+    <PlayingCardTest :playingCards="cards"></PlayingCardTest>
     <h2>Card Data from C# Backend</h2>
 
   </div>

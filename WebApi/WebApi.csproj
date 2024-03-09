@@ -30,6 +30,16 @@
     <Folder Include="Services\" />
   </ItemGroup>
 
+
+
+  <!--<ItemGroup>
+    <_ContentIncludedByDefault Remove="Testing\bin\Debug\net8.0\Testing.deps.json" />
+    <_ContentIncludedByDefault Remove="Testing\bin\Debug\net8.0\Testing.runtimeconfig.json" />
+    <_ContentIncludedByDefault Remove="Testing\obj\Debug\net8.0\Testing.sourcelink.json" />
+    <_ContentIncludedByDefault Remove="Testing\obj\project.assets.json" />
+    <_ContentIncludedByDefault Remove="Testing\obj\Testing.csproj.nuget.dgspec.json" />
+  </ItemGroup>-->
+
 <!--  <ItemGroup>-->
 <!--    <ProjectReference Include="..\Client\Client.esproj">-->
 <!--      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>-->

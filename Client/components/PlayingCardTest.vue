@@ -10,7 +10,7 @@ import { defineProps } from 'vue';
   
   const props = defineProps({
     playingCards: {
-      type: Array as PropType<Array<Card>>,
+      type: Array as PropType<Array<StandardCard>>,
       required: true
     }
   });
@@ -32,7 +32,7 @@ import { defineProps } from 'vue';
 
 // https://stackoverflow.com/questions/56624817/passing-and-binding-img-src-from-props-in-vue-js
 const getSuitIcon = (suit: string) => {
-  return new URL(`../assets/icons/${suit.toLowerCase()}.svg`, import.meta.url);
+  return new URL(`../assets/icons/standardDeck/${suit.toLowerCase()}.svg`, import.meta.url);
 };
 
 const getSuitColor = (suit: string) => {
@@ -40,8 +40,8 @@ const getSuitColor = (suit: string) => {
 };
 
 // Deals with the card selection
-const cardSelected = ref<Card | null>(null);
-const handleCardClick = (card: Card) => {
+const cardSelected = ref<StandardCard | null>(null);
+const handleCardClick = (card: StandardCard) => {
   cardSelected.value = card;
 };
 </script>

@@ -66,4 +66,5 @@ app.MapHub<BaseHub>("/basehub", options =>
 });
 
 app.Run();
+
 public partial class Program { }

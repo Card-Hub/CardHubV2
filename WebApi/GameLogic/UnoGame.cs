@@ -1,4 +1,4 @@
-﻿using WebApi.Common;
+using WebApi.Common;
 using WebApi.Controllers;
 using WebApi.Models;
 

@@ -122,16 +122,6 @@ public class PlayerOrder
             current = current.Next;
         }
     }
-    
-    public bool SetPlayerConnectionStatus(string id, bool connectPlayer)
-    {
-        var playerToEdit = _players.SingleOrDefault(info => info.Id == id);
-        if (playerToEdit == null || playerToEdit.IsConnected == connectPlayer)
-            return false;
-        
-        playerToEdit.IsConnected = connectPlayer;
-        return true;
-    }
 
     private LinkedListNode<PlayerInfo> GetNextNode()
     {
@@ -147,7 +137,6 @@ public class PlayerOrder
             _ => throw new ArgumentOutOfRangeException()
         };
     }
-    
     
     
     // For debugging purposes

@@ -21,6 +21,11 @@ public class UserMessage
     public required string Message { get; set; }
 }
 
+public interface IBaseClient
+{
+    
+}
+
 public partial class BaseHub : Hub
 {
     private const string BotUser = "Bot";
@@ -54,8 +59,11 @@ public partial class BaseHub : Hub
                 Message = $"{userConnection.User} has joined the room {userConnection.Room}"
             });
         await SendConnectedUsers(userConnection.Room);
-        
-        _game.AddPlayer(userConnection.User);
+
+        if (userConnection.UserType == UserType.Player)
+        {
+            _game.AddPlayer(userConnection.User);    
+        }
     }
 
     public async Task SendMessage(string message)
@@ -99,7 +107,7 @@ public partial class BaseHub : Hub
             foreach (var pCard in playerHand)
             {
                 Console.WriteLine(pCard);
-                return Clients.Caller.SendAsync("ReceiveCard", "Gameboard", pCard);
+                Clients.Caller.SendAsync("ReceiveCard", "Gameboard", pCard);
             }
         }
 
@@ -108,19 +116,18 @@ public partial class BaseHub : Hub
     
     public Task StartGame()
     {
-        _game = new UnoGame();
         _game.ShuffleDeck();
         _game.StartGame();
         
         var roomConnections = _userConnections.Values.Where(x => x.Room == _userConnections[Context.ConnectionId].Room);
-        
+
         foreach (var conn in roomConnections.Where(x => x.UserType == UserType.Player))
         {
             var userName = conn.User;
             var hand = _game.GetPlayerHand(userName);
             Clients.Client(conn.ConnectionId!).SendAsync("StartedGame", hand);
         }
-        
+
         return Task.CompletedTask;
     }
 

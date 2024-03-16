@@ -134,7 +134,7 @@ public class UnoGame : IBaseGame<UnoCard> {
     Deck.RemoveAt(0);
     return card;
   }
-  public bool Draw(string playerName) {
+  public bool DrawCard(string playerName) {
     if (playerName == GetCurrentPlayer()) {
       playerHands[playerName].Add(PopTopCard());
       return true;
@@ -151,7 +151,7 @@ public class UnoGame : IBaseGame<UnoCard> {
   public void Assign7CardsToPlayer(string playerName) {
     CurrentPlayerIndex = playerList.IndexOf(playerName);
     for (int j = 0; j < 7; j++) {
-      Draw(playerName);
+      DrawCard(playerName);
     }
   }
   private void SetUpHands() {
@@ -235,8 +235,8 @@ public class UnoGame : IBaseGame<UnoCard> {
         }
         else if (card.Value == "Draw 2") {
           NextTurn();
-          Draw(GetCurrentPlayer());
-          Draw(GetCurrentPlayer());
+          DrawCard(GetCurrentPlayer());
+          DrawCard(GetCurrentPlayer());
         }
         else {
           Console.WriteLine("Played unknown action card.");
@@ -288,7 +288,7 @@ public class UnoGame : IBaseGame<UnoCard> {
     return !someoneHasWon;
   }
   public bool DrawAndMoveOn(string playerName) {
-    Draw(playerName);
+    DrawCard(playerName);
     Console.WriteLine(playerName + " drew a card : " + GetPlayerHand(playerName).Last().ToString());
     NextTurn();
     return true;

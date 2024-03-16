@@ -27,7 +27,7 @@ public partial class BaseHub : Hub
     private IDictionary<string, UserConnection> _userConnections;
     private UnoGame _game;
 
-    public BaseHub(IDictionary<string, UserConnection> userConnections, IBaseGame game)
+    public BaseHub(IDictionary<string, UserConnection> userConnections, IBaseGame<UnoCard> game)
     {
         _userConnections = userConnections;
         _game = (UnoGame) game;

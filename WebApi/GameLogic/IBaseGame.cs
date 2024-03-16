@@ -7,11 +7,10 @@ namespace WebApi.GameLogic {
     List<string> GetPlayerList();
     bool AddPlayer(string playerName);
     bool RemovePlayer(string playerName);
-
     List<CardType> GetPlayerHand(string playerName);
     List<string> GetPlayersInOrder();
 
     bool Draw(string playerName);
-    //void EndGame();
+    void EndGame();
   }
 }

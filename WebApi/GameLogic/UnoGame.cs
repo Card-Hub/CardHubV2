@@ -303,5 +303,6 @@ public class UnoGame : IBaseGame<UnoCard> {
     WildColor = color;
     PlayerWhoNeedsToPickWildColor = "";
   }
+  public void EndGame() {}
 }
 }

@@ -2,22 +2,27 @@
 import { defineProps, defineEmits, ref } from 'vue';
 import StandardCardDisplay from './Card/StandardCardDisplay.vue';
 import UNOCardDisplay from "~/components/Card/UNOCardDisplay.vue";
+import { useWebSocketStore } from "~/stores/webSocketStore";
 
-const props = defineProps({
-  playerHand: {
-    type: Array as PropType<Card[]>,
-    required: true
-  },
-});
+const store = useWebSocketStore();
+const { connection, isConnected, cards, messages, users, user, room } = storeToRefs(store);
+const { tryJoinRoom, sendCard, drawCard } = store;
 
-const selectedCard = ref<Card | null>(null);
-const emit = defineEmits<{
-  cardClick: [card: Card]
-}>()
+// const selectedCard = ref<Card | null>(null);
+// const emit = defineEmits<{
+//   cardClick: [card: Card]
+// }>()
 
-const handleCardClick = (card: Card) => {
+const selectedCard = ref<UNOCard | null>(null);
+
+// const handleCardClick = (card: Card) => {
+//   selectedCard.value = card;
+//   emit('cardClick', card);
+// };
+
+const handleCardClick = (card: UNOCard) => {
   selectedCard.value = card;
-  emit('cardClick', card);
+  sendCard(card);
 };
 
 // determine which type of card to display
@@ -44,13 +49,19 @@ const isUNOCard = (card: Card): card is UNOCard => {
 
 <template>
   <div class="player-hand">
-    <component v-for="card in playerHand"
-                 :key="card.id"
-                 :is="getCardComponent(card)"
-                 :card="card"
-                 :isSelected="selectedCard === card"
-                  @cardClicked="handleCardClick"
-                  />
+<!--    <component v-for="card in playerHand"-->
+<!--                 :key="card.id"-->
+<!--                 :is="getCardComponent(card)"-->
+<!--                 :card="card"-->
+<!--                 :isSelected="selectedCard === card"-->
+<!--                  @cardClicked="handleCardClick"-->
+<!--                  />-->
+    <UNOCardDisplay v-for="card in cards"
+               :key="card.id"
+               :card="card"
+               :isSelected="selectedCard === card"
+               @cardClicked="handleCardClick"
+    />
   </div>
 </template>
 

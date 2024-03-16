@@ -40,7 +40,7 @@ const getSuitIcon = (suit: string) => {
 
 
 const getSuitColor = (suit: string) => {
-  return suit === 'Hearts' || suit === 'Diamonds' ? 'red' : 'black';
+  return suit.toLowerCase() === 'hearts' || suit === 'diamonds' ? 'red' : 'black';
 };
 </script>
 

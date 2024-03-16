@@ -45,31 +45,31 @@ const getIcon = (value: string) => {
   }
 };
 
-// const cardColor = (color: string) => {
-//   if (color === 'red') {
-//     return 'rgba(255, 0, 0, 0.5)';
-//   } else if (color === 'yellow') {
-//     return 'rgba(255, 255, 0, 0.5)';
-//   } else if (color === 'green') {
-//     return 'rgba(0, 255, 0, 0.5)';
-//   } else if (color === 'blue') {
-//     return 'rgba(0, 0, 255, 0.5)';
-//   } else {
-//     return 'rgba(255, 255, 255, 0.5)';
-//   }
-// };
-
 const cardColor = (color: string) => {
-  return {backgroundColor: color};
+  if (color.toLowerCase() === 'red') {
+    return {backgroundColor: '#d12c15'};
+  } else if (color.toLowerCase() === 'yellow') {
+    return {backgroundColor: '#ffce30'};
+  } else if (color.toLowerCase() === 'green') {
+    return {backgroundColor: '#7abb18'};
+  } else if (color.toLowerCase() === 'blue') {
+    return {backgroundColor: '#1166ac'};
+  } else if (color.toLowerCase() === 'black') {
+    return {backgroundColor: '#151515'};
+  }else{
+    return {backgroundColor: color};
+  }
 };
 
+
+//add this after the v-ifs
+//          style="box-shadow: 6px -6px 3px rgba(200, 200, 200, 0.4);"
 </script>
 
 <template>
   <div class="flex flex-wrap justify-center items-center">
-    <div v-if="isNumberCard" class="flex flex-col justify-center items-center w-20 h-32 m-2 rounded-md shadow-md p-2"
-         style="box-shadow: 6px -6px 3px rgba(200, 200, 200, 0.4);"
-         :style="{ backgroundColor: card.color }"
+    <div v-if="isNumberCard" class="card flex flex-col justify-center items-center w-20 h-32 m-2 rounded-md shadow-md border-white border-4 p-2"
+         :style="cardColor(card.color)"
          @click="handleClick"
          :class="{ 'selected': isSelected }">
       <div class="relative h-screen flex justify-center items-center">
@@ -82,8 +82,7 @@ const cardColor = (color: string) => {
         </div>
     </div>
 
-    <div v-else-if="isActionCard" class="relative w-20 h-32 m-2 rounded-md shadow-md p-2"
-         style="box-shadow: 6px -6px 3px rgba(200, 200, 200, 0.4);"
+    <div v-else-if="isActionCard" class="card flex flex-col justify-center items-center w-20 h-32 m-2 rounded-md shadow-md border-black border-4 p-2"
          :style="cardColor(card.color)"
          @click="handleClick"
          :class="{ 'selected': isSelected }">
@@ -95,8 +94,7 @@ const cardColor = (color: string) => {
            class="absolute bottom-2 right-2 w-14 h-14"/>
     </div>
 
-    <div v-else-if="isDrawCard" class="relative w-20 h-32 m-2 rounded-md shadow-md p-2"
-         style="box-shadow: 6px -6px 3px rgba(200, 200, 200, 0.4);"
+    <div v-else-if="isDrawCard" class="card flex flex-col justify-center items-center w-20 h-32 m-2 rounded-md shadow-md border-black border-4 p-2"
          :style="cardColor(card.color)"
          @click="handleClick"
          :class="{ 'selected': isSelected }">
@@ -123,5 +121,9 @@ const cardColor = (color: string) => {
 
 .selected {
   border: 2px solid red;
+}
+
+.card {
+  border: 1px solid white;
 }
 </style>

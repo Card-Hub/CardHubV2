@@ -18,18 +18,18 @@ const getCardComponent = (card: Card) => {
 
 // helper functions to determine card type
 const isStandardCard = (card: Card): card is StandardCard => {
-  return 'suit' in card && 'value' in card;
+  return 'suit' in card;
 };
 
 const isUNOCard = (card: Card): card is UNOCard => {
-  return 'color' in card && 'value' in card;
+  return 'color' in card;
 };
 // add more as needed
 </script>
 
 <template>
   <div class="selected-card">
-    <component v-if="selectedCard" :is="getCardComponent(selectedCard)" :card="selectedCard" />
+    <UNOCardDisplay v-if="selectedCard" is-selected="1 === 1" :card="selectedCard" />
   </div>
 </template>
 

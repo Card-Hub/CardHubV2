@@ -2,7 +2,7 @@ import { storeToRefs } from "pinia";
 
 // Check if the user is connected to the server and if not, try to reconnect
 export default defineNuxtRouteMiddleware(async to => {
-    // if (true) return;
+    if (true) return;
     if (!(to.path === "/join" || to.path.startsWith("/gameboard") || to.path.startsWith("/player"))) {
         return;
     }

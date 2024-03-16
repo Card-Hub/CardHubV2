@@ -74,8 +74,6 @@ public class UnoCard : iCard
   {
     return this.Attributes[attribute];
   }
-  public override string ToString() // used mostly for the game sim
-    {
-      return $"Uno Card with id: {this.Id.ToString()}, value: {this.Value}, color: {this.Color}";
-    }
+
+    public override string ToString() => $"{{ id: {_id}, value: {_value}, color: {_color} }}";
 }

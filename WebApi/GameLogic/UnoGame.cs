@@ -1,18 +1,19 @@
-using WebApi.Common;
-using WebApi.Controllers;
 using WebApi.Models;
+using WebApi.Models.CardConverter;
+using System.Linq;
+using System; // Console
 
-namespace WebApi.GameLogic;
+namespace WebApi.GameLogic {
 
-public class UnoGame : IBaseGame {
+public class UnoGame : IBaseGame<UnoCard> {
   // constructor
-  private List<String> playerList = new List<String>();
+  private List<string> playerList = new List<string>();
   private List<UnoCard> Deck = new List<UnoCard>();
   private List<UnoCard> DiscardPile = new List<UnoCard>();
   private int DirectionInt = 1;
   private int CurrentPlayerIndex = 0;
   private bool someoneHasWon = false;
-  private Dictionary<String, List<UnoCard>> playerHands = new Dictionary<string, List<UnoCard>>();
+  private Dictionary<string, List<UnoCard>> playerHands = new Dictionary<string, List<UnoCard>>();
   private string WildColor = "";
   private string PlayerWhoNeedsToPickWildColor = "";
   public UnoGame() {
@@ -22,30 +23,33 @@ public class UnoGame : IBaseGame {
   /// <summary>
   /// Initialize the deck. Resets it to the 100 something cards.
   /// </summary>
+  public List<string> GetPlayersInOrder() {
+    throw new NotImplementedException();
+  }
   private void InitDeck() {
     Deck.Clear();
     // Add cards to deck
-    String[] colors = ["red", "blue", "yellow", "green"];
-    String[] coloredValues = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "1", "2", "3", "4", "5", "6", "7", "8", "9", "Draw Two", "Draw Two", "Reverse", "Reverse", "Skip", "Skip", "Skip All", "Skip All"];
-    String[] wildCardValues = ["Wild", "Wild Draw Four"];
+    string[] colors = ["red", "blue", "yellow", "green"];
+    string[] coloredValues = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "1", "2", "3", "4", "5", "6", "7", "8", "9", "Draw Two", "Draw Two", "Reverse", "Reverse", "Skip", "Skip", "Skip All", "Skip All"];
+    string[] wildCardValues = ["Wild", "Wild Draw Four"];
     int cardId = 0;
     // Add colored cards
-    foreach (String color in colors) {
-      foreach (String value in coloredValues) {
+    foreach (string color in colors) {
+      foreach (string value in coloredValues) {
         UnoCard newCard = new UnoCard();
-        newCard.id = cardId;
-        newCard.value = value;
-        newCard.color = color;
+        newCard.Id = cardId;
+        newCard.Value = value;
+        newCard.Color = color;
         Deck.Add(newCard);
         cardId++;
       }
     }
-    foreach (String wildCardValue in wildCardValues) {
+    foreach (string wildCardValue in wildCardValues) {
       for (int i = 0; i < 4; i++) { // 4 times each
         UnoCard newCard = new UnoCard();
-        newCard.id = cardId;
-        newCard.value = wildCardValue;
-        newCard.color = "black";
+        newCard.Id = cardId;
+        newCard.Value = wildCardValue;
+        newCard.Color = "black";
         Deck.Add(newCard);
         cardId++;
       }
@@ -66,11 +70,11 @@ public class UnoGame : IBaseGame {
     bool wildOnTop = true;
     while (wildOnTop) {
       DiscardPile.Insert(0, PopTopCard());
-      wildOnTop = DiscardPile.ElementAt(0).color == "black";
+      wildOnTop = DiscardPile.ElementAt(0).Color == "black";
     }
-    Console.WriteLine("Card on top of discard pile is " + GetUnoCardString(DiscardPile.ElementAt(0)));
+    Console.WriteLine("Card on top of discard pile is " + DiscardPile.ElementAt(0).ToString());
   }
-  public List<String> GetPlayerList() {
+  public List<string> GetPlayerList() {
     return playerList;
     throw new NotImplementedException();
   }
@@ -81,9 +85,9 @@ public class UnoGame : IBaseGame {
   /// <summary>
   /// If a player is not in the list of players, remove them.
   /// <para /> 
-  /// <c>playerName</c>: String; player name to add 
+  /// <c>playerName</c>: string; player name to add 
   /// </summary>
-  public Boolean AddPlayer(String playerName) {
+  public bool AddPlayer(string playerName) {
     if (playerList.IndexOf(playerName) == -1) {
       playerList.Add(playerName);
       return true;
@@ -98,9 +102,9 @@ public class UnoGame : IBaseGame {
   /// NOT DONE
   /// If a player exists in the list of players, remove them.
   /// <para /> 
-  /// <c>playerName</c>: String; player name to remove 
+  /// <c>playerName</c>: string; player name to remove 
   /// </summary>
-  public Boolean RemovePlayer(String playerName) {
+  public bool RemovePlayer(string playerName) {
     if (playerList.IndexOf(playerName) != -1) {
       // playerName in playerList
       playerList.Remove(playerName);
@@ -109,7 +113,7 @@ public class UnoGame : IBaseGame {
     return false; // failed due to not having playerName in list of players
     throw new NotImplementedException();
   }
-  public void EndGame(String playerName) {
+  public void EndGame(string playerName) {
     throw new NotImplementedException();
   }
 /// <summary>
@@ -117,10 +121,6 @@ public class UnoGame : IBaseGame {
 /// </summary>
 /// <para />
 /// <returns><c>"Uno Card with id: 4, value: Skip, color: blue"</c></returns>
-  public String GetUnoCardString(UnoCard card) {
-    String str =  "Uno Card with id: " + card.id.ToString() + ", value: " + card.value + ", color: " + card.color;
-    return str;
-  }
   public void ShuffleDeck() {
     Random rng = new Random();
     Deck = Deck.OrderBy(_ => rng.Next()).ToList();
@@ -134,7 +134,7 @@ public class UnoGame : IBaseGame {
     Deck.RemoveAt(0);
     return card;
   }
-  public bool DrawCard(String playerName) {
+  public bool DrawCard(string playerName) {
     if (playerName == GetCurrentPlayer()) {
       playerHands[playerName].Add(PopTopCard());
       return true;
@@ -161,7 +161,7 @@ public class UnoGame : IBaseGame {
     }
   }
   public List<UnoCard> GetPlayerHand(string playerName) {
-    return playerHands[playerName];
+    return playerHands[playerName]; 
   }
   public string GetCurrentPlayer() {
     return playerList[CurrentPlayerIndex];
@@ -191,17 +191,17 @@ public class UnoGame : IBaseGame {
   
   public bool CardCanBePlayed(UnoCard cardToPlay) {
     bool cardCanBePlayed = false;
-    bool cardMatchesValue = GetTopCardInDiscardPile().value == cardToPlay.value;
-    bool cardMatchesColor = GetTopCardInDiscardPile().color == cardToPlay.color;
+    bool cardMatchesValue = GetTopCardInDiscardPile().Value == cardToPlay.Value;
+    bool cardMatchesColor = GetTopCardInDiscardPile().Color == cardToPlay.Color;
     // handle if there's a wild on the top card
     bool cardMatchesWildColor = false;
-    if (GetTopCardInDiscardPile().value == "Wild" || GetTopCardInDiscardPile().value == "Wild Draw Four") {
-      if (cardToPlay.color == WildColor) {
+    if (GetTopCardInDiscardPile().Value == "Wild" || GetTopCardInDiscardPile().Value == "Wild Draw Four") {
+      if (cardToPlay.Color == WildColor) {
         cardMatchesWildColor = true;
       }
     }
     // handle if cardToPlay is a wild card itself
-    bool cardToPlayIsWild = cardToPlay.value == "Wild" || cardToPlay.value == "Wild Draw 4";
+    bool cardToPlayIsWild = cardToPlay.Value == "Wild" || cardToPlay.Value == "Wild Draw 4";
 
     cardCanBePlayed = cardMatchesValue || cardMatchesColor || cardMatchesWildColor || cardToPlayIsWild;
     return cardCanBePlayed;
@@ -213,27 +213,27 @@ public class UnoGame : IBaseGame {
 
     if (playerName == GetCurrentPlayer() || CardCanBePlayed(card)) {
       // check what type of card it is
-      bool cardIsNumerical = Array.IndexOf(numericalVals, card.value) != -1;
-      bool cardIsAction = Array.IndexOf(actionCards, card.value) != -1;
-      bool cardIsWild = Array.IndexOf(wildCards, card.value) != -1;
+      bool cardIsNumerical = Array.IndexOf(numericalVals, card.Value) != -1;
+      bool cardIsAction = Array.IndexOf(actionCards, card.Value) != -1;
+      bool cardIsWild = Array.IndexOf(wildCards, card.Value) != -1;
 
 
       // put card on top of the discard pile
       DiscardPile.Insert(0, card);
       // remove card from player hand
       playerHands[playerName].Remove(card);
-      Console.WriteLine(playerName + " successfully played a card: " + GetUnoCardString(card));
+      Console.WriteLine(playerName + " successfully played a card: " + card.ToString());
       // handle card effects
       if (cardIsNumerical) { // nothing more to do
       }
       else if (cardIsAction) {
-        if (card.value == "Skip") {
+        if (card.Value == "Skip") {
           NextTurn();
         }
-        else if (card.value == "Reverse") {
+        else if (card.Value == "Reverse") {
           ReverseDirection();
         }
-        else if (card.value == "Draw 2") {
+        else if (card.Value == "Draw 2") {
           NextTurn();
           DrawCard(GetCurrentPlayer());
           DrawCard(GetCurrentPlayer());
@@ -289,7 +289,7 @@ public class UnoGame : IBaseGame {
   }
   public bool DrawAndMoveOn(string playerName) {
     DrawCard(playerName);
-    Console.WriteLine(playerName + " drew a card : " + GetUnoCardString(GetPlayerHand(playerName).Last()));
+    Console.WriteLine(playerName + " drew a card : " + GetPlayerHand(playerName).Last().ToString());
     NextTurn();
     return true;
   }
@@ -303,4 +303,6 @@ public class UnoGame : IBaseGame {
     WildColor = color;
     PlayerWhoNeedsToPickWildColor = "";
   }
+  public void EndGame() {}
+}
 }

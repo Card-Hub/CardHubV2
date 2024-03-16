@@ -1,13 +1,16 @@
-﻿namespace WebApi.GameLogic;
+﻿using WebApi.Models;
 
-public interface IBaseGame {
-  void StartGame();
-  List<String> GetPlayerList();
-  Boolean AddPlayer(String playerName);
-  Boolean RemovePlayer( String playerName);
+namespace WebApi.GameLogic {
 
-  //List<iCard> GetPlayerHand(string playerName);
+  public interface IBaseGame<CardType> {
+    void StartGame();
+    List<string> GetPlayerList();
+    bool AddPlayer(string playerName);
+    bool RemovePlayer(string playerName);
+    List<CardType> GetPlayerHand(string playerName);
+    List<string> GetPlayersInOrder();
 
-
-  //void EndGame();
+    bool DrawCard(string playerName);
+    void EndGame();
+  }
 }

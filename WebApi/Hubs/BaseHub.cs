@@ -1,4 +1,5 @@
-﻿using WebApi.Models;
+﻿using WebApi.GameLogic;
+using WebApi.Models;
 
 namespace WebApi.Hubs;
 
@@ -20,23 +21,28 @@ public class UserMessage
     public required string Message { get; set; }
 }
 
+public interface IBaseClient
+{
+    
+}
+
 public partial class BaseHub : Hub
 {
     private const string BotUser = "Bot";
     private IDictionary<string, UserConnection> _userConnections;
+    private UnoGame _game;
 
-    public BaseHub(IDictionary<string, UserConnection> userConnections)
+    public BaseHub(IDictionary<string, UserConnection> userConnections, IBaseGame<UnoCard> game)
     {
         _userConnections = userConnections;
+        _game = (UnoGame) game;
     }
-    
+
     public override Task OnConnectedAsync()
     {
         Console.WriteLine("Connected");
         return base.OnConnectedAsync();
     }
-    
-    
 
     public async Task JoinRoom(UserConnection userConnection)
     {
@@ -53,6 +59,11 @@ public partial class BaseHub : Hub
                 Message = $"{userConnection.User} has joined the room {userConnection.Room}"
             });
         await SendConnectedUsers(userConnection.Room);
+
+        if (userConnection.UserType == UserType.Player)
+        {
+            _game.AddPlayer(userConnection.User);    
+        }
     }
 
     public async Task SendMessage(string message)
@@ -69,7 +80,7 @@ public partial class BaseHub : Hub
         }
     }
 
-    public async Task SendCard(StandardCard card)
+    public async Task SendCard(UnoCard card)
     {
         if (_userConnections.TryGetValue(Context.ConnectionId, out var userConnection))
         {
@@ -85,9 +96,46 @@ public partial class BaseHub : Hub
         }
     }
 
+    public Task DrawCard()
+    {
+        if (_userConnections.TryGetValue(Context.ConnectionId, out var userConnection))
+        {
+            var userName = userConnection.User;
+            var card = _game.DrawCard(userName);
+            var playerHand = _game.GetPlayerHand(userName);
+            
+            foreach (var pCard in playerHand)
+            {
+                Console.WriteLine(pCard);
+                Clients.Caller.SendAsync("ReceiveCard", "Gameboard", pCard);
+            }
+        }
+
+        return Task.CompletedTask;
+    }
+    
+    public Task StartGame()
+    {
+        _game.ShuffleDeck();
+        _game.StartGame();
+        
+        var roomConnections = _userConnections.Values.Where(x => x.Room == _userConnections[Context.ConnectionId].Room);
+
+        foreach (var conn in roomConnections.Where(x => x.UserType == UserType.Player))
+        {
+            var userName = conn.User;
+            var hand = _game.GetPlayerHand(userName);
+            Clients.Client(conn.ConnectionId!).SendAsync("StartedGame", hand);
+        }
+
+        return Task.CompletedTask;
+    }
+
     public Task SendConnectedUsers(string room)
     {
-        var users = _userConnections.Values.Where(x => x.Room == room).Select(x => x.User);
+        var users = _userConnections.Values.Where(x => x.Room == room && x.UserType == UserType.Player)
+            .Select(x => x.User);
+        Console.WriteLine("in send connected: ", users);
         return Clients.Group(room).SendAsync("UsersInRoom", users);
     }
 
@@ -95,6 +143,8 @@ public partial class BaseHub : Hub
     {
         if (!_userConnections.TryGetValue(Context.ConnectionId, out var userConnection))
             return base.OnDisconnectedAsync(exception);
+
+        _game.RemovePlayer(userConnection.User);
         
         Console.WriteLine($"Disconnected", userConnection.ToString());
         

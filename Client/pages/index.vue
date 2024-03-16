@@ -21,7 +21,7 @@ const getPearl = () => {
 
 <template>
   <Header2 v-if="!showText"/>
-  <div class="home-page">
+  <div id="home-page">
     <transition name="fade">
       <div v-if="showText" class="initial-message">
         <img class="pearl-logo" alt="pearl logo" 
@@ -33,7 +33,7 @@ const getPearl = () => {
     <transition name="fade">
       <div v-if="!showText" class="main-info"> 
 <!--        <h1> Welcome to </h1> <br>-->
-        <img class="cardhub-logo" alt="Cardhub logo"
+        <img class="cd-logo" alt="Cardhub logo"
              :src= 'getLogo()' />
       </div>
     </transition>
@@ -46,17 +46,21 @@ const getPearl = () => {
 </template>
 
 <style scoped>
-.home-page {
+#home-page {
+  width: 100%;
+  height: 100%;
   display: flex;
   justify-content: center;
   flex-direction: column;
   align-items: center;
-  height: 90vh;
 }
 
 .initial-message, .main-info {
   text-align: center;
-  
+  padding-top: 30vh;
+  justify-content: center;
+  align-items: center;
+  width: 50%;
 }
 
 
@@ -68,10 +72,6 @@ const getPearl = () => {
   opacity: 0;
 }
 
-.cardhub-logo {
-  align-items: center;
-  width: 100%;
-}
 
 .join-button{
   text-align: center;

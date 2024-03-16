@@ -512,3 +512,6 @@ coverage
 *.tsbuildinfo
 
 vite.config.ts.timestamp-*.mjs
+
+# VSCode personal settings
+.vscode/

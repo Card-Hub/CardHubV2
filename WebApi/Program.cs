@@ -1,6 +1,7 @@
-using WebApi.Common;
 using WebApi.Controllers;
+using WebApi.GameLogic;
 using WebApi.Hubs;
+using WebApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Logging.ClearProviders();
@@ -40,6 +41,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddSingleton<IDictionary<string, UserConnection>>(options => new Dictionary<string, UserConnection>());
 builder.Services.AddSingleton<HashSet<string>>(options => new HashSet<string>());
 builder.Services.AddSingleton<CardDbContext>();
+builder.Services.AddSingleton<IBaseGame<UnoCard>>(options => new UnoGame());
 
 var app = builder.Build();
 
@@ -64,3 +66,9 @@ app.MapHub<BaseHub>("/basehub", options =>
 });
 
 app.Run();
+
+public partial class Program { }
+
+//// For simulations
+//using WebApi.GameLogic.Simulations;
+//UnoGameSim.Simulate();

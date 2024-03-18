@@ -1,6 +1,7 @@
 using WebApi.GameLogic;
 using WebApi.Models;
 using System;
+using Xunit.Abstractions;
 
 // to run simulation:
 // (in PowerShell)
@@ -8,11 +9,14 @@ using System;
 // cd .\WebApi\GameLogic\Simulations
 // csc .\UnoGameSim.cs ..\UnoGame.cs ..\..\Models\iCard.cs ..\..\Models\UnoCard.cs ..\iBaseGame.cs
 
-namespace WebApi.GameLogic.Simulations {
+namespace Tests.GameSims;
 
 public class UnoGameSim {
-  public UnoGameSim() {}
-  public static void Simulate() {
+  private readonly ITestOutputHelper output;
+  public UnoGameSim(ITestOutputHelper output) {
+    this.output = output;
+  }
+  public void Simulate() {
     UnoGame game = new UnoGame();
     game.AddPlayer("Alex");
     game.AddPlayer("Liam");
@@ -20,34 +24,42 @@ public class UnoGameSim {
     game.AddPlayer("Rubi");
     game.ShuffleDeck();
     game.StartGame();
-    Console.WriteLine("RANDOM PLAYER ORDER:");
+    output.WriteLine("RANDOM PLAYER ORDER:");
     foreach (string player in game.GetPlayerList()) {
-      Console.WriteLine("\t" + player);
+      output.WriteLine("\t" + player);
     }
-    Console.WriteLine("PLAYER CARDS:");
+    output.WriteLine("PLAYER CARDS:");
     foreach (string name in game.GetPlayerList())
     {
-      Console.WriteLine("\t" + name + "'s cards:");
+      output.WriteLine("\t" + name + "'s cards:");
       foreach (UnoCard card in game.GetPlayerHand(name))
       {
-        Console.WriteLine("\t\t" + card.ToString());
+        output.WriteLine("\t\t" + card.ToString());
       }
     }
     int playerTurnNum = 0;
-    Console.WriteLine("GAME START!");
+    output.WriteLine("GAME START!");
     List<UnoCard> playerHand = new List<UnoCard>();
     string playerName = "";
     while (game.IsOngoing()) {
       playerName = game.GetCurrentPlayer();
       // person is going to try and play the game.
-      Console.WriteLine(playerTurnNum.ToString() + ". " + playerName + "'s turn.");
+      output.WriteLine(playerTurnNum.ToString() + ". " + playerName + "'s turn.");
       // try and play a card
       playerHand = game.GetPlayerHand(playerName);
-      if (!game.PlayerHasPlayableCard(playerName)) {Console.WriteLine("No playable cards!"); game.DrawAndMoveOn(playerName);}
-      bool playedACard = false;
+      if (!game.PlayerHasPlayableCard(playerName)) {
+        output.WriteLine("No playable cards!");
+        bool drewAndMovedOn = game.DrawAndMoveOn(playerName);
+        if (drewAndMovedOn) {
+          output.WriteLine(playerName + " drew a card : " + game.GetPlayerHand(playerName).Last().ToString());
+        }
+      }
+      else {
+          bool playedACard = false;
       for (int i = 0; i < playerHand.Count; i++) {
         if (!playedACard && game.CardCanBePlayed(playerHand.ElementAt(i))) {
           playedACard = true;
+          output.WriteLine(playerName + " played a card: " + playerHand.ElementAt(i).ToString());
           game.PlayCard(playerName, playerHand.ElementAt(i));
           if (game.PlayerNeedsToPickWildColor(playerName)) {
             // get the first non-black color in the hand
@@ -57,22 +69,28 @@ public class UnoGameSim {
                 newWildColor = card.Color;
               }
               // set that color as the new wild color
-              game.SetWildColor(playerName, newWildColor);
+              bool wildColorSet = game.SetWildColor(playerName, newWildColor);
+              if (wildColorSet) {
+                output.WriteLine(playerName + " set the wild color to be " + newWildColor);
+              }
+              else {
+                output.WriteLine(playerName + " could not set the wild color to " + newWildColor);
+              }
               break;
             }
           }
         }
       }
+      }
+      
       string endTurnStr = "Card totals: ";
       foreach (string name in game.GetPlayerList()) {
         endTurnStr += name + ": " + game.GetPlayerHand(name).Count() + ", ";
       }
-      Console.WriteLine(endTurnStr);
+      output.WriteLine(endTurnStr);
 
       playerTurnNum ++;
     }
-    Console.WriteLine(playerName + " won!");
+    output.WriteLine(playerName + " won!");
   }
-}
-
 }

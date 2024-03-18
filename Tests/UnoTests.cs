@@ -1,8 +1,7 @@
 namespace WebApi.Tests;
 using WebApi.Models;
 //using WebApi.GameLogic;
-using Xunit;
-using Xunit.Abstractions;
+using Xunit.Abstractions; // for output
 
 // Setup/Teardown not implemented
 // Notes on output:
@@ -19,7 +18,7 @@ public class UnitTest1
     private readonly ITestOutputHelper output;
     public UnitTest1(ITestOutputHelper output)
     {
-        this.output = output;
+      this.output = output;
     }
     // tests need either [Fact] or [Theory] above them
     // google [Theory] or just use [Fact]
@@ -52,9 +51,9 @@ public class UnitTest1
     [Fact]
     public void TestUnoCardString() {
       UnoCard uc = new UnoCard();
-      Assert.Equal("Uno Card with id: 0, value: , color: ", uc.ToString());
+      Assert.Equal("{ id: 0, value: , color:  }", uc.ToString());
       UnoCard uc2 = new UnoCard(15, "Skip", "blue");
-      Assert.Equal("Uno Card with id: 15, value: Skip, color: blue", uc2.ToString());
+      Assert.Equal("{ id: 15, value: Skip, color: blue }", uc2.ToString());
     } 
     [Fact]
     public void TestHalfFinishedUnoCardValues() {

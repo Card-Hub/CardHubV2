@@ -268,7 +268,7 @@ public class UnoGame : IBaseGame<UnoCard> {
     if (playerName == GetCurrentPlayer()) {
       if (playerName == PlayerWhoNeedsToPickWildColor) {
         WildColor = color;
-        Console.WriteLine(playerName + " set the wild color to be " + color);
+        //Console.WriteLine(playerName + " set the wild color to be " + color);
         PlayerWhoNeedsToPickWildColor = "";
         NextTurn();
         return true;
@@ -288,10 +288,15 @@ public class UnoGame : IBaseGame<UnoCard> {
     return !someoneHasWon;
   }
   public bool DrawAndMoveOn(string playerName) {
-    DrawCard(playerName);
-    Console.WriteLine(playerName + " drew a card : " + GetPlayerHand(playerName).Last().ToString());
-    NextTurn();
-    return true;
+    bool drewCard = DrawCard(playerName);
+    if (drewCard) {
+      Console.WriteLine(playerName + " drew a card : " + GetPlayerHand(playerName).Last().ToString());
+      NextTurn();
+      return true;
+    }
+    else {
+      return false;
+    }
   }
   private void SetPlayerNeedsToPickWildColor(string playerName) {
     PlayerWhoNeedsToPickWildColor = playerName;

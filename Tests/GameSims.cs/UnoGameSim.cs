@@ -1,13 +1,10 @@
 using WebApi.GameLogic;
 using WebApi.Models;
-using System;
 using Xunit.Abstractions;
 
 // to run simulation:
-// (in PowerShell)
-// make sure you have csc compiler downloaded, add the location of csc to PATH, then in PowerShell:
-// cd .\WebApi\GameLogic\Simulations
-// csc .\UnoGameSim.cs ..\UnoGame.cs ..\..\Models\iCard.cs ..\..\Models\UnoCard.cs ..\iBaseGame.cs
+// cd to CardHubV2 (or whatever your parent folder for WebApi is)
+// dotnet test --filter "SimGame=Uno" --logger "console;verbosity=detailed"
 
 namespace Tests.GameSims;
 

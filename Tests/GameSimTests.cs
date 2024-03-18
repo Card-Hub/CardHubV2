@@ -14,9 +14,13 @@ public class GameSimTests {
   [Category ("Sim")]
   [Trait ("SimGame", "Uno")]
   public void RunUnoSim() {
-    output.WriteLine("12345");
     UnoGameSim UnoSim = new UnoGameSim(this.output);
     UnoSim.Simulate();
-    Assert.True(true);
+  }
+  [Fact]
+  [Category ("Sim")]
+  [Trait ("SimGame", "TexasHoldEm")]
+  public void RunTexasSim() {
+    TexasGameSim TexasSim = new TexasGameSim(this.output);
   }
 }

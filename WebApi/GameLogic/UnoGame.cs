@@ -309,5 +309,15 @@ public class UnoGame : IBaseGame<UnoCard> {
     PlayerWhoNeedsToPickWildColor = "";
   }
   public void EndGame() {}
-}
+
+    bool IBaseGame<UnoCard>.InitDeck()
+    {
+      throw new NotImplementedException();
+    }
+
+    public bool ResetForNextRound()
+    {
+      throw new NotImplementedException();
+    }
+  }
 }

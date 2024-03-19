@@ -13,6 +13,7 @@ namespace WebApi.GameLogic {
     List<string> GetPlayersInOrder();
 
     bool DrawCard(string playerName);
+    bool ResetForNextRound();
     void EndGame();
   }
 }

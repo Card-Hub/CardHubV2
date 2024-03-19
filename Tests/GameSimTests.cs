@@ -22,5 +22,6 @@ public class GameSimTests {
   [Trait ("SimGame", "TexasHoldEm")]
   public void RunTexasSim() {
     TexasGameSim TexasSim = new TexasGameSim(this.output);
+    TexasSim.Simulate();
   }
 }

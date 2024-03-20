@@ -1,18 +1,6 @@
-﻿namespace WebApi.Common;
+﻿using System.Collections;
 
-public record PlayerInfo
-{
-    public string Id { get; }
-    public bool IsConnected { get; set; }
-
-    public PlayerInfo(string id, bool isConnected = true)
-    {
-        if (string.IsNullOrEmpty(id))
-            throw new ArgumentException("Id must be provided.", nameof(id));
-        Id = id;
-        IsConnected = isConnected;
-    }
-}
+namespace WebApi.Common;
 
 public enum Direction
 {
@@ -20,14 +8,20 @@ public enum Direction
     Backward
 }
 
-public class PlayerOrder
+public class PlayerOrder<TPlayer, TCard> : IEnumerable<TPlayer> where TPlayer : CardPlayer<TCard>
 {
-    private LinkedList<PlayerInfo> _players;
-    private LinkedListNode<PlayerInfo> _currentNode;
-    private Direction _direction;
+    private LinkedList<TPlayer> _players;
+    private LinkedListNode<TPlayer> _currentNode;
+    
+    private Direction _direction = Direction.Forward;
     private const int MaxCapacity = 8;
+    
+    public PlayerOrder()
+    {
+        _players = new LinkedList<TPlayer>();
+    }
 
-    public PlayerOrder(IEnumerable<string> players)
+    public PlayerOrder(IEnumerable<TPlayer> players)
     {
         switch (players.Count())
         {
@@ -36,20 +30,22 @@ public class PlayerOrder
             case < 2:
                 throw new ArgumentException("Too few players");
             default:
-                _players = new LinkedList<PlayerInfo>(players.Select(id => new PlayerInfo(id)));
+                _players = new LinkedList<TPlayer>(players);
                 _currentNode = _players.First ?? throw new ArgumentException("No players in the list");
-                _direction = Direction.Forward;
                 break;
         }
     }
 
-    public int GetPlayerCount() => _players.Count;
+    public int Count() => _players.Count;
 
-    public int GetActivePlayerCount() => _players.Count(p => p.IsConnected);
+    public TPlayer Current() => _currentNode.ValueRef;
+    
+    public TPlayer Next() => GetNextNode().ValueRef;
 
-    public string GetCurrentPlayer()
+    public TPlayer GetPlayer(string name)
     {
-        return _currentNode.Value.Id;
+        var player = _players.SingleOrDefault(p => p.Name == name);
+        return player ?? throw new ArgumentException("Player not found");
     }
 
     public void ToggleDirection()
@@ -57,7 +53,7 @@ public class PlayerOrder
         _direction = _direction == Direction.Forward ? Direction.Backward : Direction.Forward;
     }
     
-    public string SetNextCurrentPlayer(int playersToIterate = 1)
+    public string SetNextCurrent(int playersToIterate = 1)
     {
         if (_players.First is null || _players.Last is null || playersToIterate < 1)
         {
@@ -70,24 +66,24 @@ public class PlayerOrder
             playersToIterate--;
         }
 
-        var nextPlayer = _currentNode.Value.Id;
-        return string.IsNullOrEmpty(nextPlayer) ? "" : nextPlayer;
+        var nextPlayer = _currentNode.Value;
+        return string.IsNullOrEmpty(nextPlayer.Name) ? "" : nextPlayer.Name;
     }
 
-    public bool AddPlayer(string id)
+    public bool Add(TPlayer player)
     {
-        if (_players.Count >= MaxCapacity || _players.Any(p => p.Id == id))
+        if (_players.Count >= MaxCapacity || _players.Any(p => p.Name == player.Name))
         {
             return false;
         }
 
-        _players.AddLast(new PlayerInfo(id));
+        _players.AddLast(player);
         return true;
     }
 
-    public bool RemovePlayer(string id)
+    public bool Remove(string name)
     {
-        var playerToRemove = _players.SingleOrDefault(p => p.Id == id);
+        var playerToRemove = _players.SingleOrDefault(p => p.Name == name);
         if (playerToRemove == null)
         {
             return false;
@@ -95,35 +91,24 @@ public class PlayerOrder
 
         if (playerToRemove == _currentNode.Value)
         {
-            SetNextCurrentPlayer();
+            SetNextCurrent();
         }
 
         _players.Remove(playerToRemove);
         return true;
     }
-
-
+    
     public void RandomizeOrder()
     {
         if (_players.Count < 2) return;
         var random = new Random();
         var randomizedPlayers = _players.OrderBy(p => random.Next());
-        _players = new LinkedList<PlayerInfo>(randomizedPlayers);
+        _players = new LinkedList<TPlayer>(randomizedPlayers);
         _direction = Direction.Forward;
-        var current = _players.First;
-        while (current != null)
-        {
-            if (current.Value.IsConnected)
-            {
-                _currentNode = current;
-                break;
-            }
-
-            current = current.Next;
-        }
+        _currentNode = _players.First ?? throw new ArgumentException("No players in the list");
     }
 
-    private LinkedListNode<PlayerInfo> GetNextNode()
+    private LinkedListNode<TPlayer> GetNextNode()
     {
         if (_players.First is null || _players.Last is null)
         {
@@ -137,29 +122,20 @@ public class PlayerOrder
             _ => throw new ArgumentOutOfRangeException()
         };
     }
-    
-    
-    // For debugging purposes
-    public void PrintPlayers()
-    {
-        foreach (var player in _players)
-        {
-            Console.WriteLine("Player: " + player.Id + " IsConnected: " + player.IsConnected);
-        }
-    }
 
-    // For debugging purposes
-    public void TraversePlayers()
+    public IEnumerator<TPlayer> GetEnumerator()
     {
         var startNode = _currentNode;
         do
         {
-            if (_currentNode.Value.IsConnected)
-            {
-                Console.WriteLine("Player: " + _currentNode.Value.Id + " IsConnected: " + _currentNode.Value.IsConnected);
-            } 
+            yield return _currentNode.Value;
             _currentNode = GetNextNode();
         } while (startNode != _currentNode);
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
     }
 }
 
@@ -169,14 +145,14 @@ public class PlayerOrder
 // playerOrder.PrintPlayers();
 //
 // Console.WriteLine("\n-- Current player --");
-// Console.WriteLine(playerOrder.GetCurrentPlayer());
+// Console.WriteLine(playerOrder.Current());
 //
 // Console.WriteLine("\n-- Next player --");
-// Console.WriteLine(playerOrder.SetNextCurrentPlayer());
+// Console.WriteLine(playerOrder.SetNextCurrent());
 //
 // Console.WriteLine("\n-- Han added, Lyssie removed --");
-// playerOrder.AddPlayer("han");
-// playerOrder.RemovePlayer("lyssie");
+// playerOrder.Add("han");
+// playerOrder.Remove("lyssie");
 // playerOrder.PrintPlayers();
 //
 // Console.WriteLine("\n-- Liam disconnected --");

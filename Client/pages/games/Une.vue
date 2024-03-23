@@ -1,6 +1,6 @@
 <script setup lang="ts">
-  import PlayerHand from "~/components/PlayerHand.vue";
   import { ref, computed } from 'vue';
+  import UNOCardDisplay from "~/components/Card/UNOCardDisplay.vue";
 
   // create uno deck of cards
   const unoDeck = [];
@@ -79,9 +79,11 @@
 <!--      </div>-->
     </div>
     <Button @click='showCardContainer()' class="show-cards">{{ buttonText }}</Button>
-    
     <div v-if="showCards" class="card-container">
-      <PlayerHand :player-hand="playerHand"/>
+      <UNOCardDisplay v-for="card in unoDeck"
+                      :key="card.id"
+                      :card="card"
+      />
     </div>
     
   </div> 
@@ -168,6 +170,7 @@
   display: flex;
   flex-direction: row;
   justify-content: center;
+  flex-wrap: wrap;
   align-self: center;
   align-items: center;
   height: 100%;

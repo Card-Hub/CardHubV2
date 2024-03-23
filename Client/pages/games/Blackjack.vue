@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import PlayerHand from "~/components/PlayerHand.vue";
 import { ref, computed } from 'vue';
+import UNOCardDisplay from "~/components/Card/UNOCardDisplay.vue";
+import StandardCardDisplay from "~/components/Card/StandardCardDisplay.vue";
 
 
 // create standard deck of cards
@@ -36,7 +38,7 @@ const getCards = () => {
 </script>
 
 <template>
-  <div class="une">
+  <div class="blackjack">
     <NuxtLink href="/games" class="go-back-btn">
       <Button class="go-back">Go Back</Button>
     </NuxtLink>
@@ -68,14 +70,18 @@ const getCards = () => {
     <Button @click='showCardContainer()' class="show-cards">{{ buttonText }}</Button>
 
     <div v-if="showCards" class="card-container">
-      <PlayerHand :player-hand="playerHand"/>
+      <div v-if="showCards" class="card-container">
+        <StandardCardDisplay v-for="card in standardDeck"
+                        :key="card.id"
+                        :card="card"
+        />
+      </div>
     </div>
-
   </div>
 </template>
 
 <style scoped>
-.une {
+.blackjack {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -156,6 +162,7 @@ const getCards = () => {
   flex-direction: row;
   justify-content: center;
   align-self: center;
+  flex-wrap: wrap;
   align-items: center;
   height: 100%;
   width: 85%;

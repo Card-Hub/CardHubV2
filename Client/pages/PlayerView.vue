@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import { useWebSocketStore } from "~/stores/webSocketStore";
+import PlayerHand from "~/components/PlayerHand.vue";
 
 // const { $api } = useNuxtApp();
 
@@ -80,15 +81,15 @@ const selectedCard = ref<UNOCard | null>(null);
 //   sendCard(card)
 // };
 
-// const handleCardClick = <C extends Card>(card: C) => {
-//   selectedCard.value = card;
-//   sendCard(card);
-// };
-
-const handleCardClick = (card: UNOCard) => {
+const handleCardClick = <C extends Card>(card: C) => {
   selectedCard.value = card;
   sendCard(card);
 };
+
+// const handleCardClick = (card: UNOCard) => {
+//   selectedCard.value = card;
+//   sendCard(card);
+// };
 
 // Websockets stuff
 console.log("check here for connectivity", isConnected.value);
@@ -98,7 +99,7 @@ console.log("check here for obj", connection.value);
 <template>
   <div id="dimScreen">
     <Button @click="drawCard">Draw Card</Button>
-    <PlayerHand :playerHand="cards" @cardClick="handleCardClick" />
+    <PlayerHand @cardClick="handleCardClick" />
     <h2 class="text-center text-2xl font-bold my-4">Selected Card</h2>
     <SelectedCard :selectedCard="selectedCard" />
   </div>

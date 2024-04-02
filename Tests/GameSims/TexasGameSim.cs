@@ -14,7 +14,8 @@ public class TexasGameSim {
     this.output = output;
   }
   public void Simulate() {
+    output.WriteLine("Started Texas Hold Em Game Sim.");
     TexasHoldEmGame game = new TexasHoldEmGame();
-    
+    output.WriteLine("Game state is: " + game.GetGameState());
   }
 }

@@ -20,9 +20,9 @@ public class StandardCard
     public string GetValues()
     {
       string innerJson = "";
-      innerJson += "id: " + this.Id + ",";
-      innerJson += "suit: " + this.Suit + ",";
-      innerJson += "value: " + this.Value;
+      innerJson += $"\"id\":  \"{this.Id}\",";
+      innerJson += $"\"suit\": \"{this.Suit}\"" + ",";
+      innerJson += $"\"value\": \"{this.Value}\"";
       return $"{{{innerJson}}}";
     }
 }

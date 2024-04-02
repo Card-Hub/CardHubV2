@@ -1,44 +1,48 @@
 using System.Runtime.CompilerServices;
-//using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using WebApi.Models;
+using WebApi.GameLogic.TexasHoldEmStates;
+using WebApi.Common;
+using WebApi.Common.LyssiePlayerOrder;
 namespace WebApi.GameLogic;
 
 public class TexasHoldEmGame : IBaseGame<StandardCard>
 {
-  enum TexasGameState {
-    NotStarted = 0,
-    PreFlop = 1,
-    PostFlop = 2,
-    Turn = 3, // 4th card, or 4th street
-    River = 4, // 5th card, or 5th street
-    BetweenHands = 5
+  private TexasHoldEmState _State {get; set;}
+  public LyssiePlayerOrder PlayerOrder;
+  public bool SpectatorsOnly {get; set;}
+
+  public Deck<StandardCard> Deck {get; set;}
+
+  public int LittleBlindAmt {get;set;}
+  public int BigBlindAmt {get;set;}
+
+  public TexasHoldEmGame() {
+    this.PlayerOrder = new();
+    this._State = new TexasHoldEmStateNotStarted(this);
+    this.Deck = new();
+    this.LittleBlindAmt = 1;
+    this.BigBlindAmt = 2;
   }
-  private TexasGameState _state;
+  public void SetState(TexasHoldEmState newState) {
+    this._State = newState;
+  }
   public string GetGameState() {
-    switch (_state) {
-      case TexasGameState.NotStarted:
-        return "Not Started";
-      case TexasGameState.PreFlop:
-        return "Pre-Flop";
-      case TexasGameState.PostFlop:
-        return "Post-Flop";
-      case TexasGameState.Turn:
-        return "Turn";
-      case TexasGameState.River:
-        return "River";
-      case TexasGameState.BetweenHands:
-        return "Between Hands";
-      default:
-        throw new SwitchExpressionException("Game state not added to switch case");
+    string modelString = "";
+    modelString += "";
+    string players = "";
+    List<string> ActivePlayers = this.PlayerOrder.GetPlayers(LyssiePlayerStatus.Active);
+    List<string> SpectatorPlayers = this.PlayerOrder.GetPlayers(LyssiePlayerStatus.Active);
+
+    for (int i = 0; i < ActivePlayers.Count; i++) {
+      string playerName = ActivePlayers.ElementAt(i);
     }
-  }
-  private TexasGameState GetEnumGameState() {
-    return this._state;
+    return $"{{{modelString}}}";
+    //return _State.ToString();
   }
   //private
   public bool AddPlayer(string playerName)
   {
-    throw new NotImplementedException();
+    return this._State.AddPlayer(playerName);
   }
 
   public bool DrawCard(string playerName)
@@ -58,7 +62,11 @@ public class TexasHoldEmGame : IBaseGame<StandardCard>
 
   public List<string> GetPlayerList()
   {
-    throw new NotImplementedException();
+    return PlayerOrder.GetPlayers(LyssiePlayerStatus.Active);
+  }
+  public List<string> GetSpectatorList() {
+    return this.PlayerOrder.GetPlayers(LyssiePlayerStatus.Spectator);
+    //throw new NotImplementedException();
   }
 
   public List<string> GetPlayersInOrder()

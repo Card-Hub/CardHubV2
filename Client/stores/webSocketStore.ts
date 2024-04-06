@@ -27,6 +27,8 @@ export const useWebSocketStore = defineStore("webSocket", () => {
     const user = ref("");
     const room = ref("");
 
+    const timer = ref<number>(0);
+
     const runtimeConfig = useRuntimeConfig();
     const reconnectTimeout = runtimeConfig.public.reconnectTimeout;
 
@@ -93,6 +95,10 @@ export const useWebSocketStore = defineStore("webSocket", () => {
                 console.log(card);
             });
 
+            joinConnection.on("ReceiveCards", (gameCards: UNOCard[]) => {
+               cards.value.push(...gameCards);
+            });
+
             joinConnection.on("UsersInRoom", (groupUsers: string[]) => {
                 users.value = groupUsers;
             });
@@ -100,6 +106,28 @@ export const useWebSocketStore = defineStore("webSocket", () => {
             joinConnection.on("StartedGame", (gameCards: UNOCard[]) => {
                 cards.value = gameCards;
                 navigateTo("/playerview");
+            });
+
+            joinConnection.on("PopCard", (card: UNOCard) => {
+                console.log("Popped card:", card);
+                cards.value = cards.value.filter(c => c.id !== card.id);
+            });
+
+            const timeout = ref<NodeJS.Timeout | null>(null);
+            joinConnection.on("StartTimer", async (time: number) => {
+                if (timeout.value)
+                    clearInterval(timeout.value);
+                console.log("Timer started:", timer);
+                timer.value = time;
+                if (time > 0) {
+                    timeout.value = setInterval(async () => {
+                        timer.value--;
+                        if (timer.value === 0) {
+                            if (timeout.value)
+                                clearInterval(timeout.value);
+                        }
+                    }, 1000);
+                }
             });
 
             joinConnection.onclose(async () => {
@@ -159,7 +187,6 @@ export const useWebSocketStore = defineStore("webSocket", () => {
         if (connection.value === null) {
             return;
         }
-        cards.value = [];
         await connection.value.invoke("DrawCard");
     }
 
@@ -194,7 +221,7 @@ export const useWebSocketStore = defineStore("webSocket", () => {
     // Must return all state properties
     // https://pinia.vuejs.org/core-concepts/
     return {
-        connection, isConnected, isPlayer, cards, messages, users, user, room, cookieUser, cookieRoom,
+        connection, isConnected, isPlayer, cards, messages, users, user, room, cookieUser, cookieRoom, timer,
         tryCreateRoom, tryJoinRoom, sendCard, drawCard, startGame, sendMessage, closeConnection
     };
 });

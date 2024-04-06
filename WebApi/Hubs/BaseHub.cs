@@ -30,12 +30,12 @@ public partial class BaseHub : Hub
 {
     private const string BotUser = "Bot";
     private IDictionary<string, UserConnection> _userConnections;
-    private UnoGame _game;
+    private UnoGameMod _game;
 
-    public BaseHub(IDictionary<string, UserConnection> userConnections, IBaseGame<UnoCard> game)
+    public BaseHub(IDictionary<string, UserConnection> userConnections, UnoGameMod game)
     {
         _userConnections = userConnections;
-        _game = (UnoGame) game;
+        _game = game;
     }
 
     public override Task OnConnectedAsync()
@@ -60,9 +60,16 @@ public partial class BaseHub : Hub
             });
         await SendConnectedUsers(userConnection.Room);
 
-        if (userConnection.UserType == UserType.Player)
+        switch (userConnection.UserType)
         {
-            _game.AddPlayer(userConnection.User);    
+            case UserType.Player:
+                _game.AddPlayer(userConnection.ConnectionId);
+                break;
+            case UserType.Gameboard:
+                _game.Gameboard = userConnection.ConnectionId;
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
         }
     }
 
@@ -84,51 +91,50 @@ public partial class BaseHub : Hub
     {
         if (_userConnections.TryGetValue(Context.ConnectionId, out var userConnection))
         {
-            var gameboardId = _userConnections.Values
-                .Where(x => x.Room == userConnection.Room && x.UserType == UserType.Gameboard)
-                .Select(x => x.ConnectionId).SingleOrDefault();
-            if (string.IsNullOrEmpty(gameboardId))
+            var userName = userConnection.ConnectionId;
+            if (await _game.PlayCard(userConnection.ConnectionId!, card))
             {
-                throw new Exception("Gameboard not found");
+                await Clients.Client(userConnection.ConnectionId!).SendAsync("PopCard", card);
+                await Clients.Client(_game.Gameboard).SendAsync("ReceiveCard", userConnection.User, card);
             }
-
-            await Clients.Client(gameboardId).SendAsync("ReceiveCard", userConnection.User, card);
-        }
+            else
+            {
+                await Clients.Caller.SendAsync("ReceiveMessage",
+                    new UserMessage
+                    {
+                        User = BotUser,
+                        Message = $"It's not your turn, {userName}"
+                    });
+            }
+        }   
     }
 
-    public Task DrawCard()
+    public async Task DrawCard()
     {
-        if (_userConnections.TryGetValue(Context.ConnectionId, out var userConnection))
+        if (!_userConnections.TryGetValue(Context.ConnectionId, out var userConnection)) return;
+
+        var userName = userConnection.ConnectionId!;
+        var card = _game.DrawCard(userName);
+
+        if (card is not null)
         {
-            var userName = userConnection.User;
-            var card = _game.DrawCard(userName);
-            var playerHand = _game.GetPlayerHand(userName);
-            
-            foreach (var pCard in playerHand)
-            {
-                Console.WriteLine(pCard);
-                Clients.Caller.SendAsync("ReceiveCard", "Gameboard", pCard);
-            }
-        }
+            await Clients.Caller.SendAsync("ReceiveCard", "Gameboard", card);
 
-        return Task.CompletedTask;
+        }
     }
-    
-    public Task StartGame()
+
+    public async Task StartGame()
     {
-        _game.ShuffleDeck();
-        _game.StartGame();
+        await _game.StartGame();
         
         var roomConnections = _userConnections.Values.Where(x => x.Room == _userConnections[Context.ConnectionId].Room);
 
         foreach (var conn in roomConnections.Where(x => x.UserType == UserType.Player))
         {
-            var userName = conn.User;
+            var userName = conn.ConnectionId!;
             var hand = _game.GetPlayerHand(userName);
-            Clients.Client(conn.ConnectionId!).SendAsync("StartedGame", hand);
+            await Clients.Client(conn.ConnectionId!).SendAsync("StartedGame", hand);
         }
-
-        return Task.CompletedTask;
     }
 
     public Task SendConnectedUsers(string room)

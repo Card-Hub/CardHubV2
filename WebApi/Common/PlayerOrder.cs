@@ -78,6 +78,11 @@ public class PlayerOrder<TPlayer, TCard> : IEnumerable<TPlayer> where TPlayer : 
         }
 
         _players.AddLast(player);
+        if (_currentNode is null)
+        {
+            _currentNode = _players.First ?? throw new ArgumentException("No players in the list");
+        }
+        
         return true;
     }
 
@@ -98,7 +103,7 @@ public class PlayerOrder<TPlayer, TCard> : IEnumerable<TPlayer> where TPlayer : 
         return true;
     }
     
-    public void RandomizeOrder()
+    public void ShuffleOrder()
     {
         if (_players.Count < 2) return;
         var random = new Random();
@@ -126,9 +131,13 @@ public class PlayerOrder<TPlayer, TCard> : IEnumerable<TPlayer> where TPlayer : 
     public IEnumerator<TPlayer> GetEnumerator()
     {
         var startNode = _currentNode;
+        if (startNode is null)
+        {
+            yield break;
+        }
         do
         {
-            yield return _currentNode.Value;
+            yield return _currentNode.ValueRef;
             _currentNode = GetNextNode();
         } while (startNode != _currentNode);
     }
@@ -160,7 +169,7 @@ public class PlayerOrder<TPlayer, TCard> : IEnumerable<TPlayer> where TPlayer : 
 // playerOrder.PrintPlayers();
 //
 // Console.WriteLine("\n-- Randomize order --");
-// playerOrder.RandomizeOrder();
+// playerOrder.ShuffleOrder();
 // playerOrder.PrintPlayers();
 //
 // Console.WriteLine("\n-- Test real game loop --");

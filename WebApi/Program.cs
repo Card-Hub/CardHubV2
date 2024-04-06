@@ -1,3 +1,33 @@
+// using WebApi.Common;
+// using WebApi.GameLogic;
+//
+// var u = new UnoGameMod(new UnoDeckBuilder(), new UnoSettings());
+// var players = new List<UnoPlayer>();
+// for (var i = 0; i < 3; i++)
+// {
+//     players.Add(new UnoPlayer($"Player { i + 1 }"));
+// }
+//
+// u.AddPlayers(players);
+// u.StartGame();
+// while (true)
+// {
+//     u.InitiateTurn();
+//     var number = Console.ReadLine();
+//     //convert to number
+//     if (int.TryParse(number, out var num))
+//     {
+//         u.PlayCard(num);
+//     }
+//     else
+//     {
+//         u.DrawCard();
+//     }
+//     u.CancelTimer(input ?? "null shi");
+// }
+
+
+using WebApi.Common;
 using WebApi.Controllers;
 using WebApi.GameLogic;
 using WebApi.Hubs;
@@ -39,9 +69,10 @@ builder.Services.AddCors(options =>
     });
 });
 builder.Services.AddSingleton<IDictionary<string, UserConnection>>(options => new Dictionary<string, UserConnection>());
-builder.Services.AddSingleton<HashSet<string>>(options => new HashSet<string>());
+builder.Services.AddSingleton<HashSet<string>>(options => []);
 builder.Services.AddSingleton<CardDbContext>();
-builder.Services.AddSingleton<IBaseGame<UnoCard>>(options => new UnoGame());
+builder.Services.AddSingleton<UnoDeckBuilder>();
+builder.Services.AddSingleton<UnoGameMod>();
 
 var app = builder.Build();
 

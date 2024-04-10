@@ -1,14 +1,16 @@
-using System.Security.Cryptography.X509Certificates;
-
 namespace WebApi.Models;
 
 public class PokerPlayer : Player {
+  public int Pot { get; set; }
+  public int CurrentBet { get; set; }
+  public bool Afk { get; set; }
+  public bool Folded { get; set; }
   public List<StandardCard> Hand;
-  public List<int> Bet;
-  public List<int> PileOfChips;
   public PokerPlayer(string name) : base(name) {
-    this.Hand = new();
-    this.Bet = new();
-    this.PileOfChips = new();
+    Pot = 0;
+    CurrentBet = 0;
+    Afk = false;
+    Folded = false;
+    Hand = new List<StandardCard>();
   }
 }

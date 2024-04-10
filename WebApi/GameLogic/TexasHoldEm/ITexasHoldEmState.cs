@@ -8,5 +8,5 @@ public interface ITexasHoldEmState : IGameState {
   bool Call(string playerName);
   bool Check(string playerName);
   bool Fold(string playerName);
-  bool Raise(string playerName);
+  bool Raise(string playerName, int amtRaised);
 }

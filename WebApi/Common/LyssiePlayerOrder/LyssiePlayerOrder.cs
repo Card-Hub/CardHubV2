@@ -10,13 +10,13 @@ public class LyssiePlayerOrder : LyssieIPlayerOrder
   private Dictionary<string, bool> AfkPlayersDict;
   private int CurrentPlayerIndex;
   private int? ForcedNextPlayerIndex;
-  public int DirectionInt {get;set;}
+  public Direction DirectionInt {get;set;}
   public LyssiePlayerOrder() {
     this.ActivePlayers = new();
     this.SpectatorPlayers = new();
     this.AfkPlayersDict = new();
     this.CurrentPlayerIndex = 0;
-    this.DirectionInt = 1;
+    this.DirectionInt = Direction.Forward;
     this.ForcedNextPlayerIndex = null;
   }
   public List<string> GetAllPlayers()
@@ -48,7 +48,7 @@ public class LyssiePlayerOrder : LyssieIPlayerOrder
     List<string> inOrder = new();
     do {
       inOrder.Add(ActivePlayers.ElementAt(i));
-      i += DirectionInt;
+      i += (int) DirectionInt;
       // handle too much or too little
       i %= ActivePlayers.Count; // too much
       if (i < 0) {
@@ -134,7 +134,7 @@ public class LyssiePlayerOrder : LyssieIPlayerOrder
       ForcedNextPlayerIndex = null;
     }
     else {
-      CurrentPlayerIndex += DirectionInt;
+      CurrentPlayerIndex += (int) DirectionInt;
     }
     // loop around
     // handle index too high
@@ -164,7 +164,7 @@ public class LyssiePlayerOrder : LyssieIPlayerOrder
           CurrentPlayerIndex -= 1;
         }
         // If the CurrentPlayer is the one removed, and the direction int is negative, then the CPI needs to be decreased by 1
-        else if (RemovedPlayerIndex == CurrentPlayerIndex && DirectionInt < 0) {
+        else if (RemovedPlayerIndex == CurrentPlayerIndex && DirectionInt == Direction.Backward) {
           CurrentPlayerIndex -= 1;
         }
       }
@@ -191,7 +191,7 @@ public class LyssiePlayerOrder : LyssieIPlayerOrder
   // Set next player to be offset * direction players away from the current player.
   public bool SetNextPlayer(int offset)
   {
-    ForcedNextPlayerIndex = CurrentPlayerIndex += offset * DirectionInt;
+    ForcedNextPlayerIndex = CurrentPlayerIndex += offset * (int) DirectionInt;
     // loop around
     // handle index too high
     ForcedNextPlayerIndex %= ActivePlayers.Count;

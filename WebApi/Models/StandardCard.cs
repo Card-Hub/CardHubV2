@@ -1,5 +1,6 @@
 ﻿namespace WebApi.Models;
 
+// no more manual json
 public class StandardCard
 {
     public StandardCard() {
@@ -15,14 +16,4 @@ public class StandardCard
     public int Id { get; set; }
     public string Suit { get; set; }
     public string Value { get; set; }
-
-    // manually doing json is a red flag but oh well lmao
-    public string GetValues()
-    {
-      string innerJson = "";
-      innerJson += $"\"id\":  \"{this.Id}\",";
-      innerJson += $"\"suit\": \"{this.Suit}\"" + ",";
-      innerJson += $"\"value\": \"{this.Value}\"";
-      return $"{{{innerJson}}}";
-    }
 }

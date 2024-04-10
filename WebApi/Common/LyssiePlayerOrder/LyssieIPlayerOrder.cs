@@ -5,6 +5,10 @@ public enum LyssiePlayerStatus {
   Afk,
   NotAfk
 }
+public enum Direction {
+  Forward = 1,
+  Backward = -1
+}
 
 public interface LyssieIPlayerOrder {
   public List<string> GetAllPlayers();

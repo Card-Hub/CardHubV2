@@ -156,7 +156,7 @@ public class LyssiePlayerOrderTests {
     Assert.Equal("Juno", PlayerOrder.GetCurrentPlayer());
     PlayerOrder.NextTurn();
     Assert.Equal("Lyssie", PlayerOrder.GetCurrentPlayer());
-    PlayerOrder.DirectionInt = -1;
+    PlayerOrder.DirectionInt = Direction.Backward;
     Assert.Equal("Lyssie", PlayerOrder.GetCurrentPlayer());
     PlayerOrder.NextTurn();
     Assert.Equal("Juno", PlayerOrder.GetCurrentPlayer());
@@ -216,7 +216,7 @@ public class LyssiePlayerOrderTests {
     PlayerOrder.NextTurn();
     Assert.Equal(inOrder3, PlayerOrder.GetActivePlayersInOrder());
     List<string> inOrder4 = new() {"Player3", "Player2", "Player1", "Player4"};
-    PlayerOrder.DirectionInt = -1;
+    PlayerOrder.DirectionInt = Direction.Backward;
     Assert.Equal(inOrder4, PlayerOrder.GetActivePlayersInOrder());
     // No impact from SetNextPlayer()
     PlayerOrder.SetNextPlayer("Player1");

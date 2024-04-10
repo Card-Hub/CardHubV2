@@ -2,8 +2,8 @@ namespace WebApi.Common;
 
 public class Deck<TCard> // : IDeck<TCard>
 {
-    private List<TCard> _cards;
-    private readonly List<TCard> _drawnCards;
+    protected List<TCard> _cards;
+    protected readonly List<TCard> _drawnCards;
 
     public Deck()
     {
@@ -54,5 +54,8 @@ public class Deck<TCard> // : IDeck<TCard>
     {
         _cards.AddRange(_drawnCards);
         _drawnCards.Clear();
+    }
+    public int GetDeckCount() {
+      return _cards.Count;
     }
 }

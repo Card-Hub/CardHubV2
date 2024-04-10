@@ -20,9 +20,10 @@ abstract public class TexasHoldEmState : ITexasHoldEmState
   public abstract bool Call(string playerName);
   public abstract bool Check(string playerName);
   public abstract bool Fold(string playerName);
-  public abstract bool Raise(string playerName);
+  public abstract bool Raise(string playerName, int amtRaised);
   public abstract void NextTurn();
   public abstract void RoundStart();
   public abstract void RoundEnd();
+  public abstract void Setup();
   public abstract override string ToString();
 }

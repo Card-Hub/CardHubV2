@@ -8,20 +8,20 @@ public enum Direction
     Backward
 }
 
-public class PlayerOrder<TPlayer, TCard> : IEnumerable<TPlayer> where TPlayer : CardPlayer<TCard>
+public class PlayerOrder : IEnumerable<string>
 {
-    private LinkedList<TPlayer> _players;
-    private LinkedListNode<TPlayer> _currentNode;
+    private LinkedList<string> _players;
+    private LinkedListNode<string>? _currentNode;
     
     private Direction _direction = Direction.Forward;
     private const int MaxCapacity = 8;
     
     public PlayerOrder()
     {
-        _players = new LinkedList<TPlayer>();
+        _players = new LinkedList<string>();
     }
 
-    public PlayerOrder(IEnumerable<TPlayer> players)
+    public PlayerOrder(IEnumerable<string> players)
     {
         switch (players.Count())
         {
@@ -30,7 +30,7 @@ public class PlayerOrder<TPlayer, TCard> : IEnumerable<TPlayer> where TPlayer : 
             case < 2:
                 throw new ArgumentException("Too few players");
             default:
-                _players = new LinkedList<TPlayer>(players);
+                _players = new LinkedList<string>(players);
                 _currentNode = _players.First ?? throw new ArgumentException("No players in the list");
                 break;
         }
@@ -38,13 +38,13 @@ public class PlayerOrder<TPlayer, TCard> : IEnumerable<TPlayer> where TPlayer : 
 
     public int Count() => _players.Count;
 
-    public TPlayer Current() => _currentNode.ValueRef;
+    public string Current() => _currentNode.Value;
     
-    public TPlayer Next() => GetNextNode().ValueRef;
+    public string Next() => GetNextNode().Value;
 
-    public TPlayer GetPlayer(string name)
+    public string GetPlayer(string name)
     {
-        var player = _players.SingleOrDefault(p => p.Name == name);
+        var player = _players.SingleOrDefault(p => p == name);
         return player ?? throw new ArgumentException("Player not found");
     }
 
@@ -67,12 +67,12 @@ public class PlayerOrder<TPlayer, TCard> : IEnumerable<TPlayer> where TPlayer : 
         }
 
         var nextPlayer = _currentNode.Value;
-        return string.IsNullOrEmpty(nextPlayer.Name) ? "" : nextPlayer.Name;
+        return string.IsNullOrEmpty(nextPlayer) ? "" : nextPlayer;
     }
 
-    public bool Add(TPlayer player)
+    public bool Add(string player)
     {
-        if (_players.Count >= MaxCapacity || _players.Any(p => p.Name == player.Name))
+        if (_players.Count >= MaxCapacity || _players.Any(p => p == player))
         {
             return false;
         }
@@ -88,7 +88,7 @@ public class PlayerOrder<TPlayer, TCard> : IEnumerable<TPlayer> where TPlayer : 
 
     public bool Remove(string name)
     {
-        var playerToRemove = _players.SingleOrDefault(p => p.Name == name);
+        var playerToRemove = _players.SingleOrDefault(p => p == name);
         if (playerToRemove == null)
         {
             return false;
@@ -108,12 +108,12 @@ public class PlayerOrder<TPlayer, TCard> : IEnumerable<TPlayer> where TPlayer : 
         if (_players.Count < 2) return;
         var random = new Random();
         var randomizedPlayers = _players.OrderBy(p => random.Next());
-        _players = new LinkedList<TPlayer>(randomizedPlayers);
+        _players = new LinkedList<string>(randomizedPlayers);
         _direction = Direction.Forward;
         _currentNode = _players.First ?? throw new ArgumentException("No players in the list");
     }
-
-    private LinkedListNode<TPlayer> GetNextNode()
+    
+    private LinkedListNode<string> GetNextNode()
     {
         if (_players.First is null || _players.Last is null)
         {
@@ -128,7 +128,7 @@ public class PlayerOrder<TPlayer, TCard> : IEnumerable<TPlayer> where TPlayer : 
         };
     }
 
-    public IEnumerator<TPlayer> GetEnumerator()
+    public IEnumerator<string> GetEnumerator()
     {
         var startNode = _currentNode;
         if (startNode is null)
@@ -147,6 +147,7 @@ public class PlayerOrder<TPlayer, TCard> : IEnumerable<TPlayer> where TPlayer : 
         return GetEnumerator();
     }
 }
+
 
 // Console.WriteLine("\n-- Players inserted --");
 // string[] p = { "alex", "rubi", "lyssie", "liam", "juno" };

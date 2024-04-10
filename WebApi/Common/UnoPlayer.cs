@@ -2,7 +2,7 @@
 
 namespace WebApi.Common;
 
-public class UnoPlayer : CardPlayer<UnoCard>
+public class UnoPlayer : CardPlayer<UnoCardMod>
 {
     public UnoPlayer(string name) : base(name)
     {

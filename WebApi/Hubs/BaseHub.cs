@@ -87,15 +87,15 @@ public partial class BaseHub : Hub
         }
     }
 
-    public async Task SendCard(UnoCard card)
+    public async Task SendCard(UnoCardMod card)
     {
         if (_userConnections.TryGetValue(Context.ConnectionId, out var userConnection))
         {
             var userName = userConnection.ConnectionId;
             if (await _game.PlayCard(userConnection.ConnectionId!, card))
             {
-                await Clients.Client(userConnection.ConnectionId!).SendAsync("PopCard", card);
-                await Clients.Client(_game.Gameboard).SendAsync("ReceiveCard", userConnection.User, card);
+                await Clients.Client(userConnection.ConnectionId!).SendAsync("PopCard", card.ExtractValue());
+                await Clients.Client(_game.Gameboard).SendAsync("ReceiveCard", userConnection.User, card.ExtractValue());
             }
             else
             {
@@ -118,8 +118,7 @@ public partial class BaseHub : Hub
 
         if (card is not null)
         {
-            await Clients.Caller.SendAsync("ReceiveCard", "Gameboard", card);
-
+            await Clients.Caller.SendAsync("ReceiveCard", "Gameboard", card.ExtractValue());
         }
     }
 

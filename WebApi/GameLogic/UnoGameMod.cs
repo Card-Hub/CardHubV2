@@ -9,10 +9,10 @@ namespace WebApi.GameLogic;
 
 public class UnoGameMod
 {
-    private IDeck<UnoCard> _deck;
-    private Stack<UnoCard> _discardPile = new();
-    private PlayerOrder<UnoPlayer, UnoCard> _playerOrder = [];
-    // dictionary<string, UnoPlayer>
+    private IDeck<UnoCardMod>? _deck;
+    private Stack<UnoCardMod> _discardPile = new();
+    private PlayerOrder _playerOrder = [];
+    private Dictionary<string, UnoPlayer> _players = new();
 
     private TimeSpan _moveTimeLimit;
     private Timer _moveTimer;
@@ -26,7 +26,7 @@ public class UnoGameMod
     public UnoGameMod(IHubContext<BaseHub> hubContext, UnoDeckBuilder deckBuilder)
     {
         _deckBuilder = deckBuilder;
-        
+
         _moveTimeLimit = TimeSpan.FromSeconds(5);
         _moveTimer = new Timer(_moveTimeLimit);
         _moveTimer.Elapsed += OnMoveTimeElapsed;
@@ -40,20 +40,21 @@ public class UnoGameMod
 
     public async Task StartGame()
     {
+        InitGame(new UnoSettings());
         _deck.Shuffle();
         _playerOrder.ShuffleOrder();
 
         foreach (var player in _playerOrder)
         {
             var drawnCards = _deck.Draw(7);
-            player.AddCards(drawnCards);
+            _players[player].AddCards(drawnCards);
         }
 
         var counter = 0;
         while (counter++ < 10)
         {
             var topCard = _deck.Draw();
-            if (topCard.Color == "black") continue;
+            if (topCard.Color == UnoColor.Black) continue;
             _discardPile.Push(topCard);
             break;
         }
@@ -64,16 +65,24 @@ public class UnoGameMod
 
     public void AddPlayer(string player)
     {
-        _playerOrder.Add(new UnoPlayer(player));
+        _playerOrder.Add(player);
+        if (!_players.ContainsKey(player)) _players[player] = new UnoPlayer(player);
     }
 
-    public async Task<bool> PlayCard(string playerName, UnoCard card)
+    public async Task<bool> PlayCard(string playerName, UnoCardMod card)
     {
-        if (_playerOrder.Current().Name != playerName) return false;
+        if (_playerOrder.Current() != playerName) return false;
+
+        var lastCard = _discardPile.Peek();
+        var isColorMatch = card.Color == lastCard.Color
+                           && card.Color != UnoColor.Black; // Non-wild card edge case
+        var isValueMatch = card.Value == lastCard.Value;
+        var isWildPlayable = card is { Color: UnoColor.Black, Value: UnoValue.WildDrawFour };
+
+        if (!isColorMatch && !isValueMatch && !isWildPlayable) return false;
         
-        
-        
-        _playerOrder.Current().RemoveCard(card);
+
+        _players[_playerOrder.Current()].RemoveCard(card);
         _discardPile.Push(card);
 
         await CancelTimer(card.ToString());
@@ -82,21 +91,27 @@ public class UnoGameMod
         return true;
     }
 
-    public UnoCard? DrawCard(string playerName)
+    public bool AllEqual<T>(params T[]? values)
     {
-        var player = _playerOrder.GetPlayer(playerName);
-        
-        if (_playerOrder.Current().Name != playerName) return null;
-        
+        if (values is null || values.Length == 0) return false;
+        return values.All(v => v.Equals(values[0]));
+    }
+
+    public UnoCardMod? DrawCard(string player)
+    {
+        var currentPlayer = _playerOrder.GetPlayer(player);
+
+        if (_playerOrder.Current() != player) return null;
+
         var card = _deck.Draw();
-        player.AddCard(card);
+        _players[currentPlayer].AddCard(card);
         return card;
     }
 
-    public List<UnoCard> GetPlayerHand(string playerName)
+    public List<UnoCardMod> GetPlayerHand(string playerName)
     {
         var player = _playerOrder.GetPlayer(playerName);
-        return player.GetHand();
+        return _players[player].GetHand();
     }
 
     public void RemovePlayer(string playerName)
@@ -110,8 +125,8 @@ public class UnoGameMod
         {
             _moveTimer.Start();
         }
-        
-        var player = _playerOrder.Current().Name;
+
+        var player = _playerOrder.Current();
         await _hubContext.Clients.Clients(player, Gameboard).SendAsync("StartTimer", _moveTimeLimit.Seconds);
 
         Console.WriteLine("Timer started.");
@@ -124,17 +139,18 @@ public class UnoGameMod
             _moveTimer.Stop();
             Console.WriteLine($"Timer cancelled by card {card}.");
         }
-        
-        await _hubContext.Clients.Client(_playerOrder.Current().Name).SendAsync("StartTimer", 0);
+
+        await _hubContext.Clients.Client(_playerOrder.Current()).SendAsync("StartTimer", 0);
     }
 
     private async void OnMoveTimeElapsed(object? source, ElapsedEventArgs e)
     {
         Console.WriteLine("Turn elapsed at {0:mm:ss}", e.SignalTime);
         var drawnCard = _deck.Draw();
-        _playerOrder.Current().AddCard(drawnCard);
+        var currentPlayer = _playerOrder.Current();
+        _players[currentPlayer].AddCard(drawnCard);
 
-        await _hubContext.Clients.Client(_playerOrder.Current().Name).SendAsync("ReceiveCard", "Gameboard", drawnCard);
+        await _hubContext.Clients.Client(currentPlayer).SendAsync("ReceiveCard", "Gameboard", drawnCard);
         lock (_lock)
         {
             _moveTimer.Stop();

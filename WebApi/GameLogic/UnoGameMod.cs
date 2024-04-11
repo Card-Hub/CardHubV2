@@ -5,7 +5,7 @@ using WebApi.Hubs;
 using WebApi.Models;
 using Timer = System.Timers.Timer;
 
-namespace WebApi.GameLogic;
+//namespace WebApi.GameLogic;
 
 public class UnoGameMod
 {
@@ -29,7 +29,7 @@ public class UnoGameMod
 
         _moveTimeLimit = TimeSpan.FromSeconds(5);
         _moveTimer = new Timer(_moveTimeLimit);
-        _moveTimer.Elapsed += OnMoveTimeElapsed;
+        //_moveTimer.Elapsed += OnMoveTimeElapsed;
         _hubContext = hubContext;
     }
 

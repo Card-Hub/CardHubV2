@@ -9,4 +9,14 @@ public class BlackJackPlayer : Player {
     Afk = false;
     Hand = new List<StandardCard>();
   }
+
+  public bool TakeCard(StandardCard card){
+    Hand.Add(card);
+    return true;
+  }
+
+  public List<StandardCard> ShowHand(){
+    return Hand;
+  }
+
 }

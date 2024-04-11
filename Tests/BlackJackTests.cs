@@ -2,6 +2,7 @@ namespace WebApi.Tests;
 using WebApi.Models;
 using WebApi.GameLogic;
 using Xunit.Abstractions; // for output
+using WebApi.Common.LyssiePlayerOrder;
 
 public class BlackJackTests {
   private readonly ITestOutputHelper output;
@@ -26,6 +27,9 @@ public class BlackJackTests {
     game.AddPlayer("Rubi");
     game.AddPlayer("Alex");
     game.RemovePlayer("Liam");
+    game.TakeBet("Lyssie", 1);
+    game.TakeBet("Rubi", 2);
+    game.TakeBet("Alex", 3);
     Assert.Equal(controlNames, game.GetPlayerList());
     output.WriteLine(game.GetGameState());
   }

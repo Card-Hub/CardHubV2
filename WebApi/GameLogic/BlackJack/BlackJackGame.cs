@@ -4,6 +4,7 @@ using WebApi.Common.LyssiePlayerOrder;
 //using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using WebApi.Models;
 using Newtonsoft.Json;
+using WebApi.Common;
 namespace WebApi.GameLogic;
 
 
@@ -13,23 +14,23 @@ public class BlackJackGame : IBaseGame<StandardCard>
     public LyssiePlayerOrder PlayerOrder;
     public Dictionary<string, BlackJackPlayer> Players;
     public BlackJackJsonState BlackJackJsonState;
+    public StandardCardDeck Deck;
     public BlackJackGame() {
         PlayerOrder = new();
         Players = new();
         BlackJackJsonState = new();
+        Deck = new();
     }
-    public void StartGame()
+    public void StartGame()//need to ask for bets before we can init
     {
         throw new NotImplementedException();
     }
     public bool InitDeck()
     {
-        throw new NotImplementedException();
+        Deck.Init52();
+        Deck.Shuffle();
+        return true;
     }
-    // public List<StandardCard> GetPlayerHand(string playerName)
-    // {
-    //     throw new NotImplementedException();
-    // }
 
     public bool TakeBet(string player, int amt){
         Players[player].CurrentBet = amt;
@@ -54,25 +55,22 @@ public class BlackJackGame : IBaseGame<StandardCard>
     }  
     public List<StandardCard> GetPlayerHand(string playerName)
     {
-        throw new NotImplementedException();
+        return Players[playerName].ShowHand();
     }  
-    public List<string> GetPlayersInOrder()
+
+    public bool GiveCard(string playerName)
     {
-        throw new NotImplementedException();
-    }
-    public bool DrawCard(string playerName)
-    {
-        throw new NotImplementedException();
+        Players[playerName].TakeCard(Deck.Draw());
+        return true;
     }
 
-    public bool ResetForNextRound()
-    {
-        throw new NotImplementedException();
-    }
-
-    public void EndGame()
-    {
-        throw new NotImplementedException();
+    public int GetPlayerScore(string playerName){//need to allow for splits, double downs. only one or the other.
+        int score = 0;
+        List<StandardCard> hand = Players[playerName].ShowHand();
+        foreach(StandardCard card in hand){
+            score += 0;
+        }
+        return score;
     }
     public string GetGameState() {
         BlackJackJsonState.Update(this);

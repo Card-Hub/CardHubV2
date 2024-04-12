@@ -1,7 +1,13 @@
 <script setup lang="ts">
 
   import Header from "~/components/Header.vue";
-
+  const team = ref([
+  { name: "Alejandro Mozqueda", image: new URL('../assets/icons/avatars/star.png', import.meta.url) },
+  { name: "Rubi Dionisio", image: new URL('../assets/icons/avatars/ruby.png', import.meta.url) },
+  { name: "Liam Prior", image: new URL('../assets/icons/avatars/fairy.png', import.meta.url) },
+  { name: "Lyssie Brown", image: new URL('../assets/icons/avatars/lyssie.png', import.meta.url) },
+  ]);
+  
   const getLogo = () => {
     return new URL('../assets/icons/logos/combination.svg', import.meta.url);
   };
@@ -50,7 +56,12 @@
       <img alt="Team Pearl" 
            :src="getPearl()" style="width: 300px; height: 90px;"/>
       <h2> Meet the Team! </h2>
-      <p> Pictures to be uploaded later </p>
+      <div class="members">
+        <div v-for="(teamMate, index) in team" :key="index" class="team-mate-container">
+          <img alt="team-mate" class="team-mate-pic" :src="teamMate.image"/>
+          <h3 class="team-mate">{{ teamMate.name }}</h3>
+        </div>
+      </div>
     </div>
     
     <br> <br>
@@ -113,6 +124,33 @@
   .cardhub-logo{
     width: 400px;
     height: 200px;
+  }
+  
+  .members{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .team-mate-container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 0 10px;
+  }
+  
+  .team-mate {
+    text-align: center;
+    line-height: 30px;
+  }
+  
+  .team-mate-pic{
+    height: 30vh;
+    margin: 10px;
+    background: rgba(255, 255, 255, 0.2);
+    object-fit: cover; /* Maintain aspect ratio while covering the space */
   }
 
 </style>

@@ -122,7 +122,6 @@ const isCurrentPlayer = (player: string) => {
 const getUNE = () => {
   return new URL(`../../assets/icons/unoDeck/UNE.svg`, import.meta.url);
 };
-how to 
 </script>
 
 <template>

@@ -6,15 +6,12 @@ using WebApi.Common.LyssiePlayerOrder;
 
 public class BlackJackTests {
   private readonly ITestOutputHelper output;
-  private void setUp() { // there is a way to do this properly. this is not it.
-    
-  }
   public BlackJackTests(ITestOutputHelper output) {
     this.output = output; 
   }
   [Trait("testing", "rn")]
   [Fact]
-  public void TestGetPlayerList()
+  public void TestAddRemovePlayer()//works for remove and add
   {
     List<string> controlNames = new List<string>();
     // controlNames.Add("Liam");
@@ -33,8 +30,23 @@ public class BlackJackTests {
     Assert.Equal(controlNames, game.GetPlayerList());
     output.WriteLine(game.GetGameState());
   }
+[Trait("testing", "rn1")]
+[Fact]
+public void TestInitDeck()
+{
+  BlackJackGame game = new BlackJackGame();
+  game.InitDeck();
+  foreach (var card in game.Deck.GetCards())
+  {
+      Console.WriteLine(card.Value); // Assuming Card class overrides ToString() method
+  }
+  Assert.Equal(52, game.Deck.GetCards().Count());
+}
 
-
+    // public bool TakeBet(string player, int amt){
+    //     Players[player].CurrentBet = amt;
+    //     return true;
+    // }
   // Test that a game can be started
   // [Fact]
   // public void TestStartGame() {

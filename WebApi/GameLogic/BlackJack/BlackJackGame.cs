@@ -25,6 +25,7 @@ public class BlackJackGame : IBaseGame<StandardCard>
     {
         throw new NotImplementedException();
     }
+    // IBaseGame<StandardCard>.EndGame()
     public bool InitDeck()
     {
         Deck.Init52();
@@ -32,6 +33,17 @@ public class BlackJackGame : IBaseGame<StandardCard>
         return true;
     }
 
+    public void EndGame() {
+        throw new NotImplementedException();
+    }
+
+    public List<string> GetPlayersInOrder() {
+        throw new NotImplementedException();
+    }
+    public bool ResetForNextRound()
+    {
+        throw new NotImplementedException();
+    }
     public bool TakeBet(string player, int amt){
         Players[player].CurrentBet = amt;
         return true;
@@ -58,7 +70,7 @@ public class BlackJackGame : IBaseGame<StandardCard>
         return Players[playerName].ShowHand();
     }  
 
-    public bool GiveCard(string playerName)
+    public bool DrawCard(string playerName)
     {
         Players[playerName].TakeCard(Deck.Draw());
         return true;

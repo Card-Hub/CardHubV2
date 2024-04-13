@@ -10,7 +10,10 @@ public class Deck<TCard> // : IDeck<TCard>
         _cards = new List<TCard>();
         _drawnCards = new List<TCard>();
     }
-        
+    
+    public List<TCard> GetCards(){
+        return _cards;
+    }
     public void Shuffle()
     {
         _cards = _cards.OrderBy(x=> Random.Shared.Next()).ToList();

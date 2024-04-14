@@ -29,7 +29,7 @@ public class UnoJsonStateLyssie {
     CurrentPlayer = game.GetCurrentPlayer();
     SomeoneNeedsToSelectWildColor = game.SomeoneNeedsToSelectWildColor;
     PlayerWhoHasUnoPrompt = game.PlayerWhoHasUnoPrompt;
-    //Winner = game.GetWinner();
+    Winner = game.Winner;
     DiscardedCards = game._discardPile.ToList<UnoCardModLyssie>();
     DeckCardCount = game.DeckCardCount;
     ActivePlayers = game.GetActivePlayers();

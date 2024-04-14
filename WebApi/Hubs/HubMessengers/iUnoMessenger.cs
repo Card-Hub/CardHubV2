@@ -8,4 +8,5 @@ public interface iUnoMessenger {
   //public Task SendFrontendTimerPause();
   //public Task SendFrontendTimerStop();
   public Task SendFrontendError(List<string> connStrs, string error);
+  public void Log(string message);
 }

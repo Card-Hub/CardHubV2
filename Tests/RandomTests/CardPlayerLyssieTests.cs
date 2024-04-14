@@ -7,10 +7,10 @@ using WebApi.Common;
 using WebApi.Models;
 using Xunit.Abstractions;
 
-namespace Tests.Random;
+namespace Tests.RandomTests;
 
 
-[Trait("Category", "Random")]
+[Trait("Category", "RandomTests")]
 
 public class CardPlayerLyssieTests {
   private ITestOutputHelper Output;

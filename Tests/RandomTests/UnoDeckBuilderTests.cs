@@ -3,9 +3,9 @@ using WebApi.Models;
 using Newtonsoft.Json;
 using Xunit.Abstractions;
 
-namespace Tests.Random;
+namespace Tests.RandomTests;
 
-[Trait ("Category", "Random")]
+[Trait ("Category", "RandomTests")]
 public class UnoDeckBuilderTests {
   public ITestOutputHelper Output;
   public UnoDeckBuilderTests(ITestOutputHelper output) {

@@ -4,9 +4,9 @@ using Xunit.Abstractions;
 using WebApi.Models;
 using Newtonsoft.Json.Linq;
 
-namespace Tests.Random;
+namespace Tests.RandomTests;
 
-[Trait("Category", "Random")]
+[Trait("Category", "RandomTests")]
 public class UnoCardTests {
   public ITestOutputHelper Output;
   public UnoCardTests(ITestOutputHelper output) {

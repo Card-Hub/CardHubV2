@@ -2,9 +2,9 @@ using System.ComponentModel;
 using Tests.Messengers;
 using Xunit.Abstractions;
 
-namespace Tests.Random;
+namespace Tests.RandomTests;
 
-[Trait("Category", "Random")]
+[Trait("Category", "RandomTests")]
 public class TestUnoTestMessenger {
   public ITestOutputHelper Output;
   public TestUnoTestMessenger(ITestOutputHelper output) {

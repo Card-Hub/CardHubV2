@@ -23,4 +23,7 @@ public class UnoTestMessenger : iUnoMessenger {
   {
     Output.WriteLine($"UnoTestMessenger told the frontend the timer reset to {time} seconds");
   }
+    public void Log(string message) {
+      Output.WriteLine(message);
+    }
 }

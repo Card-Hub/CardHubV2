@@ -30,4 +30,7 @@ public class UnoMessenger : iUnoMessenger {
   {
     Console.WriteLine($"UnoMessenger told the frontend there's an error: {error}");
   }
+    public void Log(string message) {
+      Console.WriteLine(message);
+    }
 }

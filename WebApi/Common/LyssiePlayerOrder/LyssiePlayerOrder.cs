@@ -9,7 +9,8 @@ public class LyssiePlayerOrder : LyssieIPlayerOrder
   private List<string> SpectatorPlayers;
   private Dictionary<string, bool> AfkPlayersDict;
   private int CurrentPlayerIndex;
-  private int? ForcedNextPlayerIndex;
+  public int CPI { get { return CurrentPlayerIndex;}}
+  public int? ForcedNextPlayerIndex {get; set;}
   public Direction DirectionInt {get;set;}
   public LyssiePlayerOrder() {
     this.ActivePlayers = new();
@@ -191,7 +192,7 @@ public class LyssiePlayerOrder : LyssieIPlayerOrder
   // Set next player to be offset * direction players away from the current player.
   public bool SetNextPlayer(int offset)
   {
-    ForcedNextPlayerIndex = CurrentPlayerIndex += offset * (int) DirectionInt;
+    ForcedNextPlayerIndex = CurrentPlayerIndex + offset * (int) DirectionInt;
     // loop around
     // handle index too high
     ForcedNextPlayerIndex %= ActivePlayers.Count;
@@ -244,6 +245,16 @@ public class LyssiePlayerOrder : LyssieIPlayerOrder
     }
     else {
       throw new ArgumentException($"Cannot set player status of {playerName}: not a player in current game");
+    }
+  }
+  public bool ToggleDirection() {
+    if (DirectionInt == Direction.Backward) {
+      DirectionInt = Direction.Forward;
+      return true;
+    }
+    else {
+      DirectionInt = Direction.Backward;
+      return true;
     }
   }
 }

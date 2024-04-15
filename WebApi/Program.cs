@@ -74,6 +74,8 @@ builder.Services.AddSingleton<CardDbContext>();
 builder.Services.AddSingleton<UnoDeckBuilder>();
 builder.Services.AddSingleton<UnoGameMod>();
 
+builder.Services.AddSingleton<UnoGameModLyssieBuilder>();
+
 var app = builder.Build();
 
 app.UseHttpsRedirection();

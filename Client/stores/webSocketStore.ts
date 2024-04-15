@@ -41,7 +41,7 @@ export const useWebSocketStore = defineStore("webSocket", () => {
     // Attempt to create a new room for the Gameboard device
     const tryCreateRoom = async (): Promise<boolean> => {
         try {
-            room.value = await $api<string>("game/createroom", { method: "POST" });
+            room.value = await $api<string>("Game/CreateRoom", { method: "POST" });
             console.log("Room created: ", room.value);
             await joinRoom(user.value, room.value, UserType.Gameboard);
             isPlayer.value = false;
@@ -112,6 +112,10 @@ export const useWebSocketStore = defineStore("webSocket", () => {
                 console.log("Popped card:", card);
                 cards.value = cards.value.filter(c => c.id !== card.id);
             });
+            // LYSSIETEST
+            joinConnection.on("ReceiveJson", (json: string) => {
+              console.log("Json Received: \n", json);
+          });
 
             const timeout = ref<NodeJS.Timeout | null>(null);
             joinConnection.on("StartTimer", async (time: number) => {
@@ -218,10 +222,24 @@ export const useWebSocketStore = defineStore("webSocket", () => {
         }
     };
 
+    const selectUno = async (): Promise<void> => {
+      try {
+        console.log("clicked to start uno");
+        if (connection.value !== null) {
+          await connection.value.invoke("SelectUno");
+        }
+        console.log("selected uno.");
+    } catch (e) {
+        console.log(e);
+    }
+    };
+
+
     // Must return all state properties
     // https://pinia.vuejs.org/core-concepts/
     return {
         connection, isConnected, isPlayer, cards, messages, users, user, room, cookieUser, cookieRoom, timer,
-        tryCreateRoom, tryJoinRoom, sendCard, drawCard, startGame, sendMessage, closeConnection
+        tryCreateRoom, tryJoinRoom, sendCard, drawCard, startGame, sendMessage, closeConnection,
+        selectUno
     };
 });

@@ -82,11 +82,12 @@ public class UnoGameModLyssie
       //await InitiateTurn();
   }
 
-  public bool AddPlayer(string playerName, string connectionString)
+  public bool AddPlayer(string playerName, string connStr)
   {
-      if (!_players.ContainsKey(connectionString)) {
-        _playerOrder.AddPlayer(connectionString);
-        _players[connectionString] = new UnoPlayerLyssie(playerName, connectionString);
+      _messenger.SendFrontendJson(new List<string>() {GameboardConnStr}, GetGameState());
+      if (!_players.ContainsKey(connStr)) {
+        _playerOrder.AddPlayer(connStr);
+        _players[connStr] = new UnoPlayerLyssie(playerName, connStr);
         return true;
       }
       return false;

@@ -4,6 +4,7 @@ using WebApi.Models;
 namespace WebApi.Hubs;
 
 using Microsoft.AspNetCore.SignalR;
+using WebApi.GameLogic.LyssieUno;
 
 public class UserConnection
 {
@@ -51,6 +52,8 @@ public partial class BaseHub : Hub
         userConnection.ConnectionId = Context.ConnectionId;
         _userConnections[Context.ConnectionId] = userConnection;
         Console.WriteLine(userConnection.ToString());
+        // lyssie
+        Console.WriteLine("!!");
 
         await Clients.Group(userConnection.Room).SendAsync("ReceiveMessage",
             new UserMessage

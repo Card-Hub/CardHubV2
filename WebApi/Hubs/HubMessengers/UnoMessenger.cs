@@ -17,6 +17,7 @@ public class UnoMessenger : iUnoMessenger {
   public async Task SendFrontendJson(List<string> connStrs, string json)
   {
     Console.WriteLine($"UnoMessenger sent to the frontend: \n {json}");
+    Context.Clients.Client(connStrs[0]).SendAsync("ReceiveJson", json);
   }
 
 // only the gameboard needs to know this

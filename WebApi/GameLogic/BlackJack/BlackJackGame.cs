@@ -13,10 +13,10 @@ public class BlackJackGame : IBaseGame<StandardCard>
     public LyssiePlayerOrder PlayerOrder;
     public Dictionary<string, BlackJackPlayer> Players;
     public BlackJackJsonState BlackJackJsonState;
-    public string state;// NotStarted, TakingBets, giving cards, in turns, round end
+    public string state;// NotStarted, TakingBets, GiveCards, in turns, round end
     public StandardCardDeck Deck;
     // public bool BetsTaken;
-    public BlackJackGame() {
+    public BlackJackGame() {//dealer will jsut be a player i control.
         PlayerOrder = new();
         Players = new();
         BlackJackJsonState = new();
@@ -27,14 +27,33 @@ public class BlackJackGame : IBaseGame<StandardCard>
 
     public void StartGame()
     {
+        AddPlayer("Dealer");//keep deal in first pos and just pretend like they are last
         StartRound();
     }
 
-    public void StartRound(){
+    public bool StartRound(){//starting a round of blackjack is everyone getss two cards
         if (state == "NotStarted") {
             state = "TakingBets";
+            return true;
         }
+        Console.WriteLine("Not all players have made bets yet");
+        return false;
     }
+
+    public bool GivingCards(){
+        if (state == "GivingCards"){
+            foreach(string playerName in GetPlayersInOrder().Skip(1))//skip 1 is for the dealer
+                DrawCard(playerName);
+            DrawCard("Dealer");//dealer gets first card
+            foreach(string playerName in GetPlayersInOrder().Skip(1))//second card for dealer will not be shown.
+                DrawCard(playerName);
+            DrawCard("Dealer");
+            return true;
+        }
+        Console.WriteLine("The state is not in \"GivingCards\"");
+        return false;
+    }
+
     public bool InitDeck()
     {
         Deck.Init52();
@@ -46,10 +65,10 @@ public class BlackJackGame : IBaseGame<StandardCard>
         throw new NotImplementedException();
     }
 
-    public List<string> GetPlayersInOrder() {
-        throw new NotImplementedException();
+    public List<string> GetPlayersInOrder() {//curent
+        return PlayerOrder.GetPlayers(LyssiePlayerStatus.Active);
     }
-    public bool ResetForNextRound()
+    public bool ResetForNextRound()// must be at thee end of the rounda
     {
         throw new NotImplementedException();
     }
@@ -62,7 +81,7 @@ public class BlackJackGame : IBaseGame<StandardCard>
                 if (player.Value.hasBet == false)
                     break;
                 else
-                    state = "BetsTaken";
+                    state = "GivingCards";
             }
             return true;
         }
@@ -99,10 +118,13 @@ public class BlackJackGame : IBaseGame<StandardCard>
         return Players[playerName].ShowHand();
     }  
 
-    public bool DrawCard(string playerName)
+    public bool DrawCard(string playerName)//this will be done before drawing and during drawing
     {
-        Players[playerName].TakeCard(Deck.Draw());
-        return true;
+        if (state == "GivingCards"){
+            Players[playerName].TakeCard(Deck.Draw());
+            return true;
+        }
+        return false;
     }
 
     public int GetPlayerScoreFromGame(string playerName){//this wont work for splits. player will need more than one hand

@@ -3,13 +3,14 @@ using WebApi.Models;
 using WebApi.GameLogic;
 using Xunit.Abstractions; // for output
 using WebApi.Common.LyssiePlayerOrder;
+using System.Security.AccessControl;
 
 public class BlackJackTests {
   private readonly ITestOutputHelper output;
   public BlackJackTests(ITestOutputHelper output) {
     this.output = output; 
   }
-  [Trait("testing", "rn")]
+  [Trait("unit-test", "test1")]
   [Fact]
   public void TestAddRemovePlayer()//works for remove and add
   {
@@ -30,7 +31,7 @@ public class BlackJackTests {
     Assert.Equal(controlNames, game.GetPlayerList());
     output.WriteLine(game.GetGameState());
   }
-[Trait("testing", "rn1")]
+[Trait("unit-test", "test2")]
 [Fact]
 public void TestInitDeck()
 {
@@ -43,10 +44,35 @@ public void TestInitDeck()
   Assert.Equal(52, game.Deck.GetCards().Count());
 }
 
-    // public bool TakeBet(string player, int amt){
-    //     Players[player].CurrentBet = amt;
-    //     return true;
-    // }
+[Trait("unit-test", "test3")]
+[Fact]
+public void TestPlayerDrawCard(){
+  BlackJackGame game = new BlackJackGame();
+  game.AddPlayer("Liam");
+  game.InitDeck();
+  game.DrawCard("Liam");
+  Assert.Equal(51, game.Deck.GetCards().Count());
+  output.WriteLine(game.GetGameState());
+}
+
+[Trait("unit-test", "test4")]
+[Fact]
+public void TestPlayerScoring()
+{
+  BlackJackGame game = new BlackJackGame();
+  game.AddPlayer("Liam");
+  StandardCard ace = new StandardCard(0, "Clubs", "A");
+  StandardCard king = new StandardCard(0, "Clubs", "K");
+  game.GivePlayerCard("Liam", ace);
+  game.GivePlayerCard("Liam", ace);
+  game.GivePlayerCard("Liam", ace);
+  game.GivePlayerCard("Liam", ace);
+  Assert.Equal(14, game.GetPlayerScoreFromGame("Liam"));
+  game.GivePlayerCard("Liam", king);
+  Assert.Equal(14, game.GetPlayerScoreFromGame("Liam"));
+  output.WriteLine(game.GetGameState());
+}
+
   // Test that a game can be started
   // [Fact]
   // public void TestStartGame() {

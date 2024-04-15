@@ -74,7 +74,7 @@ builder.Services.AddSingleton<CardDbContext>();
 builder.Services.AddSingleton<UnoDeckBuilder>();
 builder.Services.AddSingleton<UnoGameMod>();
 
-builder.Services.AddSingleton<UnoGameModLyssieBuilder>();
+builder.Services.AddSingleton<UnoGameStorage>();
 
 var app = builder.Build();
 

@@ -113,11 +113,11 @@ public class UnoGameModLyssie
       _CurrentColor = card.ColorEnum;
       
       _messenger.Log($"{connStr} played a card: {JsonConvert.SerializeObject(card)}");
-
       await CancelTimer(card);
       // did someone win?
       if (_players[_playerOrder.GetCurrentPlayer()].Hand.Count == 0) {
         Winner = _players[_playerOrder.GetCurrentPlayer()].Name;
+        _messenger.Log("Someone won.");
         await _messenger.SendFrontendJson(GetAllConnStrsIncGameboard(), GetGameState());
         return true;
       }
@@ -133,11 +133,11 @@ public class UnoGameModLyssie
       };
       if (SpecialCards.Contains(card.ValueEnum)) {
         HandleSpecialCard(card);
-        await _messenger.SendFrontendJson(GetAllConnStrsIncGameboard(), "json placeholder");
+        await _messenger.SendFrontendJson(GetAllConnStrsIncGameboard(), GetGameState());
       }
       else {
         await InitiateTurn();
-        await _messenger.SendFrontendJson(GetAllConnStrsIncGameboard(), "json placeholder");
+        await _messenger.SendFrontendJson(GetAllConnStrsIncGameboard(), GetGameState());
       }
       return true;
     }

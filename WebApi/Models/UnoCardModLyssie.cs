@@ -43,8 +43,26 @@ public class UnoCardModLyssie
       get { return ColorEnum.ToString(); }
     }
     public string Value {
-      get { 
-        return MiscFunctions.AddWhitespaceToCamelcase(ValueEnum.ToString());
+      get {
+        List<UnoValueLyssie> integerEnums = new() 
+        {
+          UnoValueLyssie.Zero,
+          UnoValueLyssie.One,
+          UnoValueLyssie.Two,
+          UnoValueLyssie.Three,
+          UnoValueLyssie.Four,
+          UnoValueLyssie.Five,
+          UnoValueLyssie.Six,
+          UnoValueLyssie.Seven,
+          UnoValueLyssie.Eight,
+          UnoValueLyssie.Nine
+        };
+        if (integerEnums.Contains(ValueEnum)) {
+          return ((int) ValueEnum).ToString();
+        }
+        else {
+          return MiscFunctions.AddWhitespaceToCamelcase(ValueEnum.ToString());
+        }
       }
     }
 

@@ -116,6 +116,10 @@ export const useWebSocketStore = defineStore("webSocket", () => {
             joinConnection.on("ReceiveJson", (json: string) => {
               console.log("Json Received: \n", json);
           });
+            joinConnection.on("Log", (string: string) => {
+              console.log("Backend logged:", string);
+              console.log(string);
+            });
 
             const timeout = ref<NodeJS.Timeout | null>(null);
             joinConnection.on("StartTimer", async (time: number) => {

@@ -112,32 +112,32 @@ public partial class BaseHub : Hub
         }   
     }
 
-    public async Task DrawCard()
-    {
-        if (!_userConnections.TryGetValue(Context.ConnectionId, out var userConnection)) return;
+    //public async Task DrawCard()
+    //{
+    //    if (!_userConnections.TryGetValue(Context.ConnectionId, out var userConnection)) return;
 
-        var userName = userConnection.ConnectionId!;
-        var card = _game.DrawCard(userName);
+    //    var userName = userConnection.ConnectionId!;
+    //    var card = _game.DrawCard(userName);
 
-        if (card is not null)
-        {
-            await Clients.Caller.SendAsync("ReceiveCard", "Gameboard", card.ExtractValue());
-        }
-    }
+    //    if (card is not null)
+    //    {
+    //        await Clients.Caller.SendAsync("ReceiveCard", "Gameboard", card.ExtractValue());
+    //    }
+    //}
 
-    public async Task StartGame()
-    {
-        await _game.StartGame();
+    //public async Task StartGame()
+    //{
+    //    await _game.StartGame();
         
-        var roomConnections = _userConnections.Values.Where(x => x.Room == _userConnections[Context.ConnectionId].Room);
+    //    var roomConnections = _userConnections.Values.Where(x => x.Room == _userConnections[Context.ConnectionId].Room);
 
-        foreach (var conn in roomConnections.Where(x => x.UserType == UserType.Player))
-        {
-            var userName = conn.ConnectionId!;
-            var hand = _game.GetPlayerHand(userName);
-            await Clients.Client(conn.ConnectionId!).SendAsync("StartedGame", hand);
-        }
-    }
+    //    foreach (var conn in roomConnections.Where(x => x.UserType == UserType.Player))
+    //    {
+    //        var userName = conn.ConnectionId!;
+    //        var hand = _game.GetPlayerHand(userName);
+    //        await Clients.Client(conn.ConnectionId!).SendAsync("StartedGame", hand);
+    //    }
+    //}
 
     public Task SendConnectedUsers(string room)
     {

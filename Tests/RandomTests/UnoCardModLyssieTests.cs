@@ -17,7 +17,7 @@ public class UnoCardModLyssieTests {
     // some random card
     var cardBlue1 = new UnoCardModLyssie(1, UnoColorLyssie.Blue, UnoValueLyssie.One);
     JToken jtokenBlue1 = JToken.FromObject(cardBlue1);
-    JToken jtokenBlue1Expected = JToken.FromObject(new {Id=1, Color="Blue", Value="One"});
+    JToken jtokenBlue1Expected = JToken.FromObject(new {Id=1, Color="Blue", Value="1"});
     Assert.True(JToken.DeepEquals(jtokenBlue1, jtokenBlue1Expected));
     // a special card
     var cardWildDrawFour = new UnoCardModLyssie(100, UnoColorLyssie.Black, UnoValueLyssie.WildDrawFour);

@@ -13,14 +13,15 @@ public class BlackJackGame : IBaseGame<StandardCard>
     public LyssiePlayerOrder PlayerOrder;
     public Dictionary<string, BlackJackPlayer> Players;
     public BlackJackJsonState BlackJackJsonState;
+    public string state;// NotStarted, TakingBets, giving cards, in turns, round end
     public StandardCardDeck Deck;
-    public bool BetsTaken;
+    // public bool BetsTaken;
     public BlackJackGame() {
         PlayerOrder = new();
         Players = new();
         BlackJackJsonState = new();
         Deck = new();
-        BetsTaken = true;
+        state = "NotStarted";
     }
 
 
@@ -30,14 +31,8 @@ public class BlackJackGame : IBaseGame<StandardCard>
     }
 
     public void StartRound(){
-        foreach (KeyValuePair<string, BlackJackPlayer> player in Players) {
-            if (player.Value.hasBet == false) {
-                BetsTaken = false;
-            }
-        }
-        if (BetsTaken == true){
-            
-            throw new NotImplementedException();
+        if (state == "NotStarted") {
+            state = "TakingBets";
         }
     }
     public bool InitDeck()
@@ -58,11 +53,20 @@ public class BlackJackGame : IBaseGame<StandardCard>
     {
         throw new NotImplementedException();
     }
-    public bool TakeBet(string player, int amt){
-        Players[player].CurrentBet = amt;
-        Players[player].hasBet = true;
-        Console.WriteLine("Player:", player, "has bet:", amt);
-        return true;
+    public bool TakeBet(string playerName, int amt){
+        if (state == "TakingBets") { 
+            Players[playerName].CurrentBet = amt;
+            Players[playerName].hasBet = true;
+            Console.WriteLine("Player:", playerName, "has bet:", amt);//send frontedn stuffs
+            foreach (KeyValuePair<string, BlackJackPlayer> player in Players) {
+                if (player.Value.hasBet == false)
+                    break;
+                else
+                    state = "BetsTaken";
+            }
+            return true;
+        }
+        return false;
     }
     public void GivePlayerCard(string player, StandardCard card){
         Players[player].TakeCard(card);
@@ -73,16 +77,22 @@ public class BlackJackGame : IBaseGame<StandardCard>
     }
     public bool AddPlayer(string playerName)
     {
-        PlayerOrder.AddPlayer(playerName);
-        Players[playerName] = new BlackJackPlayer(playerName);
-        Players[playerName].Name = playerName;
-        return true;
+        if (state == "NotStarted") {
+            PlayerOrder.AddPlayer(playerName);
+            Players[playerName] = new BlackJackPlayer(playerName);
+            Players[playerName].Name = playerName;
+            return true;
+        }
+        return false;
     }
     public bool RemovePlayer(string playerName)
     {
-        PlayerOrder.RemovePlayer(playerName);
-        Players.Remove(playerName);
-        return true;
+        if (state == "NotStarted") {
+            PlayerOrder.RemovePlayer(playerName);
+            Players.Remove(playerName);
+            return true;
+        }
+        return false;
     }  
     public List<StandardCard> GetPlayerHand(string playerName)
     {

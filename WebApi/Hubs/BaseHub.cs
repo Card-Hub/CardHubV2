@@ -1,4 +1,5 @@
-﻿using WebApi.GameLogic;
+﻿using System.Text.Json;
+using WebApi.GameLogic;
 using WebApi.Models;
 
 namespace WebApi.Hubs;
@@ -89,13 +90,14 @@ public partial class BaseHub : Hub
 
     public async Task SendCard(UnoCardMod card)
     {
+        Console.WriteLine("just sent: ", card);
         if (_userConnections.TryGetValue(Context.ConnectionId, out var userConnection))
         {
             var userName = userConnection.ConnectionId;
             if (await _game.PlayCard(userConnection.ConnectionId!, card))
             {
-                await Clients.Client(userConnection.ConnectionId!).SendAsync("PopCard", card.ExtractValue());
-                await Clients.Client(_game.Gameboard).SendAsync("ReceiveCard", userConnection.User, card.ExtractValue());
+                await Clients.Client(userConnection.ConnectionId!).SendAsync("PopCard", card);
+                await Clients.Client(_game.Gameboard).SendAsync("ReceiveCard", userConnection.User, card);
             }
             else
             {
@@ -109,6 +111,12 @@ public partial class BaseHub : Hub
         }   
     }
 
+    public async Task SendColor(UnoColor color)
+    {
+        await _game.SetColor(Context.ConnectionId, color);
+        await Clients.Group(_game.Gameboard).SendAsync("ReceiveColor", color);
+    }
+
     public async Task DrawCard()
     {
         if (!_userConnections.TryGetValue(Context.ConnectionId, out var userConnection)) return;
@@ -118,7 +126,7 @@ public partial class BaseHub : Hub
 
         if (card is not null)
         {
-            await Clients.Caller.SendAsync("ReceiveCard", "Gameboard", card.ExtractValue());
+            await Clients.Caller.SendAsync("ReceiveCard", "Gameboard", card);
         }
     }
 

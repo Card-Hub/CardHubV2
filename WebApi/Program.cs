@@ -27,6 +27,7 @@
 // }
 
 
+using System.Text.Json.Serialization;
 using WebApi.Common;
 using WebApi.Controllers;
 using WebApi.GameLogic;
@@ -51,6 +52,7 @@ builder.Services.AddSignalR(hubOptions =>
         hubOptions.EnableDetailedErrors = true;
     }
 });
+;
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("DevelopmentPolicy", policyBuilder =>
@@ -91,14 +93,13 @@ else
 
 app.UseAuthorization();
 app.MapControllers();
-app.MapHub<BaseHub>("/basehub", options =>
-{
-    options.AllowStatefulReconnects = true;
-});
+app.MapHub<BaseHub>("/basehub", options => { options.AllowStatefulReconnects = true; });
 
 app.Run();
 
-public partial class Program { }
+public partial class Program
+{
+}
 
 //// For simulations
 //using WebApi.GameLogic.Simulations;

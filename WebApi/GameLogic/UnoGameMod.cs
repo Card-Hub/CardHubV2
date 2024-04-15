@@ -9,7 +9,7 @@ namespace WebApi.GameLogic;
 
 public class UnoGameMod
 {
-    private IDeck<UnoCardMod>? _deck;
+    private IDeck<UnoCardMod> _deck;
     private Stack<UnoCardMod> _discardPile = new();
     private PlayerOrder _playerOrder = [];
     private Dictionary<string, UnoPlayer> _players = new();
@@ -18,16 +18,24 @@ public class UnoGameMod
     private Timer _moveTimer;
     private readonly object _lock = new();
 
+    private int _toDrawAmount = 0;
+    public event EventHandler ColorPicked;
+    private UnoColor? _lastColor;
+    private string _playerToPickColor = "";
+
+    private static readonly UnoColor[] NormalColors = [UnoColor.Blue, UnoColor.Green, UnoColor.Red, UnoColor.Yellow];
+
     public string Gameboard { get; set; }
 
     IHubContext<BaseHub> _hubContext;
     private readonly UnoDeckBuilder _deckBuilder;
 
+
     public UnoGameMod(IHubContext<BaseHub> hubContext, UnoDeckBuilder deckBuilder)
     {
         _deckBuilder = deckBuilder;
 
-        _moveTimeLimit = TimeSpan.FromSeconds(5);
+        _moveTimeLimit = TimeSpan.FromSeconds(30);
         _moveTimer = new Timer(_moveTimeLimit);
         _moveTimer.Elapsed += OnMoveTimeElapsed;
         _hubContext = hubContext;
@@ -36,13 +44,13 @@ public class UnoGameMod
     public void InitGame(UnoSettings settings)
     {
         _deck = _deckBuilder.Build(settings);
+        _deck.Shuffle();
+        _playerOrder.ShuffleOrder();
     }
 
     public async Task StartGame()
     {
         InitGame(new UnoSettings());
-        _deck.Shuffle();
-        _playerOrder.ShuffleOrder();
 
         foreach (var player in _playerOrder)
         {
@@ -50,14 +58,18 @@ public class UnoGameMod
             _players[player].AddCards(drawnCards);
         }
 
+        var topCard = _deck.Draw();
         var counter = 0;
         while (counter++ < 10)
         {
-            var topCard = _deck.Draw();
             if (topCard.Color == UnoColor.Black) continue;
+            topCard = _deck.Draw();
             _discardPile.Push(topCard);
             break;
         }
+
+        _lastColor = topCard.Color;
+
 
         await _hubContext.Clients.Client(Gameboard).SendAsync("ReceiveCards", _discardPile);
         await InitiateTurn();
@@ -74,20 +86,59 @@ public class UnoGameMod
         if (_playerOrder.Current() != playerName) return false;
 
         var lastCard = _discardPile.Peek();
-        var isColorMatch = card.Color == lastCard.Color
-                           && card.Color != UnoColor.Black; // Non-wild card edge case
         var isValueMatch = card.Value == lastCard.Value;
-        var isWildPlayable = card is { Color: UnoColor.Black, Value: UnoValue.WildDrawFour };
+        var isColorMatch = card.Color == _lastColor &&
+                           card.Color != UnoColor.Black && // Wild card edge case
+                           _toDrawAmount == 0; // Color matched cards can't be played after drawing
+        var isWildImmediatelyPlayable = (lastCard.Value != UnoValue.DrawTwo && card.Value == UnoValue.WildDrawFour) ||
+                                        (lastCard.Value != UnoValue.DrawTwo &&
+                                         lastCard.Value != UnoValue.WildDrawFour &&
+                                         card.Value == UnoValue.Wild);
+        var isWildPlayable = (lastCard.Value == UnoValue.Wild || lastCard.Value == UnoValue.WildDrawFour) &&
+                             _toDrawAmount == 0;
 
-        if (!isColorMatch && !isValueMatch && !isWildPlayable) return false;
-        
+        if (!isColorMatch && !isValueMatch && !isWildImmediatelyPlayable && !isWildPlayable) return false;
 
         _players[_playerOrder.Current()].RemoveCard(card);
         _discardPile.Push(card);
 
-        await CancelTimer(card.ToString());
-        _playerOrder.SetNextCurrent();
-        await InitiateTurn();
+        var nextPlayerOffset = 1;
+        switch (card.Value)
+        {
+            case UnoValue.DrawTwo:
+                _toDrawAmount += 2;
+                break;
+            case UnoValue.Reverse:
+                _playerOrder.ToggleDirection();
+                break;
+            case UnoValue.Skip:
+                nextPlayerOffset = 2;
+                break;
+            case UnoValue.SkipAll:
+                nextPlayerOffset = _playerOrder.Count();
+                break;
+            case UnoValue.Wild:
+                _lastColor = UnoColor.Black;
+                _playerToPickColor = playerName;
+                break;
+            case UnoValue.WildDrawFour:
+                _toDrawAmount += 4;
+                _lastColor = UnoColor.Black;
+                _playerToPickColor = playerName;
+                break;
+        }
+
+        if (_lastColor == UnoColor.Black)
+        {
+            await _hubContext.Clients.Client(playerName).SendAsync("RequestColor", playerName);
+        }
+        else
+        {
+            await CancelTimer();
+            _playerOrder.SetNextCurrent(nextPlayerOffset);
+            await InitiateTurn();
+        }
+
         return true;
     }
 
@@ -119,6 +170,14 @@ public class UnoGameMod
         _playerOrder.Remove(playerName);
     }
 
+    public async Task SetColor(string playerName, UnoColor color)
+    {
+        if (_lastColor != UnoColor.Black || _playerToPickColor != playerName) return;
+        await CancelTimer();
+        _playerOrder.SetNextCurrent();
+        await InitiateTurn();
+    }
+
     public async Task InitiateTurn()
     {
         lock (_lock)
@@ -127,30 +186,40 @@ public class UnoGameMod
         }
 
         var player = _playerOrder.Current();
-        await _hubContext.Clients.Clients(player, Gameboard).SendAsync("StartTimer", _moveTimeLimit.Seconds);
+        await _hubContext.Clients.Clients(player, Gameboard).SendAsync("SetTimer", _moveTimeLimit.Seconds);
+
+        // Debug
+        await _hubContext.Clients.Client(player).SendAsync("ReceiveMessage", "It's your turn!");
 
         Console.WriteLine("Timer started.");
     }
 
-    public async Task CancelTimer(string card)
+    private async Task CancelTimer()
     {
         lock (_lock)
         {
             _moveTimer.Stop();
-            Console.WriteLine($"Timer cancelled by card {card}.");
         }
 
-        await _hubContext.Clients.Client(_playerOrder.Current()).SendAsync("StartTimer", 0);
+        await _hubContext.Clients.Client(_playerOrder.Current()).SendAsync("SetTimer", 0);
     }
 
     private async void OnMoveTimeElapsed(object? source, ElapsedEventArgs e)
     {
-        Console.WriteLine("Turn elapsed at {0:mm:ss}", e.SignalTime);
-        var drawnCard = _deck.Draw();
-        var currentPlayer = _playerOrder.Current();
-        _players[currentPlayer].AddCard(drawnCard);
+        if (_lastColor == UnoColor.Black)
+        {
+            _lastColor = NormalColors[new Random().Next(0, NormalColors.Length)];
+        }
 
-        await _hubContext.Clients.Client(currentPlayer).SendAsync("ReceiveCard", "Gameboard", drawnCard);
+        if (!await CompleteTurn())
+        {
+            var drawnCard = _deck.Draw();
+            var currentPlayer = _playerOrder.Current();
+            _players[currentPlayer].AddCard(drawnCard);
+
+            await _hubContext.Clients.Client(currentPlayer).SendAsync("ReceiveCard", "Gameboard", drawnCard);
+        }
+
         lock (_lock)
         {
             _moveTimer.Stop();
@@ -159,5 +228,19 @@ public class UnoGameMod
 
         _playerOrder.SetNextCurrent();
         await InitiateTurn();
+    }
+
+
+    private async Task<bool> CompleteTurn()
+    {
+        if (_toDrawAmount <= 0) return false;
+
+        var currentPlayer = _playerOrder.Current();
+        var drawnCards = _deck.Draw(_toDrawAmount);
+        _players[currentPlayer].AddCards(drawnCards);
+        _toDrawAmount = 0;
+
+        await _hubContext.Clients.Client(currentPlayer).SendAsync("ReceiveCards", drawnCards);
+        return true;
     }
 }

@@ -7,6 +7,7 @@ import {
     LogLevel
 } from "@microsoft/signalr";
 import { ref } from "vue";
+import type { UnoColor } from "~/types";
 
 export const useWebSocketStore = defineStore("webSocket", () => {
     const { $api } = useNuxtApp();
@@ -23,6 +24,7 @@ export const useWebSocketStore = defineStore("webSocket", () => {
     const cards = ref<UNOCard[]>([]);
     const messages = ref<UserMessage[]>([]);
     const users = ref<string[]>([]);
+    const canSelectWildColor = ref<boolean>(false);
 
     const user = ref("");
     const room = ref("");
@@ -91,13 +93,17 @@ export const useWebSocketStore = defineStore("webSocket", () => {
             });
 
             joinConnection.on("ReceiveCard", (fromUser: string, card: UNOCard) => {
-                cards.value.push(card);
+                cards.value.push(card as UNOCard);
                 console.log(card);
             });
 
             joinConnection.on("ReceiveCards", (gameCards: UNOCard[]) => {
                cards.value.push(...gameCards);
             });
+
+            joinConnection.on("ReceiveColor", (color: UnoColor) => {
+                cards.value[cards.value.length - 1].color = color;
+            }); // For gameboard
 
             joinConnection.on("UsersInRoom", (groupUsers: string[]) => {
                 users.value = groupUsers;
@@ -114,7 +120,7 @@ export const useWebSocketStore = defineStore("webSocket", () => {
             });
 
             const timeout = ref<NodeJS.Timeout | null>(null);
-            joinConnection.on("StartTimer", async (time: number) => {
+            joinConnection.on("SetTimer", async (time: number) => {
                 if (timeout.value)
                     clearInterval(timeout.value);
                 console.log("Timer started:", timer);
@@ -183,6 +189,16 @@ export const useWebSocketStore = defineStore("webSocket", () => {
         }
     };
 
+    const sendColor = async (color: UnoColor): Promise<void> => {
+        try {
+            if (connection.value !== null) {
+                await connection.value.invoke("SendColor", color);
+            }
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
     const drawCard = async (): Promise<void> => {
         if (connection.value === null) {
             return;
@@ -221,7 +237,7 @@ export const useWebSocketStore = defineStore("webSocket", () => {
     // Must return all state properties
     // https://pinia.vuejs.org/core-concepts/
     return {
-        connection, isConnected, isPlayer, cards, messages, users, user, room, cookieUser, cookieRoom, timer,
-        tryCreateRoom, tryJoinRoom, sendCard, drawCard, startGame, sendMessage, closeConnection
+        connection, isConnected, isPlayer, cards, messages, users, canSelectWildColor, user, room, cookieUser, cookieRoom, timer,
+        tryCreateRoom, tryJoinRoom, sendCard, sendColor, drawCard, startGame, sendMessage, closeConnection
     };
 });

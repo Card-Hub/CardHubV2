@@ -4,11 +4,11 @@ namespace WebApi.Models;
 
 public enum UnoColor
 {
+    Black,
     Blue,
     Green,
     Red,
-    Yellow,
-    Black
+    Yellow
 }
 
 public enum UnoValue
@@ -31,15 +31,21 @@ public enum UnoValue
     WildDrawFour
 }
 
-public partial class UnoCardMod
+// Class with enum member requires empty constructor/getters & setters for serialization
+// https://stackoverflow.com/a/66991853/18790415
+public record UnoCardMod
 {
-    public int Id { get; }
-    public UnoColor Color { get; init; }
-    public UnoValue Value { get; }
+    public int Id { get; set; }
+    public UnoColor Color { get; set; }
+    public UnoValue Value { get; set; }
 
-    private static List<UnoValue> specialValues =
-        [UnoValue.DrawTwo, UnoValue.Reverse, UnoValue.Skip, UnoValue.SkipAll, UnoValue.Wild, UnoValue.WildDrawFour];
+    // private static List<UnoValue> specialValues =
+    //     [UnoValue.DrawTwo, UnoValue.Reverse, UnoValue.Skip, UnoValue.SkipAll, UnoValue.Wild, UnoValue.WildDrawFour];
 
+    public UnoCardMod()
+    {
+    }
+    
     public UnoCardMod(int id, UnoColor color, UnoValue value)
     {
         Id = id;
@@ -47,39 +53,5 @@ public partial class UnoCardMod
         Value = value;
     }
 
-    public object ExtractValue()
-    {
-        if (specialValues.Contains(Value))
-        {
-            return AddWhitespaceToCamelcase(Value.ToString());
-        }
-
-        return new
-        {
-            Id,
-            Color = Color.ToString(),
-            Value = (int)Value
-        };
-    }
-
-    public string AddWhitespaceToCamelcase(string str)
-    {
-        return Regex.Replace(str, "(?<!^)([A-Z])", " $1");
-    }
-
-    public override bool Equals(object? obj)
-    {
-        if (obj is UnoCardMod card)
-        {
-            return Color == card.Color &&
-                   Value == card.Value;
-        }
-
-        return false;
-    }
-
-    public override int GetHashCode()
-    {
-        return HashCode.Combine(Color, Value);
-    }
+    public override string ToString() => $"Color: {Color}, Value: {Value}";
 }

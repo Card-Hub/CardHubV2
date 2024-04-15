@@ -7,7 +7,7 @@ import StandardCardDisplay from "~/components/Card/StandardCardDisplay.vue";
 import UNOCardDisplay from "~/components/Card/UNOCardDisplay.vue";
 
 const store = useWebSocketStore();
-const {  cards, timer } = storeToRefs(store);
+const { cards, timer } = storeToRefs(store);
 
 const newCards = ref<number[]>([]);
 const players = ref<string[]>(["juno 0", "julio 1", "julie 2", "julian 3"]);
@@ -20,8 +20,8 @@ const getCardStyle = (index: number) => {
   const randomRotation = Math.floor(Math.random() * 20) - 10; // Random rotation
 
   return {
-    transform: `translate(${randomX}px, ${randomY}px) rotate(${randomRotation}deg)`,
-    zIndex: index,
+    transform: `translate(${ randomX }px, ${ randomY }px) rotate(${ randomRotation }deg)`,
+    zIndex: index
   };
 };
 
@@ -31,16 +31,16 @@ const cardStyle = (num: number) => {
   let randomRotation = 0;
 
   return {
-    transform: `translate(${randomX}px, ${randomY}px) rotate(${randomRotation}deg)`,
-    zIndex: num,
+    transform: `translate(${ randomX }px, ${ randomY }px) rotate(${ randomRotation }deg)`,
+    zIndex: num
   };
 };
 
 const isCurrentPlayer = (player: string) => {
-  if (player.toLowerCase() === currentTurn.value.toLowerCase()){
+  if (player.toLowerCase() === currentTurn.value.toLowerCase()) {
     return {
-      border: '#D60E26 2px solid',
-      boxShadow: '0 0 10px #D60E26',
+      border: "#D60E26 2px solid",
+      boxShadow: "0 0 10px #D60E26"
     };
   }
 };
@@ -60,8 +60,9 @@ const getUNE = () => {
   <div class="gameboard-container">
     <div class="gameboard">
       <div class="player-icons">
-        <div class="player-icon" v-for="(player, index) in players" :key="index" :style="{ ...isCurrentPlayer(player) }">
-<!--          <img :src="getPlayerIcon(player)" alt="Player Icon" class="player-icon-img" />-->
+        <div class="player-icon" v-for="(player, index) in players" :key="index"
+             :style="{ ...isCurrentPlayer(player) }">
+          <!--          <img :src="getPlayerIcon(player)" alt="Player Icon" class="player-icon-img" />-->
           <p class="player-name"> {{ player }} </p>
         </div>
       </div>
@@ -71,7 +72,8 @@ const getUNE = () => {
         <div class="column-container">
           <div class="column left-column">
             <div class="deck-view">
-              <div class="deck-card flex justify-center items-center bg-zinc-800 rounded-md shadow-md mb-2" v-for="n in 5" :key="n" :style="cardStyle(n)">
+              <div class="deck-card flex justify-center items-center bg-zinc-800 rounded-md shadow-md mb-2"
+                   v-for="n in 5" :key="n" :style="cardStyle(n)">
                 <img :src="getUNE()" alt="game icon" class="une-logo"/>
               </div>
             </div>
@@ -83,7 +85,7 @@ const getUNE = () => {
                               :key="card.id"
                               :card="card"
                               class="absolute"
-              />
+                              :is-selected="false"/>
             </div>
           </div>
 
@@ -204,7 +206,7 @@ const getUNE = () => {
 
 .player-icon {
   width: 100px; /* Adjust the size of the player icon */
-  height:  100px; /* Adjust the size of the player icon */
+  height: 100px; /* Adjust the size of the player icon */
   border-radius: 50%; /* Ensure the player icon is circular */
   overflow: hidden; /* Ensure the player icon is circular */
   margin-right: 10px; /* Adjust the spacing between player icons */

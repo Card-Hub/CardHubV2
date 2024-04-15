@@ -1,4 +1,4 @@
-﻿using WebApi.Models;
+using WebApi.Models;
 
 namespace WebApi.Common;
 
@@ -13,19 +13,19 @@ public class UnoDeckBuilder : IDeckBuilder<UnoCardMod, UnoSettings>
         var deck = new Deck<UnoCardMod>();
         var cardId = 0;
 
-        var normalCardValues = Enum.GetValues(typeof(UnoValue)).Cast<UnoValue>()
-            .Where(v => v is not UnoValue.Wild and UnoValue.WildDrawFour).ToArray();
-        foreach (var color in Enum.GetValues(typeof(UnoColor)).Cast<UnoColor>())
+        var nonWildValues = Enum.GetValues(typeof(UnoValue)).Cast<UnoValue>()
+            .Where(v => v != UnoValue.Wild && v != UnoValue.WildDrawFour).ToArray();
+        List<UnoColor> normalColors = [UnoColor.Blue, UnoColor.Green, UnoColor.Red, UnoColor.Yellow];
+        foreach (var color in normalColors)
         {
-            foreach (var value in normalCardValues)
+            foreach (var value in nonWildValues)
             {
                 deck.Add(new UnoCardMod(cardId, color, value));
                 cardId++;
             }
         }
 
-        var wildCardValues = Enum.GetValues(typeof(UnoValue)).Cast<UnoValue>()
-            .Where(v => v is UnoValue.Wild or UnoValue.WildDrawFour).ToArray();
+        List<UnoValue> wildCardValues = [UnoValue.Wild, UnoValue.WildDrawFour];
         foreach (var wildCardValue in wildCardValues)
         {
             for (var i = 0; i < 4; i++)

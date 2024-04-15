@@ -2,11 +2,12 @@
 import { storeToRefs } from "pinia";
 import { useWebSocketStore } from "~/stores/webSocketStore";
 import toast from "@/utils/toast";
+import { UnoColor, UnoValue } from "~/types";
 
 
 const store = useWebSocketStore();
 const { connection, isConnected, messages, user, room } = storeToRefs(store);
-const { tryCreateRoom, tryJoinRoom } = store;
+const { sendCard, tryCreateRoom, tryJoinRoom } = store;
 
 const isValidRoomCode = computed(() => {
   const digitRegex = /^\d+$/;
@@ -17,6 +18,7 @@ const connectPlayer = async (): Promise<void> => {
   const isCorrectRoomCode = await tryJoinRoom();
   if (isCorrectRoomCode) {
     // await navigateTo('/playerview');
+
     await navigateTo("/lobby");
   } else {
     toast.add({
@@ -38,6 +40,7 @@ const connectGameboard = async (): Promise<void> => {
 
 console.log("check here for connectivity", isConnected.value);
 console.log("check here for obj", connection.value);
+
 </script>
 
 <template>

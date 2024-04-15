@@ -8,7 +8,6 @@ const store = useWebSocketStore();
 const { cards, users, user, timer } = storeToRefs(store);
 const { tryJoinRoom, sendCard, drawCard } = store;
 
-
 // const playerHand = ref<UNOCard[]>(unoDeck);
 // const selectedCard = ref<Card | null>(null);
 const selectedCard = ref<UNOCard | null>(null);
@@ -25,8 +24,6 @@ const handleCardClick = (card: UNOCard) => {
 
 
 import { computed, watch } from 'vue';
-
-
 
 </script>
 

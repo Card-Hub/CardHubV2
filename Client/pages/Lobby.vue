@@ -2,6 +2,7 @@
 
 import { storeToRefs } from "pinia";
 import Une from "~/pages/games/Une.vue";
+import AvatarSelection from "~/components/AvatarSelection.vue";
 
 const store = useWebSocketStore();
 const { isPlayer, messages, users, room } = storeToRefs(store);
@@ -23,6 +24,8 @@ const gameboardStart = () => {
       <p>
         Waiting for the host to start the game. Sit back and relax for now.
       </p>
+      
+<!--      <AvatarSelection />-->
     </div>
     <div v-else-if="!isPlayer" class="flex min-h-screen">
       <div class="flex flex-col w-1/3 bg-neutral-950 shadow-inner">

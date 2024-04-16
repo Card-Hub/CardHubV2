@@ -33,6 +33,7 @@ export const useWebSocketStore = defineStore("webSocket", () => {
     const reconnectTimeout = runtimeConfig.public.reconnectTimeout;
     
     const gameJson = ref<string>("");
+    const lobbyUsers = ref<Array<LobbyUser>>([]);
 
     // Users have 60 seconds to reconnect to the server
     // using client-side cookies
@@ -119,7 +120,17 @@ export const useWebSocketStore = defineStore("webSocket", () => {
               console.log("Json Received: \n", json);
               
               gameJson.value = json;
-          });
+            });
+
+            // json of LobbyUsers
+            joinConnection.on("ReceiveAvatars", (json: string) => {
+                var jsonLobbyUsers = JSON.parse(json);
+                lobbyUsers.value.length = 0; //clears array lmao
+                for (var lobbyUserIndex in jsonLobbyUsers) {
+                    lobbyUsers.value.push(jsonLobbyUsers[lobbyUserIndex]);
+                }
+            });
+            
             joinConnection.on("Log", (string: string) => {
               console.log("Backend logged:", string);
               console.log(string);

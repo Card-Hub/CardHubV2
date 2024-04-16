@@ -19,6 +19,17 @@ declare global {
         user: string
         message: string
     }
+    
+    interface Player {
+        name: string
+        avatar: string
+        afk: boolean
+        cards: Card[]
+    }
+    
+    interface unePlayer extends Player {
+        pickingWildColor: boolean
+    }
 
     interface LobbyUser {
       Name: string

@@ -98,12 +98,20 @@ export const useWebSocketStore = defineStore("webSocket", () => {
             });
 
             joinConnection.on("ReceiveCards", (gameCards: UNOCard[]) => {
-               cards.value.push(...gameCards);
+                cards.value.push(...gameCards);
             });
 
             joinConnection.on("ReceiveColor", (color: UnoColor) => {
                 cards.value[cards.value.length - 1].color = color;
             }); // For gameboard
+
+            joinConnection.on("RequestColor", () => {
+                canSelectWildColor.value = true;
+            });
+
+            joinConnection.on("SendColorResult", (result: boolean) => {
+                canSelectWildColor.value = false;
+            });
 
             joinConnection.on("UsersInRoom", (groupUsers: string[]) => {
                 users.value = groupUsers;
@@ -197,14 +205,14 @@ export const useWebSocketStore = defineStore("webSocket", () => {
         } catch (e) {
             console.log(e);
         }
-    }
+    };
 
     const drawCard = async (): Promise<void> => {
         if (connection.value === null) {
             return;
         }
         await connection.value.invoke("DrawCard");
-    }
+    };
 
     const startGame = async (): Promise<void> => {
         if (connection.value === null) {
@@ -212,7 +220,7 @@ export const useWebSocketStore = defineStore("webSocket", () => {
         }
 
         await connection.value.invoke("StartGame");
-    }
+    };
 
     const sendMessage = async (message: string): Promise<void> => {
         try {
@@ -237,7 +245,25 @@ export const useWebSocketStore = defineStore("webSocket", () => {
     // Must return all state properties
     // https://pinia.vuejs.org/core-concepts/
     return {
-        connection, isConnected, isPlayer, cards, messages, users, canSelectWildColor, user, room, cookieUser, cookieRoom, timer,
-        tryCreateRoom, tryJoinRoom, sendCard, sendColor, drawCard, startGame, sendMessage, closeConnection
+        connection,
+        isConnected,
+        isPlayer,
+        cards,
+        messages,
+        users,
+        canSelectWildColor,
+        user,
+        room,
+        cookieUser,
+        cookieRoom,
+        timer,
+        tryCreateRoom,
+        tryJoinRoom,
+        sendCard,
+        sendColor,
+        drawCard,
+        startGame,
+        sendMessage,
+        closeConnection
     };
 });

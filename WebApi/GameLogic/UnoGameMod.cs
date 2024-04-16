@@ -13,6 +13,7 @@ public class UnoGameMod
     private Stack<UnoCardMod> _discardPile = new();
     private PlayerOrder _playerOrder = [];
     private Dictionary<string, UnoPlayer> _players = new();
+    private Dictionary<string, string> _names = new();
 
     private TimeSpan _moveTimeLimit;
     private Timer _moveTimer;
@@ -35,7 +36,7 @@ public class UnoGameMod
     {
         _deckBuilder = deckBuilder;
 
-        _moveTimeLimit = TimeSpan.FromSeconds(30);
+        _moveTimeLimit = TimeSpan.FromSeconds(10);
         _moveTimer = new Timer(_moveTimeLimit);
         _moveTimer.Elapsed += OnMoveTimeElapsed;
         _hubContext = hubContext;
@@ -75,9 +76,10 @@ public class UnoGameMod
         await InitiateTurn();
     }
 
-    public void AddPlayer(string player)
+    public void AddPlayer(string player, string realName)
     {
         _playerOrder.Add(player);
+        _names[player] = realName;
         if (!_players.ContainsKey(player)) _players[player] = new UnoPlayer(player);
     }
 
@@ -97,7 +99,7 @@ public class UnoGameMod
         var isWildPlayable = (lastCard.Value == UnoValue.Wild || lastCard.Value == UnoValue.WildDrawFour) &&
                              _toDrawAmount == 0;
 
-        if (!isColorMatch && !isValueMatch && !isWildImmediatelyPlayable && !isWildPlayable) return false;
+        if (!isValueMatch && !isColorMatch && !isWildImmediatelyPlayable && !isWildPlayable) return false;
 
         _players[_playerOrder.Current()].RemoveCard(card);
         _discardPile.Push(card);
@@ -170,12 +172,15 @@ public class UnoGameMod
         _playerOrder.Remove(playerName);
     }
 
-    public async Task SetColor(string playerName, UnoColor color)
+    public async Task<bool> SetColor(string playerName, UnoColor color)
     {
-        if (_lastColor != UnoColor.Black || _playerToPickColor != playerName) return;
+        if (_lastColor != UnoColor.Black || _playerToPickColor != playerName) return false;
+        Console.WriteLine("Set color to: " + color);
+        _lastColor = color;
         await CancelTimer();
         _playerOrder.SetNextCurrent();
         await InitiateTurn();
+        return true;
     }
 
     public async Task InitiateTurn()
@@ -186,12 +191,20 @@ public class UnoGameMod
         }
 
         var player = _playerOrder.Current();
+        try
+        {
+            Console.WriteLine("New turn: " + _names[player]);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+        
         await _hubContext.Clients.Clients(player, Gameboard).SendAsync("SetTimer", _moveTimeLimit.Seconds);
 
         // Debug
         await _hubContext.Clients.Client(player).SendAsync("ReceiveMessage", "It's your turn!");
-
-        Console.WriteLine("Timer started.");
     }
 
     private async Task CancelTimer()

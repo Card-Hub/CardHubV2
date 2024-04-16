@@ -8,12 +8,11 @@ const store = useWebSocketStore();
 const { cards, canSelectWildColor } = storeToRefs(store);
 const { sendCard, sendColor } = store;
 
-
-
 const selectedCard = ref<UNOCard | null>(null);
 
-const isWildSelectorVisible = computed(() => {
-  return selectedCard.value?.value === UnoValue.Wild || selectedCard.value?.value === UnoValue.WildDrawFour || canSelectWildColor.value;
+const isWildSelectorVisible = computed<boolean>(() => {
+  if (selectedCard.value === null) return false;
+  return (selectedCard.value.value === UnoValue.Wild || selectedCard.value.value === UnoValue.WildDrawFour) && canSelectWildColor.value;
 });
 
 const handleCardClick = (card: UNOCard) => {
@@ -22,9 +21,10 @@ const handleCardClick = (card: UNOCard) => {
 };
 
 const handleColorSelection = (color: UnoColor) => {
-  selectedCard.value!.color = color;
-  sendCard(selectedCard.value!);
-  selectedCard.value = null;
+  // if (selectedCard.value === null) return;
+  // selectedCard.value.color = color;
+  sendColor(color);
+  canSelectWildColor.value = false;
 };
 
 </script>
@@ -44,19 +44,14 @@ const handleColorSelection = (color: UnoColor) => {
                     :isSelected="selectedCard === card"
                     @cardClicked="handleCardClick"
     />
-    <template v-if="isWildSelectorVisible">
-      <div class="grid-container">
-        <div class="grid-item blue" @click="handleColorSelection(UnoColor.Blue)"></div>
-        <div class="grid-item red" @click="handleColorSelection(UnoColor.Red)"></div>
-        <div class="grid-item green" @click="handleColorSelection(UnoColor.Green)"></div>
-        <div class="grid-item yellow" @click="handleColorSelection(UnoColor.Yellow)"></div>
-      </div>
-    </template>
-
-
+  </div>
+  <div v-if="true" class="grid-container">
+    <div class="grid-item blue" @click="handleColorSelection(UnoColor.Blue)"></div>
+    <div class="grid-item red" @click="handleColorSelection(UnoColor.Red)"></div>
+    <div class="grid-item green" @click="handleColorSelection(UnoColor.Green)"></div>
+    <div class="grid-item yellow" @click="handleColorSelection(UnoColor.Yellow)"></div>
   </div>
 </template>
-
 
 <style scoped>
 .player-hand {
@@ -69,6 +64,8 @@ const handleColorSelection = (color: UnoColor) => {
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-gap: 10px; /* spacing between grid items */
+  width: 120px;
+  height: 120px;
 }
 
 .grid-item {

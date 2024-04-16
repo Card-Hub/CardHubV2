@@ -38,7 +38,7 @@ public class PlayerOrder : IEnumerable<string>
 
     public int Count() => _players.Count;
 
-    public string Current() => _currentNode.Value;
+    public string Current() => _currentNode?.Value ?? "";
     
     public string Next() => GetNextNode().Value;
 
@@ -55,7 +55,7 @@ public class PlayerOrder : IEnumerable<string>
     
     public string SetNextCurrent(int playersToIterate = 1)
     {
-        if (_players.First is null || _players.Last is null || playersToIterate < 1)
+        if (_players.First is null || _players.Last is null || playersToIterate < 1 || _currentNode is null)
         {
             return "";
         }
@@ -137,7 +137,7 @@ public class PlayerOrder : IEnumerable<string>
         }
         do
         {
-            yield return _currentNode.ValueRef;
+            yield return _currentNode.Value;
             _currentNode = GetNextNode();
         } while (startNode != _currentNode);
     }

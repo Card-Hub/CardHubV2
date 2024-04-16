@@ -45,7 +45,7 @@ public record UnoCardMod
     public UnoCardMod()
     {
     }
-    
+
     public UnoCardMod(int id, UnoColor color, UnoValue value)
     {
         Id = id;

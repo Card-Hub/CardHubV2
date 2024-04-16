@@ -64,7 +64,7 @@ public partial class BaseHub : Hub
         switch (userConnection.UserType)
         {
             case UserType.Player:
-                _game.AddPlayer(userConnection.ConnectionId);
+                _game.AddPlayer(userConnection.ConnectionId, userConnection.User);
                 break;
             case UserType.Gameboard:
                 _game.Gameboard = userConnection.ConnectionId;
@@ -90,7 +90,7 @@ public partial class BaseHub : Hub
 
     public async Task SendCard(UnoCardMod card)
     {
-        Console.WriteLine("just sent: ", card);
+        Console.WriteLine($"just sent: { card }");
         if (_userConnections.TryGetValue(Context.ConnectionId, out var userConnection))
         {
             var userName = userConnection.ConnectionId;
@@ -113,8 +113,11 @@ public partial class BaseHub : Hub
 
     public async Task SendColor(UnoColor color)
     {
-        await _game.SetColor(Context.ConnectionId, color);
-        await Clients.Group(_game.Gameboard).SendAsync("ReceiveColor", color);
+        if (await _game.SetColor(Context.ConnectionId, color))
+        {
+            await Clients.Client(Context.ConnectionId).SendAsync("SendColorResult", true);
+            await Clients.Group(_game.Gameboard).SendAsync("ReceiveColor", color);
+        }
     }
 
     public async Task DrawCard()
@@ -148,7 +151,6 @@ public partial class BaseHub : Hub
     {
         var users = _userConnections.Values.Where(x => x.Room == room && x.UserType == UserType.Player)
             .Select(x => x.User);
-        Console.WriteLine("in send connected: ", users);
         return Clients.Group(room).SendAsync("UsersInRoom", users);
     }
 

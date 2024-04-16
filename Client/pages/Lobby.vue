@@ -5,13 +5,17 @@ import Une from "~/pages/games/Une.vue";
 import AvatarSelection from "~/components/AvatarSelection.vue";
 
 const store = useWebSocketStore();
-const { isPlayer, messages, users, room } = storeToRefs(store);
+const { isPlayer, messages, users, room, lobbyUsers } = storeToRefs(store);
 const { sendMessage, startGame } = store;
 
 const gameboardStart = () => {
   startGame();
   navigateTo("/gameboard");
 }
+
+const getIcon = (avatar: string) => {
+  return new URL(`../assets/icons/avatars/${avatar}.png`, import.meta.url);
+};
 
 </script>
 
@@ -39,9 +43,10 @@ const gameboardStart = () => {
           <SvgoStandardDeckSpades class="suit w-80 h-80 absolute z-0 bottom-12 -left-24 rotate-[-20deg]" :fontControlled="false" filled/>
 
           <div class="m-8 flex flex-col gap-4">
-            <div v-for="user in users as string[]" class="rounded-full flex card items-center justify-content h-16 w-full">
-              <i class="pi pi-user mx-4 text-neutral-300" style="font-size: 1.5rem"></i>
-              <span class="text-2xl text-neutral-300">{{ user }}</span>
+            <div v-for="lobbyUser in lobbyUsers as LobbyUser[]" class="rounded-full flex card items-center justify-content h-16 w-full">
+              <!--<i class="pi pi-user mx-4 text-neutral-300" style="font-size: 1.5rem"></i>-->
+              <img :src="getIcon(lobbyUser.Avatar)" alt="avatar Icon" class="lobby-player-icon-img">
+              <span class="text-2xl text-neutral-300">{{ lobbyUser.Name }} </span>
             </div>
           </div>
         </div>
@@ -85,6 +90,12 @@ const gameboardStart = () => {
 
   .suit {
     opacity: 35%;
+  }
+
+  .lobby-player-icon-img {
+    width: 3em;
+    border-radius: 50%; /* Ensure the player icon is circular */
+  overflow: hidden;
   }
 </style>
 

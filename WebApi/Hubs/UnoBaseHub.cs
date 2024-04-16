@@ -13,18 +13,22 @@ public partial class BaseHub : Hub
   private Dictionary <string, UnoGameModLyssie> unoRoomToGames = new();
   private List<string> unoRoomCodes = new();
   
-  public async Task SelectUno(UnoGameStorage unoGameStorage)
+  public async Task SelectUno(UnoGameStorage unoGameStorage, string a1, string a2)
     {
         if (!_userConnections.TryGetValue(Context.ConnectionId, out var userConnection)) return;
+        Console.WriteLine(a1 + a2);
         // store settings
-        //unoGameStorage.InitializeUnoSettingsForRoom();
-        unoGameStorage.SetSetting(userConnection.Room, "UseSkipAll", true);
         unoGameStorage.BuildGame(userConnection.Room);
+        unoGameStorage.SetSetting(userConnection.Room, "UseSkipAll", true);
         var game = unoGameStorage.GetGame(userConnection.Room);
+        Console.WriteLine("in select uno ");
         // reguster gameboard to game - do this first!
-        unoRoomToGames[userConnection.Room].GameboardConnStr = userConnection.ConnectionId;
+        game.GameboardConnStr = userConnection.ConnectionId;
+        Console.WriteLine(unoGameStorage.GetGame(userConnection.Room).GameboardConnStr);
         Console.WriteLine("Uno selected");
-        await Clients.User(userConnection.ConnectionId).SendAsync("Log", "Uno selected");
+        Clients.Client(userConnection.ConnectionId!).SendAsync("BELog","Uno selected");
+        //Context.Clients.Client(game.GameboardConnStr).SendAsync("BELog", "BE Uno selected");
+        Console.WriteLine("end select uno");
     }
     public async Task UnoStartGame(UnoGameStorage unoGameStorage)
     {

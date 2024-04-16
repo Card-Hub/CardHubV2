@@ -40,8 +40,6 @@ export const useWebSocketStore = defineStore("webSocket", () => {
     const cookieUser = useCookie<string>("user", { maxAge: reconnectTimeout });
     const cookieRoom = useCookie<string>("room", { maxAge: reconnectTimeout });
 
-    const lobbyUsers = ref<Array<LobbyUser>>([]);
-
     // Attempt to create a new room for the Gameboard device
     const tryCreateRoom = async (): Promise<boolean> => {
         try {
@@ -289,6 +287,6 @@ export const useWebSocketStore = defineStore("webSocket", () => {
     return {
         connection, isConnected, isPlayer, cards, messages, users, user, room, cookieUser, cookieRoom, timer, lobbyUsers, gameJson,
         tryCreateRoom, tryJoinRoom, sendCard, drawCard, startGame, sendMessage, closeConnection,
-        selectUno, sendAvatar, , sendAvatar, sendGameType
+        selectUno, sendAvatar, sendGameType
     };
 });

@@ -14,10 +14,12 @@ public class UnoGameStorage {
     this.HubContext = hubContext;
   }
   public void BuildGame(string roomCode) {
+    Console.WriteLine("In buildgame");
     InitializeUnoSettingsForRoom(roomCode);
     var game = new UnoGameModLyssie(new UnoMessenger(HubContext), deckBuilder);
     game.ChangeSettings(SettingsFromRoomCodes[roomCode]);
     GamesFromRoomCodes[roomCode] = game;
+    Console.WriteLine("In buildgame 2");
   }
   public void SetSetting(string roomCode, string setting, bool newValue) {
     if (!SettingsFromRoomCodes.ContainsKey(roomCode)) {
@@ -36,7 +38,7 @@ public class UnoGameStorage {
   }
   
   private void InitializeUnoSettingsForRoom(string roomCode) {
-    Console.WriteLine("Initializing uno settings for room {roomCode}");
+    Console.WriteLine($"Initializing uno settings for room {roomCode}");
     var settings = new UnoSettingsLyssie();
     SettingsFromRoomCodes[roomCode] = settings;
   }

@@ -8,6 +8,7 @@ namespace WebApi.GameLogic.LyssieUno;
 // don't touch this! it's in a very particular order
 public class UnoJsonStateLyssie {
   public string GameType = "Uno";
+  public int TimerAmt = 5;
   public bool GameStarted = false;
   public string CurrentColor = "";
   public string Direction = "";

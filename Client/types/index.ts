@@ -20,4 +20,8 @@ declare global {
         message: string
     }
 
+    interface LobbyUser {
+      Name: string
+      Avatar: string
+    }
 }

@@ -4,6 +4,7 @@ using WebApi.Models;
 namespace WebApi.Hubs;
 
 using Microsoft.AspNetCore.SignalR;
+using Newtonsoft.Json;
 using WebApi.GameLogic.LyssieUno;
 
 public class UserConnection
@@ -22,10 +23,20 @@ public class UserMessage
     public required string Message { get; set; }
 }
 
+
 public interface IBaseClient
 {
     
 }
+
+class LobbyUser {
+  public string Name { get; set; }
+  public string Avatar { get; set; }
+  public LobbyUser(string name, string avatar) {
+    Name = name;
+    Avatar = avatar;
+  }
+};
 
 public partial class BaseHub : Hub
 {
@@ -45,7 +56,7 @@ public partial class BaseHub : Hub
         return base.OnConnectedAsync();
     }
 
-    public async Task JoinRoom(UserConnection userConnection)
+    public async Task JoinRoom(UnoGameStorage unoGameStorage, UserConnection userConnection)
     {
         Console.WriteLine("Join Room");
         await Groups.AddToGroupAsync(Context.ConnectionId, userConnection.Room);
@@ -66,10 +77,12 @@ public partial class BaseHub : Hub
         switch (userConnection.UserType)
         {
             case UserType.Player:
-                _game.AddPlayer(userConnection.ConnectionId);
+                //_game.AddPlayer(userConnection.ConnectionId);
+                unoGameStorage.GetGame(userConnection.Room).AddPlayer(userConnection.User, userConnection.ConnectionId);
                 break;
             case UserType.Gameboard:
-                _game.Gameboard = userConnection.ConnectionId;
+                unoGameStorage.BuildGame(userConnection.Room);
+                unoGameStorage.GetGame(userConnection.Room).GameboardConnStr = userConnection.ConnectionId;
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -111,6 +124,24 @@ public partial class BaseHub : Hub
             }
         }   
     }
+    public async Task SendAvatar(UnoGameStorage unoGameStorage, string avatar) {
+      if (_userConnections.TryGetValue(Context.ConnectionId, out var userConnection))
+        {
+          if (true) { // game is uno
+            var game = unoGameStorage.GetGame(userConnection.Room);
+            string gameboardStr = game.GameboardConnStr;
+            game.SetAvatar(userConnection.ConnectionId, avatar);
+          //// send to the gameboard that the avatar was sent
+          List<LobbyUser> lobbyUsers = new();
+          game.GetActivePlayers();
+          foreach (var player in game.GetActivePlayers()) {
+            lobbyUsers.Add(new LobbyUser(player.Name, player.Avatar));
+          }
+          await Clients.Client(gameboardStr).SendAsync("ReceiveAvatars", JsonConvert.SerializeObject(lobbyUsers));
+          //await Clients.Client(gameboardStr).SendAsync("Log", game.GetGameState());
+          }
+        }
+    }
 
     //public async Task DrawCard()
     //{
@@ -143,7 +174,7 @@ public partial class BaseHub : Hub
     {
         var users = _userConnections.Values.Where(x => x.Room == room && x.UserType == UserType.Player)
             .Select(x => x.User);
-        Console.WriteLine("in send connected: ", users);
+        //Console.WriteLine("in send connected: ", users);
         return Clients.Group(room).SendAsync("UsersInRoom", users);
     }
 

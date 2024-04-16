@@ -6,7 +6,7 @@ import toast from "@/utils/toast";
 
 const store = useWebSocketStore();
 const { connection, isConnected, messages, user, room } = storeToRefs(store);
-const { tryCreateRoom, tryJoinRoom } = store;
+const { tryJoinRoom } = store;
 
 const isValidRoomCode = computed(() => {
   const digitRegex = /^\d+$/;

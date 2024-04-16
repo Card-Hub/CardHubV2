@@ -31,6 +31,8 @@ export const useWebSocketStore = defineStore("webSocket", () => {
 
     const runtimeConfig = useRuntimeConfig();
     const reconnectTimeout = runtimeConfig.public.reconnectTimeout;
+    
+    const gameJson = ref<string>("");
 
     // Users have 60 seconds to reconnect to the server
     // using client-side cookies
@@ -115,6 +117,8 @@ export const useWebSocketStore = defineStore("webSocket", () => {
             // LYSSIETEST
             joinConnection.on("ReceiveJson", (json: string) => {
               console.log("Json Received: \n", json);
+              
+              gameJson.value = json;
           });
             joinConnection.on("Log", (string: string) => {
               console.log("Backend logged:", string);
@@ -200,6 +204,16 @@ export const useWebSocketStore = defineStore("webSocket", () => {
             console.log(e);
         }
     };
+    
+    const sendGameType = async (gameType: string): Promise<void> => {
+        try {
+            if (connection.value !== null) {
+                await connection.value.invoke("SendGameType", gameType);
+            }
+        } catch (e) {
+            console.log(e);
+        }
+    }
 
     const drawCard = async (): Promise<void> => {
         if (connection.value === null) {
@@ -252,8 +266,8 @@ export const useWebSocketStore = defineStore("webSocket", () => {
     // Must return all state properties
     // https://pinia.vuejs.org/core-concepts/
     return {
-        connection, isConnected, isPlayer, cards, messages, users, user, room, cookieUser, cookieRoom, timer,
+        connection, isConnected, isPlayer, cards, messages, users, user, room, cookieUser, cookieRoom, timer, gameJson,
         tryCreateRoom, tryJoinRoom, sendCard, drawCard, startGame, sendMessage, closeConnection,
-        selectUno, sendAvatar
+        selectUno, sendAvatar, sendGameType
     };
 });

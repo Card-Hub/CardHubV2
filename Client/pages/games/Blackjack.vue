@@ -9,11 +9,12 @@ import { useWebSocketStore } from "~/stores/webSocketStore";
 
 const store = useWebSocketStore();
 const { connection, isConnected, messages, user, room } = storeToRefs(store);
-const { tryCreateRoom, tryJoinRoom } = store;
+const { tryCreateRoom, tryJoinRoom, sendGameType } = store;
 
 const connectGameboard = async (): Promise<void> => {
   const isRoomCreated = await tryCreateRoom();
   if (isRoomCreated) {
+    sendGameType('Blackjack');
     // await navigateTo('/playerview');
     await navigateTo("/lobby");
   }

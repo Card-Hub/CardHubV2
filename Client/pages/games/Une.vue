@@ -7,11 +7,12 @@
 
   const store = useWebSocketStore();
   const { connection, isConnected, messages, user, room } = storeToRefs(store);
-  const { tryCreateRoom, tryJoinRoom } = store;
+  const { tryCreateRoom, tryJoinRoom, sendGameType } = store;
 
   const connectGameboard = async (): Promise<void> => {
     const isRoomCreated = await tryCreateRoom();
     if (isRoomCreated) {
+      await sendGameType("UNE");
       // await navigateTo('/playerview');
       await navigateTo("/lobby");
     }

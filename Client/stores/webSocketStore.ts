@@ -40,6 +40,7 @@ export const useWebSocketStore = defineStore("webSocket", () => {
     const cookieUser = useCookie<string>("user", { maxAge: reconnectTimeout });
     const cookieRoom = useCookie<string>("room", { maxAge: reconnectTimeout });
 
+    const lobbyUsers = ref<Array<LobbyUser>>([]);
 
     // Attempt to create a new room for the Gameboard device
     const tryCreateRoom = async (): Promise<boolean> => {
@@ -134,6 +135,14 @@ export const useWebSocketStore = defineStore("webSocket", () => {
             joinConnection.on("Log", (string: string) => {
               console.log("Backend logged:", string);
               console.log(string);
+            });
+            // json of LobbyUsers
+            joinConnection.on("ReceiveAvatars", (json: string) => {
+              var jsonLobbyUsers = JSON.parse(json);
+              lobbyUsers.value.length = 0; //clears array lmao
+              for (var lobbyUserIndex in jsonLobbyUsers) {
+                lobbyUsers.value.push(jsonLobbyUsers[lobbyUserIndex]);
+              }
             });
 
             const timeout = ref<NodeJS.Timeout | null>(null);
@@ -274,11 +283,12 @@ export const useWebSocketStore = defineStore("webSocket", () => {
     };
 
 
+
     // Must return all state properties
     // https://pinia.vuejs.org/core-concepts/
     return {
-        connection, isConnected, isPlayer, cards, messages, users, user, room, cookieUser, cookieRoom, timer, gameJson,
+        connection, isConnected, isPlayer, cards, messages, users, user, room, cookieUser, cookieRoom, timer, lobbyUsers, gameJson,
         tryCreateRoom, tryJoinRoom, sendCard, drawCard, startGame, sendMessage, closeConnection,
-        selectUno, sendAvatar, sendGameType
+        selectUno, sendAvatar, , sendAvatar, sendGameType
     };
 });

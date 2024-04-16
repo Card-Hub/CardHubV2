@@ -8,7 +8,13 @@ import {
 } from "@microsoft/signalr";
 import { ref } from "vue";
 
+import {useUneStore} from "~/stores/uneStore";
+
 export const useWebSocketStore = defineStore("webSocket", () => {
+  
+  const store = useUneStore();
+  const { gameType } = storeToRefs(store);
+  const { parseJson } = store;
     const { $api } = useNuxtApp();
 
     enum UserType {
@@ -119,6 +125,8 @@ export const useWebSocketStore = defineStore("webSocket", () => {
               console.log("Json Received: \n", json);
               
               gameJson.value = json;
+              parseJson(gameJson.value);
+              console.log(gameType.value);
             });
 
             // json of LobbyUsers

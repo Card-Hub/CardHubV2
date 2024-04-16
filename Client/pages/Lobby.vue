@@ -7,6 +7,8 @@ import AvatarSelection from "~/components/AvatarSelection.vue";
 const store = useWebSocketStore();
 const { isPlayer, messages, users, room, lobbyUsers } = storeToRefs(store);
 const { sendMessage, startGame } = store;
+const uneStore = useUneStore();
+const { gameType } = storeToRefs(uneStore);
 
 const gameboardStart = () => {
   startGame();
@@ -23,7 +25,7 @@ const getIcon = (avatar: string) => {
   <div>
     <div v-if="isPlayer" class="m-8">
       <h1>
-        UNE - New and Improved
+        {{ gameType }}
       </h1>
       <p>
         Waiting for the host to start the game. Sit back and relax for now.

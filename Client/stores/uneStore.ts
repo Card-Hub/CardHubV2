@@ -2,10 +2,10 @@ import { ref } from "vue";
 import { defineStore } from "pinia";
 import {useWebSocketStore} from "~/stores/webSocketStore";
 
-const store = useWebSocketStore();
-const { gameJson } = storeToRefs(store);
 
 export const useUneStore = defineStore("une", () => {
+  const store = useWebSocketStore();
+  const { gameJson } = storeToRefs(store);
     const { $api } = useNuxtApp();
     // variables for the store that will be called by the gameboard
     const gameType = ref<string>("");
@@ -20,9 +20,7 @@ export const useUneStore = defineStore("une", () => {
     const discardPile = ref<UNOCard[]>([]);
     const deckAmt = ref<number>(0);
 
-    parseJson(gameJson.value);
-
-    function parseJson(json: string) {
+    const parseJson = async (json: string) => {
         const parsed = JSON.parse(json);
         gameType.value = parsed.GameType;
         gameStarted.value = parsed.GameStarted;
@@ -39,6 +37,7 @@ export const useUneStore = defineStore("une", () => {
     }
 
     return {
+        parseJson,
         gameType,
         gameStarted,
         currentColor,

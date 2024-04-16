@@ -55,6 +55,16 @@ const getPearl = () => {
   align-items: center;
 }
 
+.cd-logo {
+  width: 75%;
+  height: 75%;
+}
+
+.pearl-logo {
+  width: 75%;
+  height: 75%;
+}
+
 .initial-message, .main-info {
   text-align: center;
   padding-top: 30vh;

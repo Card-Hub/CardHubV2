@@ -47,7 +47,7 @@ const showCardContainer = () => {
 };
 
 const getCards = () => {
-  return new URL(`../../assets/icons/standardDeck/spades.svg`, import.meta.url);
+  return new URL(`../../assets/icons/standardDeck/hearts.svg`, import.meta.url);
 };
 </script>
 
@@ -69,11 +69,11 @@ const getCards = () => {
       </div>
 
       <div class="column right-column">
-        <h1 class="text-7xl">Blackjack</h1>
+        <h1 class="text-7xl">Texas Hold 'Em</h1>
         <h3>Game Description: </h3>
-        <p> In this classic card game, your goal is to beat the dealer's hand without going over 21. You'll be dealt two cards initially and have the option to 'hit' to receive another card or 'stand' to keep your current hand. The dealer will also be dealt cards, one face up and one face down. Be careful though - if your hand total exceeds 21, you'll 'bust' and lose the round. But if you manage to get closer to 21 than the dealer without busting, you win! Get ready to test your luck and skills in this exciting game of blackjack! </p>
+        <p> In this classic card game, ... </p>
         <NuxtLink href="/lobby">
-          <Button class="play" label="Secondary" severity="secondary" @click="connectGameboard"> Play Blackjack </Button>
+          <Button class="play" label="Secondary" severity="secondary" @click="connectGameboard"> Play Texas Hold 'Em </Button>
         </NuxtLink>
       </div>
 
@@ -86,8 +86,8 @@ const getCards = () => {
     <div v-if="showCards" class="card-container">
       <div v-if="showCards" class="card-container">
         <StandardCardDisplay v-for="card in standardDeck"
-                        :key="card.id"
-                        :card="card"
+                             :key="card.id"
+                             :card="card"
         />
       </div>
     </div>

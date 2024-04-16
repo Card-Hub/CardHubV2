@@ -2,6 +2,22 @@
   import { ref, computed } from 'vue';
   import UNOCardDisplay from "~/components/Card/UNOCardDisplay.vue";
 
+  import { storeToRefs } from "pinia";
+  import { useWebSocketStore } from "~/stores/webSocketStore";
+
+  const store = useWebSocketStore();
+  const { connection, isConnected, messages, user, room } = storeToRefs(store);
+  const { tryCreateRoom, tryJoinRoom } = store;
+
+  const connectGameboard = async (): Promise<void> => {
+    const isRoomCreated = await tryCreateRoom();
+    if (isRoomCreated) {
+      // await navigateTo('/playerview');
+      await navigateTo("/lobby");
+    }
+  };
+
+
   // create uno deck of cards
   const unoDeck = [];
   const colors = ["#d12c15", "#ffce30", "#7abb18", "#1166ac"];
@@ -70,7 +86,7 @@
         <h3>Game Description: </h3>
         <p> Each player begins with a hand of 7 UNE cards. The goal of the game is to rid yourself of your cards as quickly and efficiently as possible. The only ways to win the game is by being the first player to run out of cards ro by having the least amount of cards at the end of the game. To do this, you will need to play cards from your hand to match the number, color, or the action of the top card in the discard pile. </p>
         <NuxtLink href="/lobby">
-          <Button class="play"> Play UNE </Button>
+          <Button class="play" label="Secondary" severity="secondary" @click="connectGameboard"> Play UNE </Button>
         </NuxtLink>
       </div>
       

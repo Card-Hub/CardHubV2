@@ -30,6 +30,12 @@ const popularGames = [
       image: new URL('../assets/icons/standardDeck/spades.svg', import.meta.url),
       deckColor: 'white',
       link: '/games/blackjack'
+    },
+    {
+      title: 'Texas Hold Em',
+      image: new URL('../assets/icons/standardDeck/hearts.svg', import.meta.url),
+      deckColor: 'white',
+      link: '/games/texasholdem'
   }]; // add more as necessary
 
 const searchQuery = ref('');

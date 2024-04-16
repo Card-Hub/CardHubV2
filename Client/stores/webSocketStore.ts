@@ -254,6 +254,6 @@ export const useWebSocketStore = defineStore("webSocket", () => {
     return {
         connection, isConnected, isPlayer, cards, messages, users, user, room, cookieUser, cookieRoom, timer,
         tryCreateRoom, tryJoinRoom, sendCard, drawCard, startGame, sendMessage, closeConnection,
-        selectUno
+        selectUno, sendAvatar
     };
 });

@@ -190,6 +190,16 @@ export const useWebSocketStore = defineStore("webSocket", () => {
             console.log(e);
         }
     };
+    
+    const sendAvatar = async (avatar: string): Promise<void> => {
+        try {
+            if (connection.value !== null) {
+                await connection.value.invoke("SendAvatar", avatar);
+            }
+        } catch (e) {
+            console.log(e);
+        }
+    };
 
     const drawCard = async (): Promise<void> => {
         if (connection.value === null) {

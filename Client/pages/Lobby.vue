@@ -19,13 +19,13 @@ const gameboardStart = () => {
   <div>
     <div v-if="isPlayer" class="m-8">
       <h1>
-        Une - New and Improved
+        UNE - New and Improved
       </h1>
       <p>
         Waiting for the host to start the game. Sit back and relax for now.
       </p>
       
-<!--      <AvatarSelection />-->
+      <AvatarSelection class="align-center"/>
     </div>
     <div v-else-if="!isPlayer" class="flex min-h-screen">
       <div class="flex flex-col w-1/3 bg-neutral-950 shadow-inner">

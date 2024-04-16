@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import AvatarSelection from "~/components/AvatarSelection.vue";
 
 const isPlayer = ref<boolean>(true);
 
@@ -15,7 +16,7 @@ const isPlayer = ref<boolean>(true);
         Waiting for the host to start the game. Sit back and relax for now. While you're waiting, select an avatar.
       </p>
 
-            <AvatarSelection />
+      <AvatarSelection class="align-center"/>
     </div>
     <div v-else-if="!isPlayer" class="flex min-h-screen">
 

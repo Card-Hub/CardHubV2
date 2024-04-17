@@ -12,7 +12,11 @@ const { gameType } = storeToRefs(uneStore);
 
 const gameboardStart = () => {
   startGame();
-  navigateTo("/gameboard");
+  navigateTo("/gameboard/" + gameType.value.toLowerCase());
+}
+
+const playerStart = () => {
+  navigateTo("/playerview/" + gameType.value.toLowerCase());
 }
 
 const getIcon = (avatar: string) => {

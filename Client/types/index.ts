@@ -24,11 +24,12 @@ declare global {
         name: string
         avatar: string
         afk: boolean
-        cards: Card[]
+        //cards: Card[]
     }
     
     interface unePlayer extends Player {
         pickingWildColor: boolean
+        cards: UNOCard[]
     }
 
     interface LobbyUser {

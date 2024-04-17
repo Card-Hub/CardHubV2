@@ -5,7 +5,7 @@ import {useWebSocketStore} from "~/stores/webSocketStore";
 
 export const useUneStore = defineStore("une", () => {
   const store = useWebSocketStore();
-  const { gameJson } = storeToRefs(store);
+  const { gameJson, user } = storeToRefs(store);
     const { $api } = useNuxtApp();
     // variables for the store that will be called by the gameboard
     const gameType = ref<string>("");
@@ -19,6 +19,18 @@ export const useUneStore = defineStore("une", () => {
     const currentPlayer = ref<string>("");
     const discardPile = ref<UNOCard[]>([]);
     const deckAmt = ref<number>(0);
+
+    const yourCards = computed(() => {
+      const yc: UNOCard[] = [];
+      players.value.forEach(player => {
+        if (player.name == user.value) {
+          player.cards.forEach(card => {
+            yc.push(card);
+          })
+        }
+      })
+      return yc;
+    });
 
     const parseJson = async (json: string) => {
         const parsed = JSON.parse(json);
@@ -36,6 +48,19 @@ export const useUneStore = defineStore("une", () => {
         players.value = parsed.ActivePlayers;
     }
 
+    //const getYourValues = () => {
+    //  var youPlayer = null;
+    //  // get your cards
+    //  players.value.forEach(player => {
+    //    if (player.name == user.value) {
+    //      youPlayer = player;
+    //      youPlayer.cards.forEach(card => {
+    //        yourCards.value.push(card)
+    //      });
+    //    }
+    //  });
+    //} 
+
     return {
         parseJson,
         gameType,
@@ -49,5 +74,6 @@ export const useUneStore = defineStore("une", () => {
         currentPlayer,
         discardPile,
         deckAmt,
+        yourCards,
     };
 });

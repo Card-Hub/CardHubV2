@@ -45,9 +45,9 @@ public class BlackJackGame : IBaseGame<StandardCard>
         return false;
     }
 
-    public bool EndRound(){//Before this is called i need to send frontend json so it knows winners/losers
+    public bool Restart(){//Before this is called i need to send frontend json so it knows winners/losers
         //!!!!!!!!!!!!!!! send front end stuff here maybe!!!!!!!!!!!!!!!!!!!!!!!!!!they will need info here that tells frontend to allow for restart button.
-        if (state == "EndRound") {
+        if (state == "Restart") {
             state = "NotStarted";
             foreach(string playerName in PlayerOrder.GetActivePlayersInOrder()){//reset all players
                 Players[playerName].Hand.Clear();
@@ -55,6 +55,7 @@ public class BlackJackGame : IBaseGame<StandardCard>
                 Players[playerName].Winner = false;
                 Players[playerName].StillPlaying = true;
             }
+            StartRound();
             return true;
         }
         return false;
@@ -77,10 +78,10 @@ public class BlackJackGame : IBaseGame<StandardCard>
             }
             foreach(string playerName in PlayerOrder.GetActivePlayersInOrder()){//if every single player is winner or looser restart round.
                 if (Players[playerName].Busted == true || Players[playerName].Winner == true || Players[playerName].StillPlaying == false){
-                    state = "EndRound";//will send json here
+                    state = "Restart";//will send json here to tell admin to restart
                 }
                 else
-                    state = "Drawing Cards";//will send json here.drawing cards section needs a check /s as well. it needs to manage turns from players having free will and shouldnt be allowed to.
+                    state = "DrawingCards";//will send json here.drawing cards section needs a check /s as well. it needs to manage turns from players having free will and shouldnt be allowed to.
                     break;
             }
             return true;
@@ -177,14 +178,14 @@ public class BlackJackGame : IBaseGame<StandardCard>
 
     public bool DrawCard(string playerName)//this will check to see that players can draw cards too. also needs to check each players score. 
     //
-    {//need to iterate over player turn here to 
+    {//need to iterate over player turn here too
         if ((state == "GivingCards") && Players[playerName].Busted == false && Players[playerName].Winner == false){
             Players[playerName].TakeCard(Deck.Draw());
             CheckWinnersOrLosers();//checks all players which is weird when i just need to check single bust. may fix later
             return true;
         } else if (state == "DrawingCards"){//must be correct players turn.
             string currentPlayer = PlayerOrder.GetCurrentPlayer();
-            if (currentPlayer == playerName) {
+            if (currentPlayer == playerName) {//eventually it will be dealers turn. and that will be a block.
                 Players[playerName].TakeCard(Deck.Draw());
                 CheckWinnersOrLosers();//checks all players which is weird when i just need to check single bust. may fix later
                 return true;
@@ -196,6 +197,8 @@ public class BlackJackGame : IBaseGame<StandardCard>
             Console.WriteLine("Either wrong state or player cant draw");
             return false;
     }
+
+
 
     public int GetPlayerScoreFromGame(string playerName){//this wont work for splits. player will need more than one hand
         int score = 0, aces = 0;

@@ -76,7 +76,7 @@ public partial class BaseHub : Hub
       }
     }
 
-    public async Task JoinRoom(UnoGameStorage unoGameStorage, UserConnection userConnection)
+    public async Task JoinRoom(GameService gameService, UnoGameStorage unoGameStorage, UserConnection userConnection)
     {
         Console.WriteLine("Join Room");
         await Groups.AddToGroupAsync(Context.ConnectionId, userConnection.Room);
@@ -90,9 +90,27 @@ public partial class BaseHub : Hub
                 Message = $"{userConnection.User} has joined the room {userConnection.Room}"
             });
         //await SendConnectedUsers(userConnection.Room);
-        //switch (userConnection.UserType)
-        //{
-        //    case UserType.Player:
+        switch (userConnection.UserType)
+        {
+            case UserType.Player:
+              switch (gameService.GameTypeFromRoomCode[userConnection.Room].ToLower()) {
+                case "une":
+                  Console.WriteLine($"ADDING UNE PLAYER {userConnection.User}");
+                  var game = unoGameStorage.GetGame(userConnection.Room);
+                  game.AddPlayer(userConnection.User, userConnection.ConnectionId);
+                  Console.WriteLine(game.GameboardConnStr);
+                  break;
+                default:
+                  Console.WriteLine("ADDING PLAYER FOR UNKNOWN GAME??");
+                  break;
+              }
+              break;
+            case UserType.Gameboard:
+              break;
+            default:
+              Console.WriteLine("JOINING ROOM WITH INVALID USER TYPE?");
+              break;
+        }
         //      if ()
         //        //_game.AddPlayer(userConnection.ConnectionId);
         //        unoGameStorage.GetGame(userConnection.Room).AddPlayer(userConnection.User, userConnection.ConnectionId);
@@ -169,19 +187,23 @@ public partial class BaseHub : Hub
     //    }
     //}
 
-    //public async Task StartGame()
-    //{
-    //    await _game.StartGame();
-        
-    //    var roomConnections = _userConnections.Values.Where(x => x.Room == _userConnections[Context.ConnectionId].Room);
-
-    //    foreach (var conn in roomConnections.Where(x => x.UserType == UserType.Player))
-    //    {
-    //        var userName = conn.ConnectionId!;
-    //        var hand = _game.GetPlayerHand(userName);
-    //        await Clients.Client(conn.ConnectionId!).SendAsync("StartedGame", hand);
-    //    }
-    //}
+    public async Task StartGame(UnoGameStorage unoGameStorage, GameService gameService)
+    {
+      if (_userConnections.TryGetValue(Context.ConnectionId, out var userConnection))
+        {
+          var gameType = gameService.GameTypeFromRoomCode[userConnection.Room];
+          switch (gameType.ToLower()) {
+            case "une":
+              Console.WriteLine("Une game started");
+              var game = unoGameStorage.GetGame(userConnection.Room);
+              await game.StartGame();
+              break;
+            default:
+              Console.WriteLine("STARTED GAME BUT IT'S AN INVALID GAME TYPE");
+              break;
+          }
+        }
+    }
 
     public Task SendConnectedUsers(string room)
     {

@@ -5,6 +5,8 @@ using WebApi.Common.LyssiePlayerOrder;
 using WebApi.Models;
 using Newtonsoft.Json;
 using WebApi.Common;
+using Microsoft.EntityFrameworkCore.Infrastructure.Internal;
+using System.Net;
 namespace WebApi.GameLogic;
 
 
@@ -15,6 +17,8 @@ public class BlackJackGame : IBaseGame<StandardCard>
     public BlackJackJsonState BlackJackJsonState;
     public string state;// NotStarted, TakingBets, GiveCards, Checkingforwinners, DrawingCards, round end
     //right now we have given the cards to the players and we ened to check if there are any winners
+    //right now i have made it so that the cardsa re given out and players can then ask for cards with drwa cards state in the correct order and checks for busts.
+    //stay button and a finish game button or something, idk im tired
     public StandardCardDeck Deck;
     public BlackJackGame() {//dealer will jsut be a player i control.
         PlayerOrder = new();
@@ -24,7 +28,6 @@ public class BlackJackGame : IBaseGame<StandardCard>
         state = "NotStarted";
     }
 
-
     public void StartGame()
     {
         AddPlayer("Dealer");//keep deal in first pos and just pretend like they are last
@@ -32,7 +35,9 @@ public class BlackJackGame : IBaseGame<StandardCard>
     }
 
     public bool StartRound(){//this may need a check before bets to see if players have joined
-        if (state == "NotStarted" && Players.Count() >= 2) {
+        if (state == "NotStarted" && Players.Count >= 2) {
+            InitDeck();
+            //give promt to frontend to take bets
             state = "TakingBets";
             return true;
         }
@@ -40,35 +45,60 @@ public class BlackJackGame : IBaseGame<StandardCard>
         return false;
     }
 
-    public bool CheckWinnersOrLosers(){//will just apply attributes to players. we can check those later.
-        if (state == "CheckingForWinners"){
-            foreach(string playerName in PlayerOrder.GetActivePlayersInOrder()){
-                if (Players[playerName].CurrentScore > 21)
-                    Players[playerName].Busted = true;
-                else if (Players[playerName].CurrentScore == 21)
-                    Players[playerName].Winner = true;
-                else
-                    continue;
-            }//if every single player is winner or looser restart round.
-            foreach(string playerName in PlayerOrder.GetActivePlayersInOrder()){
-                // if (Players[playerName].Busted == true)//if still playing is false on eery player then restart.
+    public bool EndRound(){//Before this is called i need to send frontend json so it knows winners/losers
+        //!!!!!!!!!!!!!!! send front end stuff here maybe!!!!!!!!!!!!!!!!!!!!!!!!!!they will need info here that tells frontend to allow for restart button.
+        if (state == "EndRound") {
+            state = "NotStarted";
+            foreach(string playerName in PlayerOrder.GetActivePlayersInOrder()){//reset all players
+                Players[playerName].Hand.Clear();
+                Players[playerName].Busted = false;
+                Players[playerName].Winner = false;
+                Players[playerName].StillPlaying = true;
             }
             return true;
         }
         return false;
     }
-    public bool GivingCards(){
+
+    public bool CheckWinnersOrLosers(){//will just apply attributes to players. we can check those later.
+        if (state == "CheckingForWinners"){
+            int playerScore = 0;
+            foreach(string playerName in PlayerOrder.GetActivePlayersInOrder()){// sets players statuses based on scores.
+                playerScore = GetPlayerScoreFromGame(playerName);
+                if (playerScore > 21) {
+                    Players[playerName].Busted = true;
+                    Players[playerName].StillPlaying = false;
+                }
+                else if (playerScore == 21) {
+                    Players[playerName].Winner = true;
+                    Players[playerName].StillPlaying = false;
+                } else
+                    continue;
+            }
+            foreach(string playerName in PlayerOrder.GetActivePlayersInOrder()){//if every single player is winner or looser restart round.
+                if (Players[playerName].Busted == true || Players[playerName].Winner == true || Players[playerName].StillPlaying == false){
+                    state = "EndRound";//will send json here
+                }
+                else
+                    state = "Drawing Cards";//will send json here.drawing cards section needs a check /s as well. it needs to manage turns from players having free will and shouldnt be allowed to.
+                    break;
+            }
+            return true;
+        }
+        return false;
+    }
+    public bool GivingCards(){//either called auto or will make button for this.
+        //will need to be sending json for each card draw. so maybe just do it in draw i guess.
         if (state == "GivingCards"){
-            foreach(string playerName in GetPlayersInOrder().Skip(1))//skip 1 is for the dealer
+            foreach(string playerName in GetPlayersInOrder().Skip(1))//skip 1 is for the dealer to go last
                 DrawCard(playerName);
-            DrawCard("Dealer");//dealer gets first card
+            DrawCard("Dealer");
             foreach(string playerName in GetPlayersInOrder().Skip(1))//second card for dealer will not be shown.
                 DrawCard(playerName);
             DrawCard("Dealer");
-            state = "CheckingForWinners";//need to check for quick winners ebfore i can go on.
-            CheckWinnersOrLosers();//its possible that the game is just over right here. need to do states
-            state = "Drawing Cards";// in draw cards i need to check if they are winner or busted alread.
-            return true;
+            state = "CheckingForWinners";
+            CheckWinnersOrLosers();//may want a wait or something here for like 2 seconds.
+            return true;//now the round either end or they draw cards. end round done, drwing cards not done.
         }
         Console.WriteLine("The state is not in \"GivingCards\"");
         return false;
@@ -101,11 +131,11 @@ public class BlackJackGame : IBaseGame<StandardCard>
                 if (player.Value.HasBet == false) {
                     state = "TakingBets";
                     Console.WriteLine("Not all bets are made");
-                    return false;
+                    return true;
                 } else
-                    state = "GivingCards";
+                    state = "GivingCards";//all bets have been made
             }
-            if (state == "GivingCards")
+            if (state == "GivingCards")//may want to give promt for button here so its not instant.
                 GivingCards();
             return true;
         }
@@ -115,20 +145,22 @@ public class BlackJackGame : IBaseGame<StandardCard>
     public void GivePlayerCard(string player, StandardCard card){//this is just for testing
         Players[player].TakeCard(card);
     }
+
     public List<string> GetPlayerList()
     {
         return PlayerOrder.GetPlayers(LyssiePlayerStatus.Active);
     }
+
     public bool AddPlayer(string playerName)
     {
         if (state == "NotStarted") {
             PlayerOrder.AddPlayer(playerName);
             Players[playerName] = new BlackJackPlayer(playerName);
-            Players[playerName].Name = playerName;
             return true;
         }
         return false;
     }
+
     public bool RemovePlayer(string playerName)
     {
         if (state == "NotStarted") {
@@ -143,15 +175,26 @@ public class BlackJackGame : IBaseGame<StandardCard>
         return Players[playerName].ShowHand();
     }  
 
-    public bool DrawCard(string playerName)//this will check to see that players can draw cards too. also needs to check each players score.
-    {
-        if ((state == "GivingCards" || state == "DrawingCards") && Players[playerName].Busted == false && Players[playerName].Winner == false){
+    public bool DrawCard(string playerName)//this will check to see that players can draw cards too. also needs to check each players score. 
+    //
+    {//need to iterate over player turn here to 
+        if ((state == "GivingCards") && Players[playerName].Busted == false && Players[playerName].Winner == false){
             Players[playerName].TakeCard(Deck.Draw());
-            CheckWinnersOrLosers();//checks all players
+            CheckWinnersOrLosers();//checks all players which is weird when i just need to check single bust. may fix later
             return true;
-        }//calc the score now
-        Console.WriteLine("Either wrong state or player cant draw");
-        return false;
+        } else if (state == "DrawingCards"){//must be correct players turn.
+            string currentPlayer = PlayerOrder.GetCurrentPlayer();
+            if (currentPlayer == playerName) {
+                Players[playerName].TakeCard(Deck.Draw());
+                CheckWinnersOrLosers();//checks all players which is weird when i just need to check single bust. may fix later
+                return true;
+            }
+            else//need to send json struct here
+                {Console.WriteLine("Current players turn is", currentPlayer);}
+            return true;
+        } else
+            Console.WriteLine("Either wrong state or player cant draw");
+            return false;
     }
 
     public int GetPlayerScoreFromGame(string playerName){//this wont work for splits. player will need more than one hand

@@ -11,8 +11,9 @@ public class BlackJackPlayer : Player {
   public bool Busted{ get; set;}
   public bool Winner {get; set;}
   public bool StillPlaying {get; set;}
-
+  // public string Name { get; set; }
   public BlackJackPlayer(string name) : base(name) {
+    
     CurrentScore = 0;
     CurrentBet = 0;
     Hand = new List<StandardCard>();
@@ -21,6 +22,7 @@ public class BlackJackPlayer : Player {
     Busted = false;
     Winner = false;
     StillPlaying = true;
+
   }
 
   public bool TakeCard(StandardCard card){

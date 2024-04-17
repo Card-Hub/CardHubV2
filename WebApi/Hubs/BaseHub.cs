@@ -56,15 +56,32 @@ public partial class BaseHub : Hub
         return base.OnConnectedAsync();
     }
 
+    public async Task SendGameType(string gameType, GameService gameService, UnoGameStorage unoGameStorage) {
+      if (!_userConnections.TryGetValue(Context.ConnectionId, out var userConnection)) {return;}
+
+      if (userConnection.UserType == UserType.Gameboard) {
+        gameService.GameTypeFromRoomCode[userConnection.Room] = gameType;
+        switch (gameType.ToLower()) {
+          case "une":
+            unoGameStorage.BuildGame(userConnection.Room);
+            var game = unoGameStorage.GetGame(userConnection.Room);
+            game.GameboardConnStr = userConnection.ConnectionId;
+            Clients.Client(game.GameboardConnStr).SendAsync("ReceiveJson", game.GetGameState());
+            break;
+          default:
+            Console.WriteLine("UNKNOWN GAME TYPE SENT??");
+            break;
+        }
+        //break;
+      }
+    }
+
     public async Task JoinRoom(UnoGameStorage unoGameStorage, UserConnection userConnection)
     {
         Console.WriteLine("Join Room");
         await Groups.AddToGroupAsync(Context.ConnectionId, userConnection.Room);
         userConnection.ConnectionId = Context.ConnectionId;
         _userConnections[Context.ConnectionId] = userConnection;
-        Console.WriteLine(userConnection.ToString());
-        // lyssie
-        Console.WriteLine("!!");
 
         await Clients.Group(userConnection.Room).SendAsync("ReceiveMessage",
             new UserMessage
@@ -72,21 +89,18 @@ public partial class BaseHub : Hub
                 User = BotUser,
                 Message = $"{userConnection.User} has joined the room {userConnection.Room}"
             });
-        await SendConnectedUsers(userConnection.Room);
-
-        switch (userConnection.UserType)
-        {
-            case UserType.Player:
-                //_game.AddPlayer(userConnection.ConnectionId);
-                unoGameStorage.GetGame(userConnection.Room).AddPlayer(userConnection.User, userConnection.ConnectionId);
-                break;
-            case UserType.Gameboard:
-                unoGameStorage.BuildGame(userConnection.Room);
-                unoGameStorage.GetGame(userConnection.Room).GameboardConnStr = userConnection.ConnectionId;
-                break;
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
+        //await SendConnectedUsers(userConnection.Room);
+        //switch (userConnection.UserType)
+        //{
+        //    case UserType.Player:
+        //      if ()
+        //        //_game.AddPlayer(userConnection.ConnectionId);
+        //        unoGameStorage.GetGame(userConnection.Room).AddPlayer(userConnection.User, userConnection.ConnectionId);
+        //        break;
+           
+        //    default:
+        //        throw new ArgumentOutOfRangeException();
+        //}
     }
 
     public async Task SendMessage(string message)
@@ -124,21 +138,20 @@ public partial class BaseHub : Hub
             }
         }   
     }
-    public async Task SendAvatar(UnoGameStorage unoGameStorage, string avatar) {
+    public async Task SendAvatar(GameService gameService, UnoGameStorage unoGameStorage, string avatar) {
       if (_userConnections.TryGetValue(Context.ConnectionId, out var userConnection))
         {
-          if (true) { // game is uno
+          if (gameService.GameTypeFromRoomCode[userConnection.Room].ToLower() == "une") { // game is uno
             var game = unoGameStorage.GetGame(userConnection.Room);
             string gameboardStr = game.GameboardConnStr;
             game.SetAvatar(userConnection.ConnectionId, avatar);
-          //// send to the gameboard that the avatar was sent
-          List<LobbyUser> lobbyUsers = new();
-          game.GetActivePlayers();
-          foreach (var player in game.GetActivePlayers()) {
-            lobbyUsers.Add(new LobbyUser(player.Name, player.Avatar));
-          }
-          await Clients.Client(gameboardStr).SendAsync("ReceiveAvatars", JsonConvert.SerializeObject(lobbyUsers));
-          //await Clients.Client(gameboardStr).SendAsync("Log", game.GetGameState());
+            //// send to the gameboard that the avatar was sent
+            List<LobbyUser> lobbyUsers = new();
+            game.GetActivePlayers();
+            foreach (var player in game.GetActivePlayers()) {
+              lobbyUsers.Add(new LobbyUser(player.Name, player.Avatar));
+            }
+            await Clients.Client(gameboardStr).SendAsync("ReceiveAvatars", JsonConvert.SerializeObject(lobbyUsers));
           }
         }
     }

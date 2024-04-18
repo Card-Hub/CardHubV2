@@ -49,11 +49,11 @@ const myCards = computed(() => {
   </div>
   <!--<p v-for="card in myCards"> {{card}}</p>-->
   <div class="cardsContainer flex overflow-x-auto">
-    <UNEnoshadowCard class="uneCard flex-none"
+    <UNOCardDisplay class="uneCard flex-none"
         v-for="card in myCards"
                       :key="card.Id"
                       :card="card"
-                      :isSelected="true"
+                      :isSelected="false"
         @click="playCard(JSON.stringify(card))"
     />
   </div>

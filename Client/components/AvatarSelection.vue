@@ -3,7 +3,7 @@ import {useWebSocketStore} from "~/stores/webSocketStore";
 const store = useWebSocketStore();
 const { tryJoinRoom, sendAvatar } = store;
 
-const availableAvatars = ['lyssie', 'ruby', 'oli', 'femaleJuno', 'andy', 'liam', 'juno', 'pocky', 'star', 'fairy'];
+const availableAvatars = ['lyssie', 'ruby', 'oli', 'femaleJuno', 'alex', 'andy', 'liam', 'juno', 'pocky', 'star', 'fairy', 'dinoNugget1', 'dinoNugget2', 'dinoNugget3', 'dinoNugget4', 'amongusNugget'];
 const currentChoice = ref<string>('lyssie');
 // sendAvatar(currentChoice.value);
 

@@ -20,7 +20,12 @@ const playerStart = () => {
 }
 
 const getIcon = (avatar: string) => {
-  return new URL(`../assets/icons/avatars/${avatar}.png`, import.meta.url);
+  if (avatar == "" || avatar == null) {
+    return new URL(`../assets/icons/avatars/dinoNugget1.png`, import.meta.url);
+  }
+  else {
+    return new URL(`../assets/icons/avatars/${avatar}.png`, import.meta.url);
+  }
 };
 
 </script>

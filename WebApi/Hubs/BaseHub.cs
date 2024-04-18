@@ -100,6 +100,7 @@ public partial class BaseHub : Hub
                   var game = unoGameStorage.GetGame(userConnection.Room);
                   game.AddPlayer(userConnection.User, userConnection.ConnectionId);
                   Console.WriteLine(game.GameboardConnStr);
+                  await Clients.Groups(game.GameboardConnStr).SendAsync("ReceiveJson", game.GetGameState());
                   break;
                 default:
                   Console.WriteLine("ADDING PLAYER FOR UNKNOWN GAME??");

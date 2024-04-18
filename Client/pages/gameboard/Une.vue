@@ -11,6 +11,7 @@ const store = useWebSocketStore();
 // const { cards } = storeToRefs(store);
 
 const newCards = ref<number[]>([]);
+const currentColor = ref<string>("red");
 
 // object of players with information about avatar, name, and cards
 interface Player {
@@ -122,11 +123,18 @@ const isCurrentPlayer = (player: string) => {
 const getUNE = () => {
   return new URL(`../../assets/icons/unoDeck/UNE.svg`, import.meta.url);
 };
+
+const getCurrentColor = () => {
+  const color = currentColor.value;
+  return {
+    background: '${currentColor.value}',
+  };
+};
 </script>
 
 <template>
   <div class="gameboard-container">
-    <div class="gameboard">
+    <div class="gameboard" :style="getCurrentColor()">
       <div class="player-icons">
         <div class="player-icon" v-for="(player, index) in players" :key="index"
              :style="{ ...getPlayerIconStyle(index), ...isCurrentPlayer(player.name) }">
@@ -135,7 +143,11 @@ const getUNE = () => {
         </div>
       </div>
 
-      <div class="game-table rounded-tr-full shadow-lg">
+<!--      TODO: ARROWS -->
+<!--      <div class="game-table rounded-tr-full shadow-lg">-->
+<!--        <div class="arrow-container">-->
+<!--          <div id="curvedarrow"></div>-->
+<!--        </div>-->
 
         <div class="column-container">
           <div class="column left-column">
@@ -186,6 +198,36 @@ const getUNE = () => {
   height: 100%;
   width: 100%;
 }
+
+.arrow-container {
+  position: absolute; /* Use absolute positioning to place arrows relative to the screen */
+  top: 100px;
+  left: 100px;
+  width: 100%;
+  height: 100%;
+}
+
+#curvedarrow {
+  position: relative;
+  width: 0;
+  height: 0;
+  border-top: 9px solid transparent;
+  border-right: 9px solid red;
+  transform: rotate(10deg);
+}
+#curvedarrow:after {
+  content: "";
+  position: absolute;
+  border: 0 solid transparent;
+  border-top: 3px solid red;
+  border-radius: 20px 0 0 0;
+  top: -12px;
+  left: -9px;
+  width: 12px;
+  height: 12px;
+  transform: rotate(45deg);
+}
+
 
 .player-name {
   font-size: 1.5rem;

@@ -27,7 +27,7 @@ const { currentColor, players, currentPlayer, discardPile  } = storeToRefs(uneSt
 // ]);
 
 // const currentTurn = ref<string>("fairy");
-const currentTurn = ref<string>(currentPlayer);
+//const currentTurn = ref<string>(currentPlayer);
 const cards = ref<UNOCard[]>(discardPile);
 
 // placeholder bc i don't want to use websockets every time
@@ -76,6 +76,16 @@ const getPlayerIcon = (player: string) => {
   return new URL(`../../assets/icons/avatars/${player}.png`, import.meta.url);
 };
 
+const discardedCardsToDisplay = computed(() => {
+  var DC = [] as [UNOCard, number][];
+  // grab first 5 cards in discardedCards
+  for (let i = 0; i < discardPile.value.length && i < 5; i++) {
+    var card:UNOCard = {id: discardPile.value[i].Id, color: discardPile.value[i].Color, value:discardPile.value[i].Value};
+    DC.push([card, 5-i]);
+  }
+  return DC;
+});
+
 const getPlayerIconStyle = (index: number) => {
   const totalPlayers = players.value.length;
   let xpos = 0;
@@ -109,11 +119,13 @@ const getPlayerIconStyle = (index: number) => {
 };
 
 const isCurrentPlayer = (player: string) => {
-  if (player.toLowerCase() === currentTurn.value.toLowerCase()) {
-    return {
-      border: 'red 3px solid',
-      boxShadow: '0 0 10px #D60E26',
-    };
+  if (currentPlayer.value != "") {
+    if (player.toLowerCase() === currentPlayer.value.toLowerCase()) {
+      return {
+        border: 'red 3px solid',
+        boxShadow: '0 0 10px #D60E26',
+      };
+    }
   }
 };
 
@@ -128,13 +140,16 @@ const getCurrentColor = () => {
 </script>
 
 <template>
+  <p> {{ currentPlayer }}</p>
+  <p> {{ discardPile }}</p>
+  <p> {{ discardedCardsToDisplay }}</p>
   <div class="gameboard-container">
     <div class="gameboard">
       <div class="player-icons">
         <div class="player-icon" v-for="(player, index) in players" :key="index"
-             :style="{ ...getPlayerIconStyle(index), ...isCurrentPlayer(player.name) }">
-          <img :src="getPlayerIcon(player.avatar)" alt="Player Icon" class="player-icon-img"/>
-          <p class="player-name"> {{ player.name }} </p>
+             :style="{ ...getPlayerIconStyle(index), ...isCurrentPlayer(player.Name) }">
+          <img :src="getPlayerIcon(player.Avatar)" alt="Player Icon" class="player-icon-img"/>
+          <p class="player-name"> {{ player.Name }} </p>
         </div>
       </div>
 
@@ -157,8 +172,8 @@ const getCurrentColor = () => {
 
           <div class="column right-column">
             <div class="card-pile">
-              <UNEnoshadowCard class="singular-card" v-for="(card, index) in cards"
-                               :key="card.id"
+              <UNEnoshadowCard class="singular-card" v-for="[card, index] in discardedCardsToDisplay"
+                               :key="card.Id"
                                :card="card"
                                :style="{ ...getCardStyle(index) }"
               />

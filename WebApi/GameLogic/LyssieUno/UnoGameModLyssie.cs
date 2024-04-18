@@ -197,6 +197,8 @@ public async Task SelectWild(string connStr, UnoColorLyssie color) {
         break;
       case UnoValueLyssie.WildDrawFour:
         _messenger.Log("Wild Draw 4 played.");
+        List<UnoCardModLyssie> cards2twice = _deck.Draw(2);
+        _players[nextPersonConnStr].AddCards(cards2twice);
         SomeoneNeedsToSelectWildColor = true;
         _playerOrder.SetNextPlayer(2);
         break;

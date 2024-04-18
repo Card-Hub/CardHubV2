@@ -2,18 +2,24 @@
 import {defineProps, defineEmits} from 'vue';
 // import get = Reflect.get;
 
-const props = defineProps<{
-  card: {
-    type: UNOCard,
-    required: true
-  };
-  isSelected: Boolean;
-}>();
+export interface Props {
+  card?: UNOCard;
+  isSelected?: Boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  card: () => ({
+    color: 'black',
+    value: '0',
+    id: 0
+  } as UNOCard),
+  isSelected: () => false
+});
 
 // for action cards, they will be displayed a little differently
-const isActionCard = (props.card.value === 'Wild' || props.card.value === 'Skip' || props.card.value === 'Reverse' || props.card.value === 'Skip All') ? true : false;
-const isDrawCard = (props.card.value === 'Draw Two' || props.card.value === 'Wild Draw Four') ? true : false;
-const isNumberCard = (props.card.value === '0' || props.card.value === '1' || props.card.value === '2' || props.card.value === '3' || props.card.value === '4' || props.card.value === '5' || props.card.value === '6' || props.card.value === '7' || props.card.value === '8' || props.card.value === '9') ? true : false;
+const isActionCard = (props.card.value === 'Wild' || props.card.value === 'Skip' || props.card.value === 'Reverse' || props.card.value === 'Skip All');
+const isDrawCard = (props.card.value === 'Draw Two' || props.card.value === 'Wild Draw Four');
+const isNumberCard = (props.card.value === '0' || props.card.value === '1' || props.card.value === '2' || props.card.value === '3' || props.card.value === '4' || props.card.value === '5' || props.card.value === '6' || props.card.value === '7' || props.card.value === '8' || props.card.value === '9');
 
 const emits = defineEmits();
 

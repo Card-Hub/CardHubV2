@@ -32,6 +32,12 @@ const popularGames = [
       link: '/games/blackjack'
     },
     {
+      title: 'CAH',
+      image: new URL('../assets/icons/cah/cah.svg', import.meta.url),
+      deckColor: '#0a0a0a',
+      link: '/games/cah'
+    },
+    {
       title: 'Texas Hold Em',
       image: new URL('../assets/icons/standardDeck/hearts.svg', import.meta.url),
       deckColor: 'white',
@@ -129,6 +135,7 @@ const searchGame = () => {
   justify-content: center;
   align-items: center;
   height: 50%;
+  width: 90%;
 }
 
 </style>

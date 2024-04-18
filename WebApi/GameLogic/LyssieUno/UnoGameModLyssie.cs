@@ -60,7 +60,7 @@ public class UnoGameModLyssie
     // Build deck, shuffle
     _deck = _deckBuilder.Build(Settings);
     _deck.Shuffle();
-    //_playerOrder.ShufflePlayers();
+    _playerOrder.ShufflePlayers();
 
     foreach (var player in _playerOrder.GetPlayers(LyssiePlayerStatus.Active))
     {
@@ -80,14 +80,17 @@ public class UnoGameModLyssie
     GameStarted = true;
       //await _hubContext.Clients.Client(Gameboard).SendAsync("ReceiveCards", _discardPile);
       //await InitiateTurn();
+    // get list of all in room
+    Console.WriteLine("In Uno StartGame");
+    await _messenger.SendFrontendJson(GetAllConnStrsIncGameboard(), GetGameState());
   }
 
   public bool AddPlayer(string playerName, string connStr)
   {
-      _messenger.SendFrontendJson(new List<string>() {GameboardConnStr}, GetGameState());
       if (!_players.ContainsKey(connStr)) {
         _playerOrder.AddPlayer(connStr);
         _players[connStr] = new UnoPlayerLyssie(playerName, connStr);
+      _messenger.SendFrontendJson(new List<string>() {GameboardConnStr}, GetGameState());
         return true;
       }
       return false;
@@ -148,9 +151,9 @@ public async Task SelectWild(string connStr, UnoColorLyssie color) {
     SomeoneNeedsToSelectWildColor = false;
     _CurrentColor = color;
     await InitiateTurn();
+    await _messenger.SendFrontendJson(GetAllConnStrsIncGameboard(), GetGameState());
   }
   else {
-
     await _messenger.SendFrontendError(GetAllConnStrsIncGameboard(), "Can't select a wild color right now, silly!"); // might not need the await tbh
   }
 }
@@ -234,6 +237,7 @@ public async Task SelectWild(string connStr, UnoColorLyssie color) {
       _players[connStr].AddCard(card);
       _messenger.Log($"{connStr} drew a card: {card.Color.ToString()} {card.Value.ToString()}");
       await InitiateTurn();
+      await _messenger.SendFrontendJson(GetAllConnStrsIncGameboard(), GetGameState());
       return true;
     }
   }
@@ -297,7 +301,7 @@ public async Task SelectWild(string connStr, UnoColorLyssie color) {
         return true;
       }
       else {
-        Console.WriteLine("Can't set avatar {avatarStr} for {connStr}, they aren't a player");
+        Console.WriteLine($"Can't set avatar {avatarStr} for {connStr}, they aren't a player");
         return false;
       }
     }

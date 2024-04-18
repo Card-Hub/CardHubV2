@@ -2,12 +2,17 @@
 import {defineProps} from 'vue';
 // import get = Reflect.get;
 
-const props = defineProps<{
-  card: {
-    type: UNOCard,
-    required: true
-  };
-}>();
+export interface Props {
+  card?: UNOCard;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  card: () => ({
+    color: 'black',
+    value: '0',
+    id: 0
+  } as UNOCard),
+});
 
 // for action cards, they will be displayed a little differently
 const isActionCard = (props.card.value === 'Wild' || props.card.value === 'Skip' || props.card.value === 'Reverse' || props.card.value === 'Skip All') ? true : false;

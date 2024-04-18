@@ -8,15 +8,24 @@ const store = useWebSocketStore();
 const { isPlayer, messages, users, room, lobbyUsers } = storeToRefs(store);
 const { sendMessage, startGame } = store;
 const uneStore = useUneStore();
-const { gameType } = storeToRefs(uneStore);
+const { gameType, gameStarted } = storeToRefs(uneStore);
 
 const gameboardStart = () => {
   startGame();
-  navigateTo("/gameboard");
+  navigateTo("/gameboard/" + gameType.value.toLowerCase());
+}
+
+const playerStart = () => {
+  return navigateTo("/playerview/" + gameType.value.toLowerCase());
 }
 
 const getIcon = (avatar: string) => {
-  return new URL(`../assets/icons/avatars/${avatar}.png`, import.meta.url);
+  if (avatar == "" || avatar == null) {
+    return new URL(`../assets/icons/avatars/dinoNugget1.png`, import.meta.url);
+  }
+  else {
+    return new URL(`../assets/icons/avatars/${avatar}.png`, import.meta.url);
+  }
 };
 
 </script>
@@ -32,6 +41,9 @@ const getIcon = (avatar: string) => {
       </p>
       
       <AvatarSelection class="align-center"/>
+      <div class="">
+        <Button class="mt-48" @click="playerStart" v-if="gameStarted">Join Game</Button>
+      </div>
     </div>
     <div v-else-if="!isPlayer" class="flex min-h-screen">
       <div class="flex flex-col w-1/3 bg-neutral-950 shadow-inner">
@@ -68,9 +80,6 @@ const getIcon = (avatar: string) => {
         </div>
       </div>
       <div class="flex flex-col w-1/3">
-        <div class="">
-
-        </div>
       </div>
     </div>
     <div v-else>

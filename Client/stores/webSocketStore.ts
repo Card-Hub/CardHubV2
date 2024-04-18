@@ -25,19 +25,21 @@ export const useWebSocketStore = defineStore("webSocket", () => {
     const connection = ref<HubConnection | null>(null);
     const isConnected = computed(() => connection.value !== null && connection.value.state === HubConnectionState.Connected);
     const isPlayer = ref<boolean | null>(null);
-
+    
     const cards = ref<UNOCard[]>([]);
     const messages = ref<UserMessage[]>([]);
     const users = ref<string[]>([]);
-
+    
     const user = ref("");
     const room = ref("");
-
+    
     const timer = ref<number>(0);
-
+    
     const runtimeConfig = useRuntimeConfig();
     const reconnectTimeout = runtimeConfig.public.reconnectTimeout;
     
+    var playerHasRedirected = false;
+
     const gameJson = ref<string>("");
     const lobbyUsers = ref<Array<LobbyUser>>([]);
 
@@ -111,10 +113,10 @@ export const useWebSocketStore = defineStore("webSocket", () => {
                 users.value = groupUsers;
             });
 
-            joinConnection.on("StartedGame", (gameCards: UNOCard[]) => {
-                cards.value = gameCards;
-                navigateTo("/playerview");
-            });
+            //joinConnection.on("StartedGame", (gameCards: UNOCard[]) => {
+            //    cards.value = gameCards;
+            //    navigateTo("/playerview");
+            //});
 
             joinConnection.on("PopCard", (card: UNOCard) => {
                 console.log("Popped card:", card);
@@ -126,7 +128,12 @@ export const useWebSocketStore = defineStore("webSocket", () => {
               
               gameJson.value = json;
               parseJson(gameJson.value);
-              console.log(gameType.value);
+              //console.log(gameType.value);
+
+              //if (isPlayer.value && !playerHasRedirected) {
+              //  navigateTo("/playerview/" + gameType.value);
+              //  playerHasRedirected = true;
+              //}
             });
 
             // json of LobbyUsers
@@ -220,6 +227,15 @@ export const useWebSocketStore = defineStore("webSocket", () => {
             console.log(e);
         }
     };
+    const selectColor = async (color: string): Promise<void> => {
+        try {
+            if (connection.value !== null) {
+                await connection.value.invoke("SelectColor", color);
+            }
+        } catch (e) {
+            console.log(e);
+        }
+    };
     
     const sendAvatar = async (avatar: string): Promise<void> => {
         try {
@@ -254,6 +270,13 @@ export const useWebSocketStore = defineStore("webSocket", () => {
         }
 
         await connection.value.invoke("StartGame");
+    }
+    const playCard = async (card: UNOCard): Promise<void> => {
+        if (connection.value === null) {
+            return;
+        }
+        console.log("played a card");
+        await connection.value.invoke("PlayCard", card);
     }
 
     const sendMessage = async (message: string): Promise<void> => {
@@ -293,8 +316,8 @@ export const useWebSocketStore = defineStore("webSocket", () => {
     // Must return all state properties
     // https://pinia.vuejs.org/core-concepts/
     return {
-        connection, isConnected, isPlayer, cards, messages, users, user, room, cookieUser, cookieRoom, timer, lobbyUsers, gameJson,
+        connection, isConnected, isPlayer, cards, messages, users, user, room, cookieUser, cookieRoom, timer, lobbyUsers, gameJson, playerHasRedirected,
         tryCreateRoom, tryJoinRoom, sendCard, drawCard, startGame, sendMessage, closeConnection,
-        selectUno, sendAvatar, sendGameType
+        selectUno, sendAvatar, sendGameType, playCard, selectColor
     };
 });

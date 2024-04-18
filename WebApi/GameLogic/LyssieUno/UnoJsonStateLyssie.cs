@@ -7,7 +7,7 @@ namespace WebApi.GameLogic.LyssieUno;
 
 // don't touch this! it's in a very particular order
 public class UnoJsonStateLyssie {
-  public string GameType = "Uno";
+  public string GameType = "Une";
   public int TimerAmt = 5;
   public bool GameStarted = false;
   public string CurrentColor = "";
@@ -27,7 +27,12 @@ public class UnoJsonStateLyssie {
     GameStarted = game.GameStarted;
     CurrentColor = game.GetCurrentColor();
     Direction = game.GetDirection();
-    CurrentPlayer = game.GetCurrentPlayer();
+    if (GameStarted) {
+      CurrentPlayer = game._players[game.GetCurrentPlayer()].Name;
+    }
+    else {
+      CurrentPlayer = "";
+    }
     SomeoneNeedsToSelectWildColor = game.SomeoneNeedsToSelectWildColor;
     PlayerWhoHasUnoPrompt = game.PlayerWhoHasUnoPrompt;
     Winner = game.Winner;

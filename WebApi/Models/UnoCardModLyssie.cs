@@ -31,7 +31,7 @@ public enum UnoValueLyssie
     WildDrawFour
 }
 
-public class UnoCardModLyssie
+public class UnoCardModLyssie : IEquatable<UnoCardModLyssie>
 {
     public int Id { get; }
     [JsonIgnore]
@@ -69,7 +69,7 @@ public class UnoCardModLyssie
     private static List<UnoValueLyssie> specialValues =
         [UnoValueLyssie.DrawTwo, UnoValueLyssie.Reverse, UnoValueLyssie.Skip, UnoValueLyssie.SkipAll, UnoValueLyssie.Wild, UnoValueLyssie.WildDrawFour];
 
-    public UnoCardModLyssie(int id, UnoColorLyssie color, UnoValueLyssie value)
+    public UnoCardModLyssie (int id, UnoColorLyssie color, UnoValueLyssie value)
     {
         Id = id;
         ColorEnum = color;
@@ -82,5 +82,10 @@ public class UnoCardModLyssie
     public override int GetHashCode()
     {
         return HashCode.Combine(Color, Value);
+    }
+    public bool Equals(UnoCardModLyssie other)
+    {
+        // Would still want to check for null etc. first.
+        return this.Id == other.Id;
     }
 }

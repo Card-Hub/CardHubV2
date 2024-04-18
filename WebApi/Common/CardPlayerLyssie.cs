@@ -55,7 +55,10 @@ public class CardPlayerLyssie<TCard> : ICardPlayer<TCard>
 
     public bool RemoveCard(TCard card)
     {
-        if (!_hand.Contains(card)) return false;
+        if (!_hand.Contains(card)) {
+          Console.WriteLine("HAND DOESN'T CONTAIN CARD???");
+          return false;
+        }
         
         _hand.Remove(card);
         return true;

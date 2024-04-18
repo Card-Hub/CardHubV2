@@ -5,7 +5,7 @@ import {useWebSocketStore} from "~/stores/webSocketStore";
 
 export const useUneStore = defineStore("une", () => {
   const store = useWebSocketStore();
-  const { gameJson } = storeToRefs(store);
+  const { gameJson, user } = storeToRefs(store);
     const { $api } = useNuxtApp();
     // variables for the store that will be called by the gameboard
     const gameType = ref<string>("");
@@ -16,6 +16,10 @@ export const useUneStore = defineStore("une", () => {
     const playerWhoHasPrompt = ref<string>(""); // not implemented yet
     const winner = ref<string>("");
     const players = ref<unePlayer[]>([]);
+    if (players.value != null) {
+      console.log("loggig players");
+      console.log(players.value);
+    }
     const currentPlayer = ref<string>("");
     const discardPile = ref<UNOCard[]>([]);
     const deckAmt = ref<number>(0);
@@ -34,7 +38,28 @@ export const useUneStore = defineStore("une", () => {
 
         discardPile.value = parsed.DiscardedCards;
         players.value = parsed.ActivePlayers;
+        //console.log("players: ");
+        //console.log(players.value);
+        //players.value.forEach(player => {
+        //  player.Hand.forEach(card => {
+        //    console.log(card);
+        //  });
+        //});
+        
     }
+
+    //const getYourValues = () => {
+    //  var youPlayer = null;
+    //  // get your cards
+    //  players.value.forEach(player => {
+    //    if (player.name == user.value) {
+    //      youPlayer = player;
+    //      youPlayer.cards.forEach(card => {
+    //        yourCards.value.push(card)
+    //      });
+    //    }
+    //  });
+    //} 
 
     return {
         parseJson,

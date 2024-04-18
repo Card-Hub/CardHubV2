@@ -2,18 +2,24 @@
 import {defineProps, defineEmits} from 'vue';
 // import get = Reflect.get;
 
-const props = defineProps<{
-  card: {
-    type: UNOCard,
-    required: true
-  };
-  isSelected: Boolean;
-}>();
+export interface Props {
+  card?: UNOCard;
+  isSelected?: Boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  card: () => ({
+    color: 'black',
+    value: '0',
+    id: 0
+  } as UNOCard),
+  isSelected: () => false
+});
 
 // for action cards, they will be displayed a little differently
-const isActionCard = (props.card.value === 'Wild' || props.card.value === 'Skip' || props.card.value === 'Reverse' || props.card.value === 'Skip All') ? true : false;
-const isDrawCard = (props.card.value === 'Draw Two' || props.card.value === 'Wild Draw Four') ? true : false;
-const isNumberCard = (props.card.value === '0' || props.card.value === '1' || props.card.value === '2' || props.card.value === '3' || props.card.value === '4' || props.card.value === '5' || props.card.value === '6' || props.card.value === '7' || props.card.value === '8' || props.card.value === '9') ? true : false;
+const isActionCard = (props.card.value === 'Wild' || props.card.value === 'Skip' || props.card.value === 'Reverse' || props.card.value === 'Skip All');
+const isDrawCard = (props.card.value === 'Draw Two' || props.card.value === 'Wild Draw Four');
+const isNumberCard = (props.card.value === '0' || props.card.value === '1' || props.card.value === '2' || props.card.value === '3' || props.card.value === '4' || props.card.value === '5' || props.card.value === '6' || props.card.value === '7' || props.card.value === '8' || props.card.value === '9');
 
 const emits = defineEmits();
 
@@ -47,6 +53,7 @@ const getIcon = (value: string) => {
 
 const cardColor = (color: string) => {
   if (color.toLowerCase() === 'red') {
+    // linear gradient from bottom left to top right
     return {backgroundColor: '#d12c15'};
   } else if (color.toLowerCase() === 'yellow') {
     return {backgroundColor: '#ffce30'};
@@ -65,8 +72,7 @@ const cardColor = (color: string) => {
 
 <template>
   <div class="flex flex-wrap justify-center items-center">
-    <div v-if="isNumberCard" class="card flex flex-col justify-center items-center w-20 h-32 m-2 rounded-md shadow-md p-2"
-         style="box-shadow: 6px -6px 3px rgba(200, 200, 200, 0.4);"
+    <div v-if="isNumberCard" class="card shadow flex flex-col justify-center items-center w-20 h-32 m-2 rounded-md shadow-md p-2"
          :style="cardColor(card.color)"
          @click="handleClick"
          :class="{ 'selected': isSelected }">
@@ -80,8 +86,7 @@ const cardColor = (color: string) => {
         </div>
     </div>
 
-    <div v-else-if="isActionCard" class="card flex flex-col justify-center items-center w-20 h-32 m-2 rounded-md shadow-md p-2"
-         style="box-shadow: 6px -6px 3px rgba(200, 200, 200, 0.4);"
+    <div v-else-if="isActionCard" class="card shadow flex flex-col justify-center items-center w-20 h-32 m-2 rounded-md shadow-md p-2"
          :style="cardColor(card.color)"
          @click="handleClick"
          :class="{ 'selected': isSelected }">
@@ -93,8 +98,7 @@ const cardColor = (color: string) => {
            class="relative -bottom-1 right-/5 w-14 h-14"/>
     </div>
 
-    <div v-else-if="isDrawCard" class="card flex flex-col justify-center items-center w-20 h-32 m-2 rounded-md shadow-md p-2"
-         style="box-shadow: 6px -6px 3px rgba(200, 200, 200, 0.4);"
+    <div v-else-if="isDrawCard" class="card shadow flex flex-col justify-center items-center w-20 h-32 m-2 rounded-md shadow-md p-2"
          :style="cardColor(card.color)"
          @click="handleClick"
          :class="{ 'selected': isSelected }">
@@ -121,6 +125,10 @@ const cardColor = (color: string) => {
 
 .selected {
   border: 2px solid red;
+}
+
+.shadow {
+  box-shadow: 4px -4px 6px rgba(256, 256, 256, 0.15);
 }
 
 </style>

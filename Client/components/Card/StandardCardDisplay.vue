@@ -47,7 +47,7 @@ const getSuitColor = (suit: string) => {
 <template>
   <div class="flex flex-wrap justify-center items-center">
     <div class="relative w-20 h-32 m-2 bg-white rounded-md shadow-md p-2"
-         style="box-shadow: 6px -6px 3px rgba(200, 200, 200, 0.4);"
+         style="box-shadow: 4px -4px 6px rgba(256, 256, 256, 0.15);"
          @click="handleClick"
          :class="{ 'selected': isSelected }"
     >

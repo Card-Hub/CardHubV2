@@ -6,12 +6,14 @@ import {useWebSocketStore} from "~/stores/webSocketStore";
 import UNEnoshadowCard from "~/components/noShadowCard/UNEnoshadowCard.vue";
 
 const store = useWebSocketStore();
+const uneStore = useUneStore();
 // uncomment these out later
 // const {  cards, users, room } = storeToRefs(store);
 // const { cards } = storeToRefs(store);
 
 const newCards = ref<number[]>([]);
-const currentColor = ref<string>("red");
+//const currentColor = ref<string>("red");
+const { currentColor } = storeToRefs(uneStore);
 
 // object of players with information about avatar, name, and cards
 interface Player {
@@ -126,15 +128,15 @@ const getUNE = () => {
 
 const getCurrentColor = () => {
   const color = currentColor.value;
-  return {
-    background: '${currentColor.value}',
-  };
+  return "background: ${currentColor.value}";
 };
 </script>
 
 <template>
   <div class="gameboard-container">
-    <div class="gameboard" :style="getCurrentColor()">
+    <div class="gameboard"
+       
+      >
       <div class="player-icons">
         <div class="player-icon" v-for="(player, index) in players" :key="index"
              :style="{ ...getPlayerIconStyle(index), ...isCurrentPlayer(player.name) }">
@@ -144,10 +146,10 @@ const getCurrentColor = () => {
       </div>
 
 <!--      TODO: ARROWS -->
-<!--      <div class="game-table rounded-tr-full shadow-lg">-->
-<!--        <div class="arrow-container">-->
-<!--          <div id="curvedarrow"></div>-->
-<!--        </div>-->
+     <div class="game-table rounded-tr-full shadow-lg" v-bind:class="currentColor">
+       <div class="arrow-container">
+         <div id="curvedarrow"></div>
+  </div>
 
         <div class="column-container">
           <div class="column left-column">
@@ -331,4 +333,19 @@ const getCurrentColor = () => {
   background: rgba(255, 255, 255, 0.2); /* Adjust the background color of the player icon and opacity */
 }
 
+.Red {
+  background: red;
+}
+.Blue {
+  background: blue;
+}
+.Green {
+  background: green;
+}
+.Yellow {
+  background: yellow;
+}
+.Black {
+  background: black;
+}
 </style>

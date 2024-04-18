@@ -227,6 +227,15 @@ export const useWebSocketStore = defineStore("webSocket", () => {
             console.log(e);
         }
     };
+    const selectColor = async (color: string): Promise<void> => {
+        try {
+            if (connection.value !== null) {
+                await connection.value.invoke("SelectColor", color);
+            }
+        } catch (e) {
+            console.log(e);
+        }
+    };
     
     const sendAvatar = async (avatar: string): Promise<void> => {
         try {
@@ -309,6 +318,6 @@ export const useWebSocketStore = defineStore("webSocket", () => {
     return {
         connection, isConnected, isPlayer, cards, messages, users, user, room, cookieUser, cookieRoom, timer, lobbyUsers, gameJson, playerHasRedirected,
         tryCreateRoom, tryJoinRoom, sendCard, drawCard, startGame, sendMessage, closeConnection,
-        selectUno, sendAvatar, sendGameType, playCard
+        selectUno, sendAvatar, sendGameType, playCard, selectColor
     };
 });

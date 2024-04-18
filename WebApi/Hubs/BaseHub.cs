@@ -174,6 +174,23 @@ public partial class BaseHub : Hub
           }
         }
     }
+    public async Task DrawCard(GameService gameService, UnoGameStorage unoGameStorage) {
+      if (_userConnections.TryGetValue(Context.ConnectionId, out var userConnection))
+        {
+          if (gameService.GameTypeFromRoomCode[userConnection.Room].ToLower() == "une") { // game is uno
+            var game = unoGameStorage.GetGame(userConnection.Room);
+            string gameboardStr = game.GameboardConnStr;
+            await game.DrawCard(userConnection.ConnectionId);
+            //// send to the gameboard that the avatar was sent
+            //List<LobbyUser> lobbyUsers = new();
+            //game.GetActivePlayers();
+            //foreach (var player in game.GetActivePlayers()) {
+            //  lobbyUsers.Add(new LobbyUser(player.Name, player.Avatar));
+            //}
+            //await Clients.Client(gameboardStr).SendAsync("ReceiveAvatars", JsonConvert.SerializeObject(lobbyUsers));
+          }
+        }
+    }
 
     //public async Task DrawCard()
     //{

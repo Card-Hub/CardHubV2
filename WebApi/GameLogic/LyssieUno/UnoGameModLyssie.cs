@@ -151,9 +151,9 @@ public async Task SelectWild(string connStr, UnoColorLyssie color) {
     SomeoneNeedsToSelectWildColor = false;
     _CurrentColor = color;
     await InitiateTurn();
+    await _messenger.SendFrontendJson(GetAllConnStrsIncGameboard(), GetGameState());
   }
   else {
-
     await _messenger.SendFrontendError(GetAllConnStrsIncGameboard(), "Can't select a wild color right now, silly!"); // might not need the await tbh
   }
 }
@@ -237,6 +237,7 @@ public async Task SelectWild(string connStr, UnoColorLyssie color) {
       _players[connStr].AddCard(card);
       _messenger.Log($"{connStr} drew a card: {card.Color.ToString()} {card.Value.ToString()}");
       await InitiateTurn();
+      await _messenger.SendFrontendJson(GetAllConnStrsIncGameboard(), GetGameState());
       return true;
     }
   }

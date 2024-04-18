@@ -19,7 +19,7 @@ public partial class BaseHub : Hub
         Console.WriteLine(a1 + a2);
         // store settings
         unoGameStorage.BuildGame(userConnection.Room);
-        unoGameStorage.SetSetting(userConnection.Room, "UseSkipAll", true);
+        //unoGameStorage.SetSetting(userConnection.Room, "UseSkipAll", true);
         var game = unoGameStorage.GetGame(userConnection.Room);
         Console.WriteLine("in select uno ");
         // reguster gameboard to game - do this first!
@@ -50,7 +50,7 @@ public partial class BaseHub : Hub
       UnoGameModLyssie game = unoGameStorage.GetGame(roomCode);
       //await game.PlayCard(connStr, cardJson);
     }
-    public async Task SelectWild(UnoGameStorage unoGameStorage, string connStr, string color) {
+    public async Task SelectColor(UnoGameStorage unoGameStorage, string color) {
       if (!_userConnections.TryGetValue(Context.ConnectionId, out var userConnection)) return;
       string roomCode = userConnection.Room;
       UnoGameModLyssie game = unoGameStorage.GetGame(roomCode);
@@ -71,6 +71,6 @@ public partial class BaseHub : Hub
         default:
           throw new ArgumentException("Invalid wild color selected");
       }
-      await game.SelectWild(connStr, colorEnum);
+      await game.SelectWild(userConnection.ConnectionId, colorEnum);
     }
 }

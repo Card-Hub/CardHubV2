@@ -9,7 +9,7 @@ import UNOCardDisplay from "~/components/Card/UNOCardDisplay.vue";
 
 const store = useWebSocketStore();
  const {user, users, room } = storeToRefs(store);
- const { playCard, selectColor } = store;
+ const { playCard, selectColor, drawCard } = store;
 const uneStore = useUneStore();
  const { winner, currentPlayer, yourCards, players, discardPile, someoneNeedsToSelectColor } = storeToRefs(uneStore);
  interface Player {
@@ -45,7 +45,7 @@ const myCards = computed(() => {
 <template>
   <div class="display-block">
     <h1> Playing Une <span v-if="currentPlayer === user">- Your Turn!</span><span v-if="winner == user">- You Won!</span></h1>
-    <Button class="mt-48" @click="draw">Draw</Button>
+    <Button class="mt-48" @click="drawCard">Draw</Button>
   </div>
   <!--<p v-for="card in myCards"> {{card}}</p>-->
   <div class="cardsContainer flex overflow-x-auto">

@@ -5,6 +5,7 @@ namespace WebApi.Hubs;
 
 using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using WebApi.GameLogic.LyssieUno;
 
 public class UserConnection
@@ -66,7 +67,7 @@ public partial class BaseHub : Hub
             unoGameStorage.BuildGame(userConnection.Room);
             var game = unoGameStorage.GetGame(userConnection.Room);
             game.GameboardConnStr = userConnection.ConnectionId;
-            Clients.Client(game.GameboardConnStr).SendAsync("ReceiveJson", game.GetGameState());
+            await Clients.Client(game.GameboardConnStr).SendAsync("ReceiveJson", game.GetGameState());
             break;
           default:
             Console.WriteLine("UNKNOWN GAME TYPE SENT??");
@@ -200,6 +201,102 @@ public partial class BaseHub : Hub
               break;
             default:
               Console.WriteLine("STARTED GAME BUT IT'S AN INVALID GAME TYPE");
+              break;
+          }
+        }
+    }
+    public async Task PlayCard(string cardJson, UnoGameStorage unoGameStorage, GameService gameService)
+    {
+      if (_userConnections.TryGetValue(Context.ConnectionId, out var userConnection))
+        {
+          var gameType = gameService.GameTypeFromRoomCode[userConnection.Room];
+          switch (gameType.ToLower()) {
+            case "une":
+              Console.WriteLine("Card was played!");
+              Console.WriteLine($"Card: {cardJson}");
+              var game = unoGameStorage.GetGame(userConnection.Room);
+              var cardJToken = JToken.Parse(cardJson);
+              var cardColor = UnoColorLyssie.Black;
+              var cardValue = UnoValueLyssie.One;
+              // color switch
+              switch (cardJToken["color"].ToString().ToLower()) {
+                case "red":
+                  cardColor = UnoColorLyssie.Red;
+                  break;
+                case "blue":
+                  cardColor = UnoColorLyssie.Blue;
+                  break;
+                case "yellow":
+                  cardColor = UnoColorLyssie.Yellow;
+                  break;
+                case "green":
+                  cardColor = UnoColorLyssie.Green;
+                  break;
+                case "black":
+                  cardColor = UnoColorLyssie.Black;
+                  break;
+                default:
+                  Console.WriteLine("INVALID CARD COLOR PLAYED???");
+                  break;
+              }
+              switch (cardJToken["value"].ToString().ToLower()) {
+                case "0":
+                  cardValue = UnoValueLyssie.Zero;
+                  break;
+                case "1":
+                  cardValue = UnoValueLyssie.One;
+                  break;
+                case "2":
+                  cardValue = UnoValueLyssie.Two;
+                  break;
+                case "3":
+                  cardValue = UnoValueLyssie.Three;
+                  break;
+                case "4":
+                  cardValue = UnoValueLyssie.Four;
+                  break;
+                case "5":
+                  cardValue = UnoValueLyssie.Five;
+                  break;
+                case "6":
+                  cardValue = UnoValueLyssie.Six;
+                  break;
+                case "7":
+                  cardValue = UnoValueLyssie.Seven;
+                  break;
+                case "8":
+                  cardValue = UnoValueLyssie.Eight;
+                  break;
+                case "9":
+                  cardValue = UnoValueLyssie.Nine;
+                  break;
+                case "draw two":
+                  cardValue = UnoValueLyssie.DrawTwo;
+                  break;
+                case "reverse":
+                  cardValue = UnoValueLyssie.Reverse;
+                  break;
+                case "skip":
+                  cardValue = UnoValueLyssie.Skip;
+                  break;
+                case "skip all":
+                  cardValue = UnoValueLyssie.SkipAll;
+                  break;
+                case "wild draw four":
+                  cardValue = UnoValueLyssie.WildDrawFour;
+                  break;
+                case "wild":
+                  cardValue = UnoValueLyssie.Wild;
+                  break;
+                default:
+                  Console.WriteLine("INVALID CARD VALUE PLAYED???");
+                  break;
+              }
+              var card = new UnoCardModLyssie(int.Parse(cardJToken["id"].ToString()), cardColor, cardValue);
+              await game.PlayCard(userConnection.ConnectionId, card);
+              break;
+            default:
+              Console.WriteLine("PLAYED CARD BUT IT'S AN INVALID GAME TYPE");
               break;
           }
         }

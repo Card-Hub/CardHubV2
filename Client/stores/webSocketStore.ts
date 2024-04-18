@@ -128,12 +128,12 @@ export const useWebSocketStore = defineStore("webSocket", () => {
               
               gameJson.value = json;
               parseJson(gameJson.value);
-              console.log(gameType.value);
+              //console.log(gameType.value);
 
-              if (isPlayer.value && !playerHasRedirected) {
-                navigateTo("/playerView/" + gameType.value.toLowerCase());
-                playerHasRedirected = true;
-              }
+              //if (isPlayer.value && !playerHasRedirected) {
+              //  navigateTo("/playerview/" + gameType.value);
+              //  playerHasRedirected = true;
+              //}
             });
 
             // json of LobbyUsers
@@ -262,6 +262,13 @@ export const useWebSocketStore = defineStore("webSocket", () => {
 
         await connection.value.invoke("StartGame");
     }
+    const playCard = async (card: UNOCard): Promise<void> => {
+        if (connection.value === null) {
+            return;
+        }
+        console.log("played a card");
+        await connection.value.invoke("PlayCard", card);
+    }
 
     const sendMessage = async (message: string): Promise<void> => {
         try {
@@ -302,6 +309,6 @@ export const useWebSocketStore = defineStore("webSocket", () => {
     return {
         connection, isConnected, isPlayer, cards, messages, users, user, room, cookieUser, cookieRoom, timer, lobbyUsers, gameJson, playerHasRedirected,
         tryCreateRoom, tryJoinRoom, sendCard, drawCard, startGame, sendMessage, closeConnection,
-        selectUno, sendAvatar, sendGameType
+        selectUno, sendAvatar, sendGameType, playCard
     };
 });

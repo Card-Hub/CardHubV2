@@ -16,21 +16,13 @@ export const useUneStore = defineStore("une", () => {
     const playerWhoHasPrompt = ref<string>(""); // not implemented yet
     const winner = ref<string>("");
     const players = ref<unePlayer[]>([]);
+    if (players.value != null) {
+      console.log("loggig players");
+      console.log(players.value);
+    }
     const currentPlayer = ref<string>("");
     const discardPile = ref<UNOCard[]>([]);
     const deckAmt = ref<number>(0);
-
-    const yourCards = computed(() => {
-      const yc: UNOCard[] = [];
-      players.value.forEach(player => {
-        if (player.name == user.value) {
-          player.cards.forEach(card => {
-            yc.push(card);
-          })
-        }
-      })
-      return yc;
-    });
 
     const parseJson = async (json: string) => {
         const parsed = JSON.parse(json);
@@ -46,6 +38,14 @@ export const useUneStore = defineStore("une", () => {
 
         discardPile.value = parsed.DiscardedCards;
         players.value = parsed.ActivePlayers;
+        //console.log("players: ");
+        //console.log(players.value);
+        //players.value.forEach(player => {
+        //  player.Hand.forEach(card => {
+        //    console.log(card);
+        //  });
+        //});
+        
     }
 
     //const getYourValues = () => {
@@ -74,6 +74,5 @@ export const useUneStore = defineStore("une", () => {
         currentPlayer,
         discardPile,
         deckAmt,
-        yourCards,
     };
 });

@@ -27,7 +27,12 @@ public class UnoJsonStateLyssie {
     GameStarted = game.GameStarted;
     CurrentColor = game.GetCurrentColor();
     Direction = game.GetDirection();
-    CurrentPlayer = game.GetCurrentPlayer();
+    if (GameStarted) {
+      CurrentPlayer = game._players[game.GetCurrentPlayer()].Name;
+    }
+    else {
+      CurrentPlayer = "";
+    }
     SomeoneNeedsToSelectWildColor = game.SomeoneNeedsToSelectWildColor;
     PlayerWhoHasUnoPrompt = game.PlayerWhoHasUnoPrompt;
     Winner = game.Winner;

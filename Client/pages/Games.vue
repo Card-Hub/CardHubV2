@@ -42,6 +42,12 @@ const popularGames = [
       image: new URL('../assets/icons/standardDeck/hearts.svg', import.meta.url),
       deckColor: 'white',
       link: '/games/texasholdem'
+    },
+    {
+    title: 'AZN Flush',
+    image: new URL('../assets/icons/aznflush/aznflush.png', import.meta.url),
+    deckColor: 'black',
+    link: '/games/aznflush'
   }]; // add more as necessary
 
 const searchQuery = ref('');
@@ -71,7 +77,7 @@ const searchGame = () => {
     <div v-if="searchResult">
       <div class="flex flex-wrap justify-start items-start">
         <div
-             :key="searchResult.title" class="m-2">
+             :key="searchResult.title" class="m-2 flex-wrap">
           <NuxtLink :to="searchResult.link">
             <div class="flex justify-center items-center w-28 h-44 rounded-md shadow-md mb-2" :style="{ backgroundColor: searchResult.deckColor }">
               <img :src="searchResult.image"
@@ -79,7 +85,7 @@ const searchGame = () => {
                    class="deck-view"/>
             </div>
           </NuxtLink>
-          <div class="text-1xl"> {{ searchResult.title }} </div>
+          <div class="text-1xl flex-wrap"> {{ searchResult.title }} </div>
         </div>
       </div>
       
@@ -91,7 +97,7 @@ const searchGame = () => {
 
         <div class="flex flex-wrap justify-start items-start">
           <div v-for="game in popularGames"
-               :key="game.title" class="m-2">
+               :key="game.title" class="m-2 flex-wrap">
             <NuxtLink :to="game.link">
               <div class="flex justify-center items-center w-28 h-44 rounded-md shadow-md mb-2" :style="{ backgroundColor: game.deckColor }">
                 <img :src="game.image"

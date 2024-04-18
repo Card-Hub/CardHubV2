@@ -2,7 +2,7 @@
 
   import Header from "~/components/Header.vue";
   const team = ref([
-  { name: "Alejandro Mozqueda", image: new URL('../assets/icons/avatars/star.png', import.meta.url) },
+  { name: "Alejandro Mozqueda", image: new URL('../assets/icons/avatars/alex.png', import.meta.url) },
   { name: "Rubi Dionisio", image: new URL('../assets/icons/avatars/ruby.png', import.meta.url) },
   { name: "Liam Prior", image: new URL('../assets/icons/avatars/liam.png', import.meta.url) },
   { name: "Lyssie Brown", image: new URL('../assets/icons/avatars/lyssie.png', import.meta.url) },

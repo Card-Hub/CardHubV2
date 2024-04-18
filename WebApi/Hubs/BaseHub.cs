@@ -171,7 +171,8 @@ public partial class BaseHub : Hub
             foreach (var player in game.GetActivePlayers()) {
               lobbyUsers.Add(new LobbyUser(player.Name, player.Avatar));
             }
-            await Clients.Client(gameboardStr).SendAsync("ReceiveAvatars", JsonConvert.SerializeObject(lobbyUsers));
+            await Clients.Group(userConnection.Room).SendAsync("ReceiveAvatars", JsonConvert.SerializeObject(lobbyUsers));
+            await Clients.Group(userConnection.Room).SendAsync("ReceiveJson", game.GetGameState());
           }
         }
     }

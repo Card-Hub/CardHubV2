@@ -1,25 +1,34 @@
 <script setup lang="ts">
 
-  import Header from "~/components/Header.vue";
+import Header from "~/components/Header.vue";
+const team = ref([
+  { name: "Alejandro Mozqueda", image: new URL('../assets/icons/avatars/alex.png', import.meta.url) },
+  { name: "Rubi Dionisio", image: new URL('../assets/icons/avatars/ruby.png', import.meta.url) },
+  { name: "Liam Prior", image: new URL('../assets/icons/avatars/liam.png', import.meta.url) },
+  { name: "Lyssie Brown", image: new URL('../assets/icons/avatars/lyssie.png', import.meta.url) },
+]);
 
-  const getLogo = () => {
-    return new URL('../assets/icons/logos/combination.svg', import.meta.url);
-  };
+const getLogo = () => {
+  return new URL('../assets/icons/logos/combination.svg', import.meta.url);
+};
 
-  const getPearl = () => {
-    return new URL('../assets/icons/logos/pearl.svg', import.meta.url);
-  };
+const getPearl = () => {
+  return new URL('../assets/icons/logos/pearl.svg', import.meta.url);
+};
 
+const getPoster = () => {
+  return new URL('../assets/icons/logos/cardhub_poster.svg', import.meta.url);
+};
 </script>
 
 <template>
-<!--  <div class="flex flex-wrap justify-center items-center">-->
+  <!--  <div class="flex flex-wrap justify-center items-center">-->
   <Header2 />
   <div class="all-info">
     <br> <br>
-    
+
     <div class="starter">
-      <img class="cardhub-logo" alt="Cardhub logo" 
+      <img class="cardhub-logo" alt="Cardhub logo"
            :src= 'getLogo()' />
       <h3 class="basic-info"> CS 426 Senior Projects | Spring 2024
         <br> University of Nevada, Reno | CSE Department
@@ -32,7 +41,7 @@
         <br> Erin Keith, CSE Department
       </h3>
     </div>
-    
+
     <div class="about-cd">
       <h2> <br> <br> About Cardhub </h2>
 
@@ -43,28 +52,46 @@
 
       </p>
     </div>
-    
+
     <br> <br>
-    
+
     <div class="team">
-      <img alt="Team Pearl" 
-           :src="getPearl()" style="width: 300px; height: 90px;"/>
+      <img alt="Team Pearl" class="pearl-logo"
+           :src="getPearl()"/>
       <h2> Meet the Team! </h2>
-      <p> Pictures to be uploaded later </p>
+      <div class="members">
+        <div v-for="(teamMate, index) in team" :key="index" class="team-mate-container">
+          <img alt="team-mate" class="team-mate-pic" :src="teamMate.image"/>
+          <h3 class="team-mate">{{ teamMate.name }}</h3>
+        </div>
+      </div>
     </div>
     
+    <div class="poster">
+      <br><br>
+      <h2> Some of Our Project Deliverables </h2>
+      <br>
+      <h3> Cardhub Poster </h3>
+      <img alt="Cardhub poster" :src="getPoster()" class="project-poster"/>
+      
+      <br>
+      
+      <h3> Project Video </h3>
+      <p>COMING SOON</p>
+    </div>
+
     <br> <br>
-    
+
     <div class="sources">
       <h2> Project Related Resources </h2>
-      <p class="resources"> 
+      <p class="resources">
         Licensing information:
         <br> <a href="https://github.com/vuejs/vue/blob/main/LICENSE"> Vue’s MIT license </a>
         <br> <a href="https://github.com/nuxt/nuxt/blob/main/LICENSE"> Nuxt’s MIT license </a>
         <br> <a href="https://github.com/primefaces/primevue/blob/master/LICENSE.md"> PrimeVue MIT license </a>
-        <br> <a href="https://medium.com/made-with-creative-commons/card-against-humanity-8c0cc2c6c299"> Cards Against Humanity licensing information and context </a>  
+        <br> <a href="https://medium.com/made-with-creative-commons/card-against-humanity-8c0cc2c6c299"> Cards Against Humanity licensing information and context </a>
         <br> <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/"> Creative Commons Attribution-NonCommercial-ShareAlike 4.0 license </a>
-        <br> <a href="https://learn.microsoft.com/en-us/dotnet/"> .net C# documentation </a> 
+        <br> <a href="https://learn.microsoft.com/en-us/dotnet/"> .net C# documentation </a>
         <br> <a href="https://www.w3.org/WAI/WCAG22/quickref/"> WCAG Guidelines </a> </p>
     </div>
   </div>
@@ -72,47 +99,84 @@
 </template>
 
 <style scoped>
-  .about-cd{
-    text-align: left;
-    line-height: 30px;
-    margin-left: 70px;
-    margin-right: 70px;
-    color: white;
-  }
+.about-cd{
+  text-align: left;
+  line-height: 30px;
+  margin-left: 70px;
+  margin-right: 70px;
+  color: white;
+}
 
-  .sources{
-    text-align: left;
-    line-height: 30px;
-    margin-left: 70px;
-    margin-right: 70px;
-  }
+.pearl-logo{
+  width: 25%;
+}
 
-  .resources{
-    text-align: left;
-    line-height: 30px;
-    margin-left: 40px;
-    color:white;
-  }
-  
-  .all-info{
-    text-align: center;
-    line-height: 30px;
-  }
+.sources{
+  text-align: left;
+  line-height: 30px;
+  margin-left: 70px;
+  margin-right: 70px;
+}
 
-  .basic-info{
-    text-align: center;
-    line-height: 30px;
-  }
-  
-  .project-description{
-    text-align: left;
-    line-height: 30px;
-    color: white;
-  }
-  
-  .cardhub-logo{
-    width: 400px;
-    height: 200px;
-  }
+.resources{
+  text-align: left;
+  line-height: 30px;
+  margin-left: 40px;
+  color:white;
+}
+
+.all-info{
+  text-align: center;
+  line-height: 30px;
+}
+
+.basic-info{
+  text-align: center;
+  line-height: 30px;
+}
+
+.project-description{
+  text-align: left;
+  line-height: 30px;
+  color: white;
+}
+
+.cardhub-logo{
+  width: 400px;
+  height: 200px;
+}
+
+.members{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.team-mate-container{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 0 10px;
+}
+
+.team-mate {
+  text-align: center;
+  line-height: 30px;
+}
+
+.team-mate-pic{
+  height: 30vh;
+  margin: 10px;
+  background: rgba(255, 255, 255, 0.2);
+  object-fit: cover; /* Maintain aspect ratio while covering the space */
+}
+
+.project-poster{
+  width: 80%;
+  height: 80%;
+  margin: 0 auto;
+}
 
 </style>

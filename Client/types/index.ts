@@ -32,8 +32,19 @@ declare global {
         Hand: UNOCard[]
     }
 
+    interface CahCard {
+        id: number
+        text: string
+        type: CahType
+    }
+
     interface LobbyUser {
       Name: string
       Avatar: string
     }
+}
+
+export enum CahType {
+    White,
+    Black
 }

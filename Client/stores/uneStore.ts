@@ -1,12 +1,10 @@
 import { ref } from "vue";
-import { defineStore } from "pinia";
-import {useWebSocketStore} from "~/stores/webSocketStore";
-
+import { defineStore, storeToRefs } from "pinia";
+import { useWebSocketStore } from "./webSocketStore";
 
 export const useUneStore = defineStore("une", () => {
-  const store = useWebSocketStore();
-  const { gameJson, user } = storeToRefs(store);
-    const { $api } = useNuxtApp();
+    const store = useWebSocketStore();
+    const { gameJson, user } = storeToRefs(store);
     // variables for the store that will be called by the gameboard
     const gameType = ref<string>("");
     const gameStarted = ref<boolean>(false);
@@ -17,8 +15,8 @@ export const useUneStore = defineStore("une", () => {
     const winner = ref<string>("");
     const players = ref<unePlayer[]>([]);
     if (players.value != null) {
-      console.log("loggig players");
-      console.log(players.value);
+        console.log("loggig players");
+        console.log(players.value);
     }
     const currentPlayer = ref<string>("");
     const discardPile = ref<UNOCard[]>([]);
@@ -45,8 +43,8 @@ export const useUneStore = defineStore("une", () => {
         //    console.log(card);
         //  });
         //});
-        
-    }
+
+    };
 
     //const getYourValues = () => {
     //  var youPlayer = null;
@@ -73,6 +71,6 @@ export const useUneStore = defineStore("une", () => {
         players,
         currentPlayer,
         discardPile,
-        deckAmt,
+        deckAmt
     };
 });

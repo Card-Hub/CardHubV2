@@ -3,6 +3,7 @@ using WebApi.Controllers;
 using WebApi.GameLogic;
 using WebApi.Hubs;
 using WebApi.Models;
+using WebApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Logging.ClearProviders();
@@ -39,14 +40,19 @@ builder.Services.AddCors(options =>
             .AllowCredentials();
     });
 });
-builder.Services.AddSingleton<IDictionary<string, UserConnection>>(options => new Dictionary<string, UserConnection>());
-builder.Services.AddSingleton<HashSet<string>>(options => []);
+builder.Services.AddSingleton<IDictionary<string, UserConnection>>(_ => new Dictionary<string, UserConnection>());
+builder.Services.AddSingleton<HashSet<string>>(_ => []);
 builder.Services.AddSingleton<CardDbContext>();
 builder.Services.AddSingleton<UnoDeckBuilder>();
 builder.Services.AddSingleton<UnoGameMod>();
 
 builder.Services.AddSingleton<UnoGameStorage>();
 builder.Services.AddSingleton<GameService>();
+
+builder.Services.AddTransient<CahGame>();
+builder.Services.AddSingleton<CahFactory>();
+builder.Services.AddSingleton<IDictionary<string, CahGame>>();
+
 
 var app = builder.Build();
 

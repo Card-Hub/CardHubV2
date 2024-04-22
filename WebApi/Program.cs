@@ -1,3 +1,4 @@
+using WebApi.Common;
 using WebApi.Controllers;
 using WebApi.GameLogic;
 using WebApi.Hubs;
@@ -39,9 +40,13 @@ builder.Services.AddCors(options =>
     });
 });
 builder.Services.AddSingleton<IDictionary<string, UserConnection>>(options => new Dictionary<string, UserConnection>());
-builder.Services.AddSingleton<HashSet<string>>(options => new HashSet<string>());
+builder.Services.AddSingleton<HashSet<string>>(options => []);
 builder.Services.AddSingleton<CardDbContext>();
-builder.Services.AddSingleton<IBaseGame<UnoCard>>(options => new UnoGame());
+builder.Services.AddSingleton<UnoDeckBuilder>();
+builder.Services.AddSingleton<UnoGameMod>();
+
+builder.Services.AddSingleton<UnoGameStorage>();
+builder.Services.AddSingleton<GameService>();
 
 var app = builder.Build();
 

@@ -1,4 +1,7 @@
 namespace WebApi.Models;
+
+// not used for anything rn
+
 public class Player {
   public string Name {get; set;}
   public string Icon {get; set;}

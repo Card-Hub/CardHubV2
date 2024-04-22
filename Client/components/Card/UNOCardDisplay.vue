@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {defineProps, defineEmits} from 'vue';
-import get = Reflect.get;
+// import get = Reflect.get;
 
 const props = defineProps<{
   card: {
@@ -61,14 +61,12 @@ const cardColor = (color: string) => {
   }
 };
 
-
-//add this after the v-ifs
-//          style="box-shadow: 6px -6px 3px rgba(200, 200, 200, 0.4);"
 </script>
 
 <template>
   <div class="flex flex-wrap justify-center items-center">
-    <div v-if="isNumberCard" class="card flex flex-col justify-center items-center w-20 h-32 m-2 rounded-md shadow-md border-white border-4 p-2"
+    <div v-if="isNumberCard" class="card flex flex-col justify-center items-center w-20 h-32 m-2 rounded-md shadow-md p-2"
+         style="box-shadow: 6px -6px 3px rgba(200, 200, 200, 0.4);"
          :style="cardColor(card.color)"
          @click="handleClick"
          :class="{ 'selected': isSelected }">
@@ -82,28 +80,30 @@ const cardColor = (color: string) => {
         </div>
     </div>
 
-    <div v-else-if="isActionCard" class="card flex flex-col justify-center items-center w-20 h-32 m-2 rounded-md shadow-md border-black border-4 p-2"
+    <div v-else-if="isActionCard" class="card flex flex-col justify-center items-center w-20 h-32 m-2 rounded-md shadow-md p-2"
+         style="box-shadow: 6px -6px 3px rgba(200, 200, 200, 0.4);"
          :style="cardColor(card.color)"
          @click="handleClick"
          :class="{ 'selected': isSelected }">
       <img :src="getIcon(card.value)"
            alt="action card icon"
-           class="absolute top-2 left-2"/>
+           class="relative -top-2.5 -left-4"/>
       <img :src="getIcon(card.value)"
            alt="action card icon"
-           class="absolute bottom-2 right-2 w-14 h-14"/>
+           class="relative -bottom-1 right-/5 w-14 h-14"/>
     </div>
 
-    <div v-else-if="isDrawCard" class="card flex flex-col justify-center items-center w-20 h-32 m-2 rounded-md shadow-md border-black border-4 p-2"
+    <div v-else-if="isDrawCard" class="card flex flex-col justify-center items-center w-20 h-32 m-2 rounded-md shadow-md p-2"
+         style="box-shadow: 6px -6px 3px rgba(200, 200, 200, 0.4);"
          :style="cardColor(card.color)"
          @click="handleClick"
          :class="{ 'selected': isSelected }">
-      <div class="absolute top-2 left-2 text-3xl font-bold jost-font">
+      <div class="relative -top-4 -left-5 text-2xl font-bold jost-font">
         {{ getDisplayValue(card.value) }}
       </div>
       <img :src="getIcon(card.value)"
            alt="draw card icon"
-           class="absolute bottom-2 right-2 w-14 h-14"/>
+           class="relative bottom-1 left-.5 w-14 h-14"/>
     </div>
   </div>
 
@@ -123,7 +123,4 @@ const cardColor = (color: string) => {
   border: 2px solid red;
 }
 
-.card {
-  border: 1px solid white;
-}
 </style>

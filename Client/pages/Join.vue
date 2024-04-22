@@ -6,7 +6,7 @@ import toast from "@/utils/toast";
 
 const store = useWebSocketStore();
 const { connection, isConnected, messages, user, room } = storeToRefs(store);
-const { tryCreateRoom, tryJoinRoom } = store;
+const { tryJoinRoom } = store;
 
 const isValidRoomCode = computed(() => {
   const digitRegex = /^\d+$/;
@@ -28,13 +28,17 @@ const connectPlayer = async (): Promise<void> => {
   }
 };
 
-const connectGameboard = async (): Promise<void> => {
-  const isRoomCreated = await tryCreateRoom();
-  if (isRoomCreated) {
-    // await navigateTo('/playerview');
-    await navigateTo("/lobby");
-  }
+const navigateToLibrary = async (): Promise<void> => {
+  await navigateTo("/games");
 };
+
+// const connectGameboard = async (): Promise<void> => {
+//   const isRoomCreated = await tryCreateRoom();
+//   if (isRoomCreated) {
+//     // await navigateTo('/playerview');
+//     await navigateTo("/lobby");
+//   }
+// };
 
 console.log("check here for connectivity", isConnected.value);
 console.log("check here for obj", connection.value);
@@ -54,7 +58,7 @@ console.log("check here for obj", connection.value);
           <Button label="Primary" @click="connectPlayer" :disabled="!isValidRoomCode">Enter</Button>
         </div>
         <div class="flex flex-col w-auto">
-          <Button label="Secondary" severity="secondary" @click="connectGameboard">Start a game</Button>
+          <Button label="Secondary" severity="secondary" @click="navigateToLibrary">Start a game</Button>
         </div>
       </div>
     </template>

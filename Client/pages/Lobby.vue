@@ -2,15 +2,31 @@
 
 import { storeToRefs } from "pinia";
 import Une from "~/pages/games/Une.vue";
+import AvatarSelection from "~/components/AvatarSelection.vue";
 
 const store = useWebSocketStore();
-const { isPlayer, messages, users, room } = storeToRefs(store);
+const { isPlayer, messages, users, room, lobbyUsers } = storeToRefs(store);
 const { sendMessage, startGame } = store;
+const uneStore = useUneStore();
+const { gameType, gameStarted } = storeToRefs(uneStore);
 
 const gameboardStart = () => {
   startGame();
-  navigateTo("/gameboard");
+  navigateTo("/gameboard/" + gameType.value.toLowerCase());
 }
+
+const playerStart = () => {
+  return navigateTo("/playerview/" + gameType.value.toLowerCase());
+}
+
+const getIcon = (avatar: string) => {
+  if (avatar == "" || avatar == null) {
+    return new URL(`../assets/icons/avatars/dinoNugget1.png`, import.meta.url);
+  }
+  else {
+    return new URL(`../assets/icons/avatars/${avatar}.png`, import.meta.url);
+  }
+};
 
 </script>
 
@@ -18,11 +34,17 @@ const gameboardStart = () => {
   <div>
     <div v-if="isPlayer" class="m-8">
       <h1>
-        Une - New and Improved
+        {{ gameType }}
       </h1>
       <p>
         Waiting for the host to start the game. Sit back and relax for now.
       </p>
+      
+      <AvatarSelection class="align-center"/>
+      <div class="">
+        <Button class="mt-48" @click="playerStart" v-if="gameStarted">Join Game</Button>
+      </div>
+      <Chat/>
     </div>
     <div v-else-if="!isPlayer" class="flex min-h-screen">
       <div class="flex flex-col w-1/3 bg-neutral-950 shadow-inner">
@@ -34,11 +56,12 @@ const gameboardStart = () => {
           <SvgoStandardDeckClubs class="suit w-80 h-80 absolute z-0 top-20 -right-20 rotate-[240deg]" :fontControlled="false" filled/>
           <SvgoStandardDeckHearts class="suit w-80 h-80 absolute z-0 -bottom-40 -right-10" :fontControlled="false" filled/>
           <SvgoStandardDeckSpades class="suit w-80 h-80 absolute z-0 bottom-12 -left-24 rotate-[-20deg]" :fontControlled="false" filled/>
-
+          
           <div class="m-8 flex flex-col gap-4">
-            <div v-for="user in users as string[]" class="rounded-full flex card items-center justify-content h-16 w-full">
-              <i class="pi pi-user mx-4 text-neutral-300" style="font-size: 1.5rem"></i>
-              <span class="text-2xl text-neutral-300">{{ user }}</span>
+            <div v-for="lobbyUser in lobbyUsers as LobbyUser[]" class="rounded-full flex card items-center justify-content h-16 w-full">
+              <!--<i class="pi pi-user mx-4 text-neutral-300" style="font-size: 1.5rem"></i>-->
+              <img :src="getIcon(lobbyUser.Avatar)" alt="avatar Icon" class="lobby-player-icon-img">
+              <span class="text-2xl text-neutral-300">{{ lobbyUser.Name }} </span>
             </div>
           </div>
         </div>
@@ -58,9 +81,6 @@ const gameboardStart = () => {
         </div>
       </div>
       <div class="flex flex-col w-1/3">
-        <div class="">
-
-        </div>
       </div>
     </div>
     <div v-else>
@@ -82,6 +102,12 @@ const gameboardStart = () => {
 
   .suit {
     opacity: 35%;
+  }
+
+  .lobby-player-icon-img {
+    width: 3em;
+    border-radius: 50%; /* Ensure the player icon is circular */
+  overflow: hidden;
   }
 </style>
 

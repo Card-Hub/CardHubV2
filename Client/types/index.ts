@@ -3,21 +3,37 @@
 declare global {
     
     interface Card {
-        id: number
-        value: string
+        Id: number
+        Value: string
     }
     
     interface StandardCard extends Card {
-        suit: string
+        Suit: string
     }
     
     interface UNOCard extends Card {
-        color: string
+        Color: string
     }
 
     interface UserMessage {
         user: string
         message: string
     }
+    
+    interface Player {
+        Name: string
+        Avatar: string
+        Afk: boolean
+        //cards: Card[]
+    }
+    
+    interface unePlayer extends Player {
+        PickingWildColor: boolean
+        Hand: UNOCard[]
+    }
 
+    interface LobbyUser {
+      Name: string
+      Avatar: string
+    }
 }

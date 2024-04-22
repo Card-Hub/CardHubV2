@@ -8,15 +8,15 @@ import UNOCardDisplay from "~/components/Card/UNOCardDisplay.vue";
 import StandardCardDisplay from "~/components/Card/StandardCardDisplay.vue";
 
 const store = useWebSocketStore();
-const { cards, users, room } = storeToRefs(store);
+const {  cards, users, room } = storeToRefs(store);
 const { sendCard } = store;
 
 const getCardStyle = (index: number) => {
   const randomX = Math.floor(Math.random() * 10) - 5; // Random offset for X-axis
   const randomY = Math.floor(Math.random() * 10) - 5; // Random offset for Y-axis
   return {
-    transform: `translate(${ randomX }px, ${ randomY }px)`,
-    zIndex: index
+    transform: `translate(${randomX}px, ${randomY}px)`,
+    zIndex: index,
   };
 };
 
@@ -42,42 +42,28 @@ const selectedCard = ref<UNOCard | null>(null);
 </script>
 
 <template>
-  <div class="gameboard-container justify-center items-center">
+  <div class="gameboard-container">
     <div class="gameboard">
       <div class="card-pile">
-        <UNOCardDisplay v-for="card in cards"
+        <UNOCardDisplay class="singular-card" v-for="card in cards"
                         :key="card.id"
                         :is-selected="selectedCard === card"
                         :card="card"
-                        class="absolute"
+                        :style="getCardStyle(cards.indexOf(card))"
         />
       </div>
     </div>
   </div>
-
+  
 
 </template>
 
 <style scoped>
-#dimScreen {
-  width: 100%;
-  height: 100%;
-  background: rgb(243, 19, 19);
-  background: radial-gradient(ellipse at center, rgba(243, 19, 19, 0.5) 0%, rgba(152, 14, 17, 0.7) 40%, rgba(63, 8, 14, 0.9) 95%);
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 100;
-}
-
 .gameboard-container {
-  width: 100%;
-  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  background: rgb(243, 19, 19);
-  background: radial-gradient(ellipse at center, rgba(243, 19, 19, 0.5) 0%, rgba(152, 14, 17, 0.7) 40%, rgba(63, 8, 14, 0.9) 95%);
+  height: 100vh;
 }
 
 .gameboard {

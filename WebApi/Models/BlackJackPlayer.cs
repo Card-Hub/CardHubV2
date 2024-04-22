@@ -33,5 +33,4 @@ public class BlackJackPlayer : Player {
   public List<StandardCard> ShowHand(){
     return Hand;
   }
-
 }

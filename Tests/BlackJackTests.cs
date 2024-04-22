@@ -50,6 +50,7 @@ public void TestPlayerDrawCard(){
   BlackJackGame game = new BlackJackGame();
   game.AddPlayer("Liam");
   game.InitDeck();
+  game.state="DrawingCards";
   game.DrawCard("Liam");
   Assert.Equal(51, game.Deck.GetCards().Count());
   output.WriteLine(game.GetGameState());

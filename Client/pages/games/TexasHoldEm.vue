@@ -72,7 +72,12 @@ const getCards = () => {
       <div class="column right-column">
         <h1 class="text-7xl">Texas Hold 'Em</h1>
         <h3>Game Description: </h3>
-        <p> In this classic card game, ... </p>
+        <p> Texas Hold'em is a popular variation of poker played in both casual settings and professional tournaments worldwide. In Texas Hold'em, each player is dealt two private cards (known as "hole cards") that belong to them alone, and five community cards are dealt face-up on the "board." Players use a combination of their hole cards and the community cards to make the best possible five-card poker hand.
+
+          The game proceeds through several rounds of betting, with players having the option to check, bet, raise, or fold depending on the strength of their hand and their confidence in winning the pot. The community cards are dealt in stages: three cards, known as the "flop," are dealt first, followed by another single card called the "turn" or "fourth street," and finally, a fifth card called the "river" or "fifth street."
+
+          The objective of Texas Hold'em is to win chips or money by either having the best hand at showdown or by getting all opponents to fold their hands before the showdown. It's a game of skill, strategy, and psychology, where players must carefully manage their resources and make calculated decisions based on their understanding of the game and their opponents.
+        </p>
         <NuxtLink href="/lobby">
           <Button class="play" label="Secondary" severity="secondary" @click="connectGameboard"> Play Texas Hold 'Em </Button>
         </NuxtLink>

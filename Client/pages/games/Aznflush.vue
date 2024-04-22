@@ -72,7 +72,7 @@ const getCards = () => {
       <div class="column right-column">
         <h1 class="text-7xl">AZN Flush</h1>
         <h3>Game Description: </h3>
-        <p> In this classic card game, ... </p>
+        <p>  "Azn Flush" as a game is a variation of the traditional card game "Rummy." In this version, players aim to create sets or runs of cards in their hands to score points. However, there's a twist – players must also contend with the effects of alcohol, mimicking the "Asian flush" phenomenon. Players might have to take a drink when certain conditions are met, such as drawing a certain card or completing a set. It adds an element of unpredictability and fun to the game, as players balance strategy with the effects of alcohol. Just remember to play responsibly! </p>
         <NuxtLink href="/lobby">
           <Button class="play" label="Secondary" severity="secondary" @click="connectGameboard"> Play AZN Flush </Button>
         </NuxtLink>

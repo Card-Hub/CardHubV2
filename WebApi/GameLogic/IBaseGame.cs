@@ -7,7 +7,7 @@ namespace WebApi.GameLogic {
 
     bool InitDeck(); // Sets up deck
     List<string> GetPlayerList();
-    bool AddPlayer(string playerName);
+    bool AddPlayer(string playerName, string connStr);
     bool RemovePlayer(string playerName);
     List<CardType> GetPlayerHand(string playerName);
     List<string> GetPlayersInOrder();

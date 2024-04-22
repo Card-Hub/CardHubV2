@@ -62,7 +62,7 @@ public class LyssiePlayerOrder : LyssieIPlayerOrder
 
 
   public void BackToFirstPlayer(){
-
+    CurrentPlayerIndex = 0;
   }
   public void ShufflePlayers() {
     Random rng = new Random();

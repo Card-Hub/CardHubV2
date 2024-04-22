@@ -189,10 +189,10 @@ public class BlackJackGame : IBaseGame<StandardCard>
 
     public bool DealersTurn(){//dealer draws cards
         if (state == "DealersTurn") {
-            int score = GetPlayerScoreFromGame("Dealer"):
+            int score = GetPlayerScoreFromGame("Dealer");
             while (score < 17) {
                 DrawCard("Dealer");
-                score = GetPlayerScoreFromGame("Dealer"):
+                score = GetPlayerScoreFromGame("Dealer");
             }
             Stand("Dealer");
             CheckWinnersOrLosers();//!!!!!!! send json to front to show button for restart

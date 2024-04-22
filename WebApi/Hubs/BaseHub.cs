@@ -1,4 +1,4 @@
-﻿using WebApi.GameLogic;
+using WebApi.GameLogic;
 using WebApi.Models;
 
 namespace WebApi.Hubs;
@@ -87,7 +87,7 @@ public partial class BaseHub : Hub
         await Clients.Group(userConnection.Room).SendAsync("ReceiveMessage",
             new UserMessage
             {
-                User = BotUser,
+                User = userConnection.User,
                 Message = $"{userConnection.User} has joined the room {userConnection.Room}"
             });
         //await SendConnectedUsers(userConnection.Room);
@@ -152,13 +152,13 @@ public partial class BaseHub : Hub
                 await Clients.Caller.SendAsync("ReceiveMessage",
                     new UserMessage
                     {
-                        User = BotUser,
+                        User = userConnection.User,
                         Message = $"It's not your turn, {userName}"
                     });
             }
         }   
     }
-    public async Task SendAvatar(GameService gameService, UnoGameStorage unoGameStorage, string avatar) {
+public async Task SendAvatar(GameService gameService, UnoGameStorage unoGameStorage, string avatar) {
       if (_userConnections.TryGetValue(Context.ConnectionId, out var userConnection))
         {
           if (gameService.GameTypeFromRoomCode[userConnection.Room].ToLower() == "une") { // game is uno
@@ -342,7 +342,7 @@ public partial class BaseHub : Hub
         Clients.Group(userConnection.Room).SendAsync("ReceiveMessage",
             new UserMessage
             {
-                User = BotUser,
+                User = userConnection.User,
                 Message = $"{userConnection.User} has left the room {userConnection.Room}"
             });
         SendConnectedUsers(userConnection.Room);

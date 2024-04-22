@@ -44,6 +44,7 @@ const getIcon = (avatar: string) => {
       <div class="">
         <Button class="mt-48" @click="playerStart" v-if="gameStarted">Join Game</Button>
       </div>
+      <Chat/>
     </div>
     <div v-else-if="!isPlayer" class="flex min-h-screen">
       <div class="flex flex-col w-1/3 bg-neutral-950 shadow-inner">
@@ -55,7 +56,7 @@ const getIcon = (avatar: string) => {
           <SvgoStandardDeckClubs class="suit w-80 h-80 absolute z-0 top-20 -right-20 rotate-[240deg]" :fontControlled="false" filled/>
           <SvgoStandardDeckHearts class="suit w-80 h-80 absolute z-0 -bottom-40 -right-10" :fontControlled="false" filled/>
           <SvgoStandardDeckSpades class="suit w-80 h-80 absolute z-0 bottom-12 -left-24 rotate-[-20deg]" :fontControlled="false" filled/>
-
+          
           <div class="m-8 flex flex-col gap-4">
             <div v-for="lobbyUser in lobbyUsers as LobbyUser[]" class="rounded-full flex card items-center justify-content h-16 w-full">
               <!--<i class="pi pi-user mx-4 text-neutral-300" style="font-size: 1.5rem"></i>-->

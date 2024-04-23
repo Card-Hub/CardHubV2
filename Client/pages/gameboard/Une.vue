@@ -80,7 +80,7 @@ const discardedCardsToDisplay = computed(() => {
   var DC = [] as [UNOCard, number][];
   // grab first 5 cards in discardedCards
   for (let i = 0; i < discardPile.value.length && i < 5; i++) {
-    var card:UNOCard = {id: discardPile.value[i].Id, color: discardPile.value[i].Color, value:discardPile.value[i].Value};
+    var card:UNOCard = {Id: discardPile.value[i].Id, Color: discardPile.value[i].Color, Value:discardPile.value[i].Value};
     DC.push([card, 5-i]);
   }
   return DC;
@@ -140,9 +140,9 @@ const getCurrentColor = () => {
 </script>
 
 <template>
-  <p> {{ currentPlayer }}</p>
-  <p> {{ discardPile }}</p>
-  <p> {{ discardedCardsToDisplay }}</p>
+<!--  <p> {{ currentPlayer }}</p>-->
+<!--  <p> {{ discardPile }}</p>-->
+<!--  <p> {{ discardedCardsToDisplay }}</p>-->
   <div class="gameboard-container">
     <div class="gameboard">
       <div class="player-icons">
@@ -157,7 +157,7 @@ const getCurrentColor = () => {
      <div class="game-table rounded-tr-full shadow-lg" v-bind:class="currentColor">
        <div class="arrow-container">
          <div id="curvedarrow"></div>
-  </div>
+       </div>
 
         <div class="column-container">
           <div class="column left-column">

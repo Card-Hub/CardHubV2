@@ -16,13 +16,16 @@ const getLogo = () => {
   return new URL('../assets/icons/logos/combination.svg', import.meta.url);
 };
 
+const navigateToHome = async (): Promise<void> => {
+  await navigateTo("/");
+};
 </script>
 
 <template>
   <Menubar :model="menuItems">
 <!--    to display the logo on the left side of the menubar-->
     <template #start>
-      <img class="logo" :src="getLogo()" alt="Cardhub logo" />
+      <img class="logo" :src="getLogo()" alt="Cardhub logo" @click="navigateToHome" />
     </template>
     
 <!--    This is the actual menubar-->

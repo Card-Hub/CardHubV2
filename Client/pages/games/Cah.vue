@@ -73,6 +73,10 @@ const getCards = () => {
         <h1 class="text-7xl">Cards Against Humanity</h1>
         <h3>Game Description: </h3>
         <p> The following game includes cards from the original Cards Against Humanity, so credit for them creating this popular game. "Cards Against Humanity" is a party game where players complete fill-in-the-blank statements using words or phrases on playing cards, typically with humor, satire, or absurdity. Each round, one player draws a prompt card and reads it aloud. Then, other players choose from their hand of answer cards to fill in the blanks, aiming to create the funniest or most outrageous combination. The player who initially drew the prompt card then selects their favorite answer, awarding that player a point. The game often involves dark humor, pop culture references, and unconventional combinations, making it a favorite for gatherings and parties. </p>
+        
+        <div>
+          <p>Copyright 2024 Cards Against Humanity LLC. Used within license terms.</p>
+        </div>
         <NuxtLink href="/lobby">
           <Button class="play" label="Secondary" severity="secondary" @click="connectGameboard"> Play CAH </Button>
         </NuxtLink>

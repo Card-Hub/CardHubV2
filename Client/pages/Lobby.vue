@@ -44,6 +44,7 @@ const getIcon = (avatar: string) => {
       <div class="">
         <Button class="mt-48" @click="playerStart" v-if="gameStarted">Join Game</Button>
       </div>
+      <div class="m-10"></div>
       <Chat/>
     </div>
     <div v-else-if="!isPlayer" class="flex min-h-screen">

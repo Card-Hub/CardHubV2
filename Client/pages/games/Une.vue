@@ -27,9 +27,9 @@
   for (const color of colors) {
     for (const value of unoValues) {
       unoDeck.push({
-        id: unoDeck.length + 1,
-        color,
-        value
+        Id: unoDeck.length + 1,
+        Color: color,
+        Value: value
       });
     }
   }
@@ -37,14 +37,14 @@
   // push 4 wild cards and 4 draw 4 wild cards
   for (let i = 0; i < 4; i++) {
     unoDeck.push({
-      id: unoDeck.length + 1,
-      color: "#151515",
-      value: "Wild"
+      Id: unoDeck.length + 1,
+      Color: "#151515",
+      Value: "Wild"
     });
     unoDeck.push({
-      id: unoDeck.length + 1,
-      color: "#151515",
-      value: "Wild Draw Four"
+      Id: unoDeck.length + 1,
+      Color: "#151515",
+      Value: "Wild Draw Four"
     });
   }
 
@@ -98,7 +98,7 @@
     <Button @click='showCardContainer()' class="show-cards">{{ buttonText }}</Button>
     <div v-if="showCards" class="card-container">
       <UNOCardDisplay v-for="card in unoDeck"
-                      :key="card.id"
+                      :key="card.Id"
                       :card="card"
       />
     </div>

@@ -30,7 +30,7 @@ const myCards = computed(() => {
       if (player.Name == user.value) {
         player.Hand.forEach(card => {
           // translate between json and unocard
-          mc.push({id:card.Id, value:card.Value, color:card.Color});
+          mc.push({Id:card.Id, Value:card.Value, Color:card.Color});
         });
       }
     });

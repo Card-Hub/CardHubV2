@@ -238,7 +238,7 @@ public async Task SendAvatar(GameService gameService, UnoGameStorage unoGameStor
               var cardColor = UnoColorLyssie.Black;
               var cardValue = UnoValueLyssie.One;
               // color switch
-              switch (cardJToken["color"].ToString().ToLower()) {
+              switch (cardJToken["Color"].ToString().ToLower()) {
                 case "red":
                   cardColor = UnoColorLyssie.Red;
                   break;
@@ -258,7 +258,7 @@ public async Task SendAvatar(GameService gameService, UnoGameStorage unoGameStor
                   Console.WriteLine("INVALID CARD COLOR PLAYED???");
                   break;
               }
-              switch (cardJToken["value"].ToString().ToLower()) {
+              switch (cardJToken["Value"].ToString().ToLower()) {
                 case "0":
                   cardValue = UnoValueLyssie.Zero;
                   break;
@@ -311,7 +311,7 @@ public async Task SendAvatar(GameService gameService, UnoGameStorage unoGameStor
                   Console.WriteLine("INVALID CARD VALUE PLAYED???");
                   break;
               }
-              var card = new UnoCardModLyssie(int.Parse(cardJToken["id"].ToString()), cardColor, cardValue);
+              var card = new UnoCardModLyssie(int.Parse(cardJToken["Id"].ToString()), cardColor, cardValue);
               await game.PlayCard(userConnection.ConnectionId, card);
               break;
             default:

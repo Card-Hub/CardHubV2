@@ -45,6 +45,7 @@ public partial class BaseHub : Hub
     private IDictionary<string, UserConnection> _userConnections;
     private UnoGameMod _game;
 
+    // private BlackJackGame _game;
     public BaseHub(IDictionary<string, UserConnection> userConnections, UnoGameMod game)
     {
         _userConnections = userConnections;
@@ -57,11 +58,12 @@ public partial class BaseHub : Hub
         return base.OnConnectedAsync();
     }
 
-    public async Task SendGameType(string gameType, GameService gameService, UnoGameStorage unoGameStorage) {
+    public async Task SendGameType(string gameType, GameService gameService, UnoGameStorage unoGameStorage, BlackJackGameStorage blackJackGameStorage) {//this is like the hub of ugly here
       if (!_userConnections.TryGetValue(Context.ConnectionId, out var userConnection)) {return;}
 
       if (userConnection.UserType == UserType.Gameboard) {
         gameService.GameTypeFromRoomCode[userConnection.Room] = gameType;
+        // var game;
         switch (gameType.ToLower()) {
           case "une":
             unoGameStorage.BuildGame(userConnection.Room);
@@ -69,11 +71,15 @@ public partial class BaseHub : Hub
             game.GameboardConnStr = userConnection.ConnectionId;
             await Clients.Client(game.GameboardConnStr).SendAsync("ReceiveJson", game.GetGameState());
             break;
+          case "blackjack":
+            blackJackGameStorage.BuildGame(userConnection.Room, userConnection.ConnectionId);
+            var game2 = blackJackGameStorage.GetGame(userConnection.Room);
+            await Clients.Client(game2.GameboardConnStr).SendAsync("ReceiveJson", game2.GetGameState());
+            break;
           default:
             Console.WriteLine("UNKNOWN GAME TYPE SENT??");
             break;
         }
-        //break;
       }
     }
 

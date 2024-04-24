@@ -11,10 +11,14 @@ public class BlackJackJsonState {
     [JsonIgnore]
     public List<string> PlayerNames;
     public List<Player> Players;
+    public string CurrentPlayer;
+
+    // add lot of button code here
     public BlackJackJsonState() {
         GameType = "Black Jack";
         PlayerNames = new();
         Players = new();
+        CurrentPlayer = "";
     }
     public void Update(BlackJackGame game) {
         PlayerNames = game.GetPlayerList();

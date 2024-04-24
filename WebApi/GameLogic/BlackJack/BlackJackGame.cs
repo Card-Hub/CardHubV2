@@ -19,23 +19,25 @@ public class BlackJackGame : IBaseGame<StandardCard>
     public Dictionary<string, BlackJackPlayer> Players;
     public BlackJackJsonState BlackJackJsonState;
     public string state;// NotStarted, TakingBets, GiveCards, Checkingforwinners, DrawingCards, round end
-    //right now we have given the cards to the players and we ened to check if there are any winners
-    //right now i have made it so that the cardsa re given out and players can then ask for cards with drwa cards state in the correct order and checks for busts.
-    //stay button and a finish game button or something, idk im tired
+
     public StandardCardDeck Deck;
     public iUnoMessenger _messenger;
-    public BlackJackGame(iUnoMessenger messenger) {//dealer will jsut be a player i control.
+    public string GameboardConnStr;
+    public BlackJackGame(iUnoMessenger messenger, string gameboardConnStr) {
         _messenger = messenger;
         PlayerOrder = new();
         Players = new();
         BlackJackJsonState = new();
         Deck = new();
         state = "NotStarted";
+       GameboardConnStr = gameboardConnStr;
+        
     }
 
     public void StartGame()
     {
         AddPlayer("Dealer", "Dealer");//keep dealer in first pos and just pretend like they are last
+        //mkae dealer hasbet true;
         StartRound();
     }
 
@@ -86,7 +88,7 @@ public class BlackJackGame : IBaseGame<StandardCard>
                 if (Players[player.Key].Busted == true || Players[player.Key].Winner == true || Players[player.Key].StillPlaying == false){
                     state = "Restart";//will send json here to tell admin to restart
                 }
-                else {
+                else {//might be bad state here else if
                     state = "DrawingCards";//will send json here.drawing cards section needs a check /s as well. it needs to manage turns from players having free will and shouldnt be allowed to.
                     break;
                 }
@@ -133,7 +135,7 @@ public class BlackJackGame : IBaseGame<StandardCard>
         return true;
     }
     public bool TakeBet(string connStr, int amt){
-        if (state == "TakingBets") { 
+        if (state == "TakingBets") {
             Players[connStr].CurrentBet = amt;
             Players[connStr].HasBet = true;
             Console.WriteLine("Player:", connStr, "has bet:", amt);//send frontedn stuffs

@@ -3,6 +3,7 @@
 import { storeToRefs } from "pinia";
 import Une from "~/pages/games/Une.vue";
 import AvatarSelection from "~/components/AvatarSelection.vue";
+import Chat from "~/components/Chat.vue";
 
 const store = useWebSocketStore();
 const { isPlayer, messages, users, room, lobbyUsers } = storeToRefs(store);
@@ -21,12 +22,23 @@ const playerStart = () => {
 
 const getIcon = (avatar: string) => {
   if (avatar == "" || avatar == null) {
-    return new URL(`../assets/icons/avatars/dinoNugget1.png`, import.meta.url);
+    return new URL(`../assets/icons/avatars/lyssie.png`, import.meta.url);
   }
   else {
     return new URL(`../assets/icons/avatars/${avatar}.png`, import.meta.url);
   }
 };
+
+const getIconGivenName = (name: string) => {
+  lobbyUsers.value.forEach(function (user: LobbyUser) {
+    // console.log(value);
+    if (user.Name == name) {
+      return getIcon(user.Avatar);
+    }
+  });
+  // if that fails
+  return getIcon("");
+}
 
 </script>
 
@@ -46,6 +58,7 @@ const getIcon = (avatar: string) => {
       </div>
       <div class="m-10"></div>
       <Chat/>
+<!--      <p>gfjagajkhgkj</p>-->
     </div>
     <div v-else-if="!isPlayer" class="flex min-h-screen">
       <div class="flex flex-col w-1/3 bg-neutral-950 shadow-inner">

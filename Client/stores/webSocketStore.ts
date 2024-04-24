@@ -143,6 +143,8 @@ export const useWebSocketStore = defineStore("webSocket", () => {
                 for (var lobbyUserIndex in jsonLobbyUsers) {
                     lobbyUsers.value.push(jsonLobbyUsers[lobbyUserIndex]);
                 }
+                
+                console.log(lobbyUsers.value);
             });
             
             joinConnection.on("Log", (string: string) => {

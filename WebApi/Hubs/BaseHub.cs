@@ -1,4 +1,4 @@
-using WebApi.GameLogic;
+﻿using WebApi.GameLogic;
 using WebApi.Models;
 
 namespace WebApi.Hubs;
@@ -87,8 +87,8 @@ public partial class BaseHub : Hub
         await Clients.Group(userConnection.Room).SendAsync("ReceiveMessage",
             new UserMessage
             {
-                User = userConnection.User,
-                Message = $"{userConnection.User} has joined the room {userConnection.Room}"
+                User = "System",
+                Message = $"{userConnection.User} has joined!"
             });
         //await SendConnectedUsers(userConnection.Room);
         switch (userConnection.UserType)

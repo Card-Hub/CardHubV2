@@ -179,7 +179,7 @@ public class LyssiePlayerOrderTests {
     Assert.Equal(PlayersExpected.Count, PlayerOrder.GetAllPlayers().Count);
   }
   [Fact]
-  private void TestSetNextPlayer() {
+  private void TestSetNextPlayerStringVersion() {
     setUp();
     PlayerOrder.AddPlayer("Player1");
     PlayerOrder.AddPlayer("Player2");
@@ -195,6 +195,31 @@ public class LyssiePlayerOrderTests {
     PlayerOrder.NextTurn();
     Assert.Equal("Player4", PlayerOrder.GetCurrentPlayer());
     PlayerOrder.SetNextPlayer("Player4");
+    PlayerOrder.NextTurn();
+    Assert.Equal("Player4", PlayerOrder.GetCurrentPlayer());
+  }
+  [Fact]
+  private void TestSetNextPlayerIntVersion() {
+    setUp();
+    PlayerOrder.AddPlayer("Player1");
+    PlayerOrder.AddPlayer("Player2");
+    PlayerOrder.AddPlayer("Player3");
+    PlayerOrder.AddPlayer("Player4");
+    PlayerOrder.AddPlayer("Player5");
+    PlayerOrder.SetPlayerStatus("Player5", LyssiePlayerStatus.Spectator);
+    PlayerOrder.SetNextPlayer(1);
+    PlayerOrder.NextTurn();
+    Assert.Equal("Player2", PlayerOrder.GetCurrentPlayer());
+    PlayerOrder.SetNextPlayer(0); // repeat current player
+    PlayerOrder.NextTurn();
+    Assert.Equal("Player2", PlayerOrder.GetCurrentPlayer());
+    PlayerOrder.SetNextPlayer(2);
+    PlayerOrder.NextTurn();
+    Assert.Equal("Player4", PlayerOrder.GetCurrentPlayer());
+    PlayerOrder.SetNextPlayer(2);
+    PlayerOrder.NextTurn();
+    Assert.Equal("Player2", PlayerOrder.GetCurrentPlayer());
+    PlayerOrder.SetNextPlayer(-2);
     PlayerOrder.NextTurn();
     Assert.Equal("Player4", PlayerOrder.GetCurrentPlayer());
   }

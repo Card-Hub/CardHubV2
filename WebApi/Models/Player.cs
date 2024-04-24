@@ -2,6 +2,9 @@ using StackExchange.Redis;
 using Newtonsoft.Json;
 
 namespace WebApi.Models;
+
+// not used for anything rn
+
 public class Player {
   [JsonProperty(Order = -2)]
   public string Name {get; set;}

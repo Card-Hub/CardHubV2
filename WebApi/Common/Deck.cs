@@ -33,7 +33,6 @@ public class Deck<TCard> : IDeck<TCard>
 
     public TCard Draw()
     {
-        Console.WriteLine("\n\n\nHERE2\n\n\n");
         if (_cards.Count == 0)
         {
             throw new InvalidOperationException("No cards to draw from the deck.");

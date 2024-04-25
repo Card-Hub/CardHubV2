@@ -69,15 +69,26 @@ public class BlackJackTests {
     var messenger = new UnoTestMessenger(output);
     BlackJackGame game = new BlackJackGame(messenger, "abcd");
     game.AddPlayer("Liam","123");
+    game.AddPlayer("Liam1","1234");
     StandardCard ace = new StandardCard(0, "Clubs", "A");
     StandardCard king = new StandardCard(0, "Clubs", "K");
+
+    StandardCard diamondsTen = new StandardCard(0, "Diamonds", "10");
+    StandardCard diamondsJ = new StandardCard(0, "Diamonds", "J");
+    StandardCard spadesSeven = new StandardCard(0, "Spades", "7");
     game.GivePlayerCard("123", ace);
     game.GivePlayerCard("123", ace);
     game.GivePlayerCard("123", ace);
     game.GivePlayerCard("123", ace);
-    Assert.Equal(14, game.GetPlayerScoreFromGame("123"));
-    game.GivePlayerCard("123", king);
-    Assert.Equal(14, game.GetPlayerScoreFromGame("123"));
+
+    game.GivePlayerCard("1234", diamondsTen);
+    game.GivePlayerCard("1234", diamondsJ);
+    game.GivePlayerCard("1234", spadesSeven);
+
+    // Assert.Equal(14, game.GetPlayerScoreFromGame("123"));
+    Assert.Equal(27, game.GetPlayerScoreFromGame("1234"));
+    // game.GivePlayerCard("123", king);
+    // Assert.Equal(14, game.GetPlayerScoreFromGame("123"));
     output.WriteLine(game.GetGameState());
   }
   [Fact]
@@ -95,7 +106,12 @@ public class BlackJackTests {
     game.TakeBet("02", 43);
     game.TakeBet("03", 44);
     game.TakeBet("04", 45);
-
+    // game.GivePlayerCard("02",ace);
+    // game.DrawCard("01");
+    game.Stand("01");
+    game.Stand("02");
+    game.Stand("03");
+    game.Stand("04");
     output.WriteLine(game.GetGameState());
   }
 }

@@ -45,6 +45,7 @@ public class BlackJackGame : IBaseGame<StandardCard>
     public bool StartRound(){//this may need a check before bets to see if players have joined
         if (state == "NotStarted" && Players.Count >= 2) {
             InitDeck();
+            PlayerOrder.NextTurn();
             //give promt to frontend to take bets
             state = "TakingBets";
             return true;
@@ -71,7 +72,7 @@ public class BlackJackGame : IBaseGame<StandardCard>
     }
 
     public bool CheckWinnersOrLosers(){//will just apply attributes to players. we can check those later.
-        if (state == "CheckingForWinners"){
+        if (state == "CheckingForWinners" || state == "DrawingCards"){
             int playerScore = 0;
             foreach (KeyValuePair<string, BlackJackPlayer> player in Players) {
                 playerScore = GetPlayerScoreFromGame(player.Key);
@@ -96,7 +97,10 @@ public class BlackJackGame : IBaseGame<StandardCard>
             }
             return true;
         }
-        return false;
+        else {
+            Console.WriteLine("Incorrect state to check winners\n");
+            return false;
+        }
     }
     public bool GivingCards(){//either called auto or will make button for this.
         //will need to be sending json for each card draw. so maybe just do it in draw i guess.
@@ -140,7 +144,7 @@ public class BlackJackGame : IBaseGame<StandardCard>
             Players[connStr].CurrentBet = amt;
             Players[connStr].HasBet = true;
             // BlackJackJsonState.Update(this);
-            Console.WriteLine("Player:", connStr, "has bet:", amt);//send frontedn stuffs
+            // Console.WriteLine("Player:", connStr, "has bet:", amt);//send frontedn stuffs
             foreach (KeyValuePair<string, BlackJackPlayer> player in Players) {
                 if (player.Value.HasBet == false) {
                     state = "TakingBets";
@@ -191,10 +195,15 @@ public class BlackJackGame : IBaseGame<StandardCard>
 
     public bool CheckAllPlayersStanding(){
         foreach (KeyValuePair<string, BlackJackPlayer> player in Players){
-            if (player.Value.StillPlaying == false)
+            if (player.Value.Standing == true || player.Value.StillPlaying == false && player.Key != "Dealer")
+             {
+                Console.WriteLine("Issue is that its not switching to dealers turn when all players are standing\n\n");
                 state = "DealersTurn";
-            else
+            }else{
+                Console.WriteLine("231Issue is that its not switching to dealers turn when all players are standing\n\n");
+                state = "DrawingCards";
                 break;
+            }
         }
         return true;
     }
@@ -206,15 +215,17 @@ public class BlackJackGame : IBaseGame<StandardCard>
                 DrawCard("Dealer");
                 score = GetPlayerScoreFromGame("Dealer");
             }
-            Stand("Dealer");
+            // Stand("Dealer");
+            Players["Dealer"].Standing = true;//may not need, not nessesarily true
             CheckWinnersOrLosers();//!!!!!!! send json to front to show button for restart
             return true;
         }
         return false;
     }
     public bool Stand(string connStr) {
-        if (state == "drawingcards" && connStr == PlayerOrder.GetCurrentPlayer()) {
-            Players[connStr].NotPlaying = true;
+        if (state == "DrawingCards" && connStr == PlayerOrder.GetCurrentPlayer()) {
+            Players[connStr].StillPlaying = false;
+            Players[connStr].Standing = true;
             PlayerOrder.NextTurn();
             CheckAllPlayersStanding();
             if (state == "DealersTurn")
@@ -222,7 +233,7 @@ public class BlackJackGame : IBaseGame<StandardCard>
             return true;
         }
         else {
-            Console.WriteLine("Its not that platers turn\n");
+            Console.WriteLine("Its not that players turn to stand\n");
             return false;
         }
     }
@@ -232,17 +243,20 @@ public class BlackJackGame : IBaseGame<StandardCard>
     {//need to iterate over player turn here too
         if ((state == "GivingCards") && Players[connStr].Busted == false && Players[connStr].Winner == false){
             Players[connStr].TakeCard(Deck.Draw());
-            CheckWinnersOrLosers();//checks all players which is weird when i just need to check single bust. may fix later
+            PlayerOrder.NextTurn();
+            // CheckWinnersOrLosers();//checks all players which is weird when i just need to check single bust. may fix later
             return true;
         } else if (state == "DrawingCards"){//must be correct players turn.
             string currentPlayer = PlayerOrder.GetCurrentPlayer();
-            if (currentPlayer == connStr) {//eventually it will be dealers turn. and that will be a block.
+            Console.WriteLine("\n\n\nHere---->", currentPlayer);
+            if (currentPlayer == connStr && Players[connStr].Busted == false && Players[connStr].Winner == false && Players[connStr].StillPlaying == true) {//eventually it will be dealers turn. and that will be a block.
+                Console.WriteLine("\n\n\n112Here---->", currentPlayer);
                 Players[connStr].TakeCard(Deck.Draw());
                 CheckWinnersOrLosers();//checks all players which is weird when i just need to check single bust. may fix later
                 return true;
             }
             else//need to send json struct here
-                {Console.WriteLine("Current players turn is", currentPlayer);}
+                {Console.WriteLine("Its not your turn! Current players turn is", currentPlayer);}
             return true;
         } else
             Console.WriteLine("Either wrong state or player cant draw");

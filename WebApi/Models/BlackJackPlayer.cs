@@ -11,6 +11,7 @@ public class BlackJackPlayer : Player {
   public bool Busted{ get; set;}
   public bool Winner {get; set;}
   public bool StillPlaying {get; set;}
+  public bool Standing {get; set;}
   // public string Name { get; set; }
   public BlackJackPlayer(string name) : base(name) {
     

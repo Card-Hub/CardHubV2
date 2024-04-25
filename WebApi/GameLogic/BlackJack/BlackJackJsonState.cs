@@ -14,7 +14,7 @@ public class BlackJackJsonState {
     public string CurrentPlayer;
     public string Winners;
     public string Losers;
-    public string state;
+    public string State;
 
 
     // add lot of button code here
@@ -25,14 +25,15 @@ public class BlackJackJsonState {
         CurrentPlayer = "";
         Winners = "";
         Losers = "";
-        state = "";
+        State = "";
     }
     public void Update(BlackJackGame game) {
         PlayerNames = game.GetPlayerList();
+        CurrentPlayer = game.PlayerOrder.GetCurrentPlayer();
         Players.Clear();
         for (int i = 0; i < game.GetPlayerList().Count; i++) {
             Players.Add(game.Players[PlayerNames[i]]);
         }
-        state = game.state;
+        State = game.state;
     }
 }

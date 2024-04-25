@@ -12,6 +12,10 @@ public class BlackJackJsonState {
     public List<string> PlayerNames;
     public List<Player> Players;
     public string CurrentPlayer;
+    public string Winners;
+    public string Losers;
+    public string state;
+
 
     // add lot of button code here
     public BlackJackJsonState() {
@@ -19,6 +23,9 @@ public class BlackJackJsonState {
         PlayerNames = new();
         Players = new();
         CurrentPlayer = "";
+        Winners = "";
+        Losers = "";
+        state = "";
     }
     public void Update(BlackJackGame game) {
         PlayerNames = game.GetPlayerList();
@@ -26,5 +33,6 @@ public class BlackJackJsonState {
         for (int i = 0; i < game.GetPlayerList().Count; i++) {
             Players.Add(game.Players[PlayerNames[i]]);
         }
+        state = game.state;
     }
 }

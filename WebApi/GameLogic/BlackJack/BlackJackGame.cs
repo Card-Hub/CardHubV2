@@ -38,7 +38,8 @@ public class BlackJackGame : IBaseGame<StandardCard>
     {
         AddPlayer("Dealer", "Dealer");//keep dealer in first pos and just pretend like they are last
         //mkae dealer hasbet true;
-        StartRound();
+        Players["Dealer"].HasBet= true;
+        // StartRound();
     }
 
     public bool StartRound(){//this may need a check before bets to see if players have joined
@@ -138,6 +139,7 @@ public class BlackJackGame : IBaseGame<StandardCard>
         if (state == "TakingBets") {
             Players[connStr].CurrentBet = amt;
             Players[connStr].HasBet = true;
+            // BlackJackJsonState.Update(this);
             Console.WriteLine("Player:", connStr, "has bet:", amt);//send frontedn stuffs
             foreach (KeyValuePair<string, BlackJackPlayer> player in Players) {
                 if (player.Value.HasBet == false) {

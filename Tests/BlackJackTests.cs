@@ -85,7 +85,17 @@ public class BlackJackTests {
   public async void TestCreateGame() {
     var messenger = new BlackJackTestMessenger(output);
     var game = new BlackJackGame(messenger, "abcd");
-    
+    game.StartGame();
+    game.AddPlayer("Alex", "01");
+    game.AddPlayer("Liam", "02");
+    game.AddPlayer("Lyssie", "03");
+    game.AddPlayer("Rubi", "04");
+    game.StartRound();
+    game.TakeBet("01", 42);
+    game.TakeBet("02", 43);
+    game.TakeBet("03", 44);
+    game.TakeBet("04", 45);
 
+    output.WriteLine(game.GetGameState());
   }
 }

@@ -88,7 +88,7 @@ public class BlackJackGame : IBaseGame<StandardCard>
             }
             foreach (KeyValuePair<string, BlackJackPlayer> player in Players) {
                 if (Players[player.Key].Busted == true || Players[player.Key].Winner == true || Players[player.Key].StillPlaying == false){
-                    state = "Restart";//will send json here to tell admin to restart
+                    state = "MakeLists";//will send json here to tell admin to restart
                 }
                 else {//might be bad state here else if
                     state = "DrawingCards";//will send json here.drawing cards section needs a check /s as well. it needs to manage turns from players having free will and shouldnt be allowed to.
@@ -208,6 +208,14 @@ public class BlackJackGame : IBaseGame<StandardCard>
         return true;
     }
 
+    public bool MakeLists(){// there are two cases, check the lsit of winners right off the bat or draws to dealer. Then need to check for lesser wins.
+        if (state == "MakeLists"){
+
+            return true;
+        }else
+            return false;
+    }
+
     public bool DealersTurn(){//dealer draws cards
         if (state == "DealersTurn") {
             int score = GetPlayerScoreFromGame("Dealer");
@@ -216,6 +224,7 @@ public class BlackJackGame : IBaseGame<StandardCard>
                 score = GetPlayerScoreFromGame("Dealer");
             }
             Players["Dealer"].Standing = true;//may not need, not nessesarily true
+            
             return true;
         }
         return false;
@@ -248,9 +257,7 @@ public class BlackJackGame : IBaseGame<StandardCard>
             return true;
         } else if (state == "DrawingCards" || state == "DealersTurn"){//must be correct players turn.
             string currentPlayer = PlayerOrder.GetCurrentPlayer();
-            Console.WriteLine("\n\n\nHere---->", currentPlayer);
             if (currentPlayer == connStr && Players[connStr].Busted == false && Players[connStr].Winner == false && Players[connStr].StillPlaying == true) {//eventually it will be dealers turn. and that will be a block.
-                Console.WriteLine("\n\n\n112Here---->", currentPlayer);
                 Players[connStr].TakeCard(Deck.Draw());
                 CheckWinnersOrLosers();//checks all players which is weird when i just need to check single bust. may fix later
                 return true;

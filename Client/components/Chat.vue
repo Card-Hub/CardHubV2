@@ -4,7 +4,7 @@ import { useWebSocketStore } from '~/stores/webSocketStore';
 import { storeToRefs } from "pinia";
 
 const store = useWebSocketStore();
-const { messages, user} = useWebSocketStore();
+const { isPlayer, messages, user} = useWebSocketStore();
 const { lobbyUsers } = storeToRefs(store);
 const { sendMessage } = store;
 // ref
@@ -12,12 +12,12 @@ const newMessage1 = ref('');//find a way to get rid fo this
 const handleSendMessage = () => {
     console.log("inside handlemessage", newMessage1.value);
     sendMessage(newMessage1.value);
-    // newMessage1.value = '';
+    newMessage1.value = '';
 };
 
 const getIcon = (avatar: string) => {
   if (avatar == "" || avatar == null) {
-    return new URL(`../assets/icons/avatars/dinoNugget2.png`, import.meta.url);
+    return new URL(`../assets/icons/avatars/lyssie.png`, import.meta.url);
   }
   else {
     return new URL(`../assets/icons/avatars/${avatar}.png`, import.meta.url);
@@ -46,37 +46,69 @@ const getIconGivenName = (name: string) => {
 </script>
 
 <template>
-  <div class="chat-container">
-    <h2 class="title text-center">Chat</h2>
-    <div class="all-messages">
-      <div v-for="(m, index) in messages" :key="index">
-        <div class="each-message-container">
-          <div class="system-message" v-if="m.user == 'System'">
-            {{m.message}}
+  <div v-if="isPlayer">
+    <div class="chat-container">
+<!--      <h2 class="title text-center">Chat</h2>-->
+      <div class="all-messages">
+        <div v-for="(m, index) in messages" :key="index">
+          <div class="each-message-container">
+            <div class="system-message" v-if="m.user == 'System'">
+              {{m.message}}
+            </div>
+            <div v-else-if="m.user != user" class="others-message-container">
+              <img :src="getIconGivenName(m.user)" alt="avatar Icon" class="lobby-player-icon-img-chat">
+              <div class="message-and-name">
+                <span class="text-2xl text-neutral-300 username">{{ m.user }} </span>
+                <div class="message-container"> {{ m.message }}</div>
+              </div>
+            </div>
+            <div v-else class="my-message-container">
+              <div class="message-and-name">
+                <span class="text-2xl text-neutral-300 username">{{ m.user }} </span>
+                <div class="message-container"> {{ m.message }}</div>
+              </div>
+              <img :src="getIconGivenName(m.user)" alt="avatar Icon" class="lobby-player-icon-img-chat">
+            </div>
+            <!--<i class="pi pi-user mx-4 text-neutral-300" style="font-size: 1.5rem"></i>-->
           </div>
-          <div v-else-if="m.user != user" class="others-message-container">
-            <img :src="getIconGivenName(m.user)" alt="avatar Icon" class="lobby-player-icon-img-chat">
-            <div class="message-and-name">
-              <span class="text-2xl text-neutral-300 username">{{ m.user }} </span>
-              <div class="message-container"> {{ m.message }}</div>
+        </div>
+      </div>
+      <div>
+        <InputText class="input-yeee p-inputtext1" type="text" v-model="newMessage1" placeholder="Type your message..." />
+        <Button class="send-button" @click="handleSendMessage" :disabled="(newMessage1=='')">Send</Button>
+      </div>
+    </div>
+  </div>
+  
+  <div v-else-if="!isPlayer">
+    <div class="chat-container">
+      <h2 class="title text-center">Chat</h2>
+      <div class="all-messages">
+        <div v-for="(m, index) in messages" :key="index">
+          <div class="each-message-container">
+            <div class="system-message" v-if="m.user == 'System'">
+              {{m.message}}
+            </div>
+            <div v-else-if="m.user != user" class="others-message-container">
+              <img :src="getIconGivenName(m.user)" alt="avatar Icon" class="lobby-player-icon-img-chat">
+              <div class="message-and-name">
+                <span class="text-2xl text-neutral-300 username">{{ m.user }} </span>
+                <div class="message-container"> {{ m.message }}</div>
+              </div>
+            </div>
+            <div v-else class="my-message-container">
+              <div class="message-and-name">
+                <span class="text-2xl text-neutral-300 username">{{ m.user }} </span>
+                <div class="message-container"> {{ m.message }}</div>
+              </div>
+              <img :src="getIconGivenName(m.user)" alt="avatar Icon" class="lobby-player-icon-img-chat">
             </div>
           </div>
-          <div v-else class="my-message-container">
-            <div class="message-and-name">
-              <span class="text-2xl text-neutral-300 username">{{ m.user }} </span>
-              <div class="message-container"> {{ m.message }}</div>
-            </div>
-            <img :src="getIconGivenName(m.user)" alt="avatar Icon" class="lobby-player-icon-img-chat">
-          </div>
-          <!--<i class="pi pi-user mx-4 text-neutral-300" style="font-size: 1.5rem"></i>-->  
         </div>
       </div>
     </div>
-    <div>
-      <input class="input-yeee p-inputtext1" type="text" v-model="newMessage1" placeholder="Type your message..." />
-      <button class="send-button" @click="handleSendMessage" :disabled="(newMessage1=='')">Send</button>
-    </div>
   </div>
+  
 </template>
 
 <style scoped>
@@ -89,7 +121,7 @@ const getIconGivenName = (name: string) => {
 .chat-container {
 background-image: linear-gradient(#860e0e,
 #3f0404);
-  width: 40%;
+  width: 100%;
   min-width: 200px;
   padding: 10px;
   border-radius: 15px;
@@ -155,4 +187,19 @@ background-image: linear-gradient(#860e0e,
 .user {
     color: var(--cardhub-red);
 }
+
+.send-button {
+  margin-top: 10px;
+  margin-left: 15px;
+  height: 30px;
+  background-color: #860e0e;
+  color: white;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+}
+
+/*.send-button:hover {
+  background-color: #3f0404;
+} */
 </style>

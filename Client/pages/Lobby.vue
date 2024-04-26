@@ -11,6 +11,12 @@ const { sendMessage, startGame } = store;
 const uneStore = useUneStore();
 const { gameType, gameStarted } = storeToRefs(uneStore);
 
+
+// will allow for a popup of the chat
+import dialog from 'primevue/dialog';
+import UnoRules from "~/components/gameRules/UnoRules.vue";
+const visible = ref(false);
+
 const gameboardStart = () => {
   startGame();
   navigateTo("/gameboard/" + gameType.value.toLowerCase());
@@ -37,7 +43,7 @@ const getIconGivenName = (name: string) => {
     }
   });
   // if that fails
-  return getIcon("");
+  return getIcon("lyssie");
 }
 
 </script>
@@ -45,21 +51,32 @@ const getIconGivenName = (name: string) => {
 <template>
   <div>
     <div v-if="isPlayer" class="m-8">
-      <h1>
-        {{ gameType }}
-      </h1>
+      
+      <div class="flex justify-between">
+        <h1 >
+          {{ gameType }}
+        </h1>
+        <div class="justify-left">
+          <i class="pi pi-fw pi-comment" style="font-size: 2rem" @click="visible = true"></i>
+          <Dialog v-model="visible" header="Chat" :visible="visible" @update:visible="visible = $event">
+            <Chat/>
+            <div class="flex justify-content-end gap-2">
+<!--              <Button type="button" class="exit-button" label="Exit" @click="visible = false"></Button>-->
+            </div>
+          </Dialog>
+        </div>
+      </div>
+      
       <p>
         Waiting for the host to start the game. Sit back and relax for now.
       </p>
       
       <AvatarSelection class="align-center"/>
       <div class="">
-        <Button class="mt-48" @click="playerStart" v-if="gameStarted">Join Game</Button>
+        <Button class="mt-5" @click="playerStart" v-if="gameStarted">Join Game</Button>
       </div>
-      <div class="m-10"></div>
-      <Chat/>
-<!--      <p>gfjagajkhgkj</p>-->
     </div>
+    
     <div v-else-if="!isPlayer" class="flex min-h-screen">
       <div class="flex flex-col w-1/3 bg-neutral-950 shadow-inner">
         <div class="flex-none">
@@ -83,7 +100,7 @@ const getIconGivenName = (name: string) => {
       <div class="flex justify-center w-1/3">
         <div class="flex flex-col items-center">
           <h1 class="text-6xl">
-            Une
+            {{ gameType }}
           </h1>
           <p class="mt-24 text-xl">
             Room Code
@@ -95,6 +112,10 @@ const getIconGivenName = (name: string) => {
         </div>
       </div>
       <div class="flex flex-col w-1/3">
+        <div class="chat-box">
+          <Chat />
+        </div>
+        
       </div>
     </div>
     <div v-else>
@@ -121,7 +142,15 @@ const getIconGivenName = (name: string) => {
   .lobby-player-icon-img {
     width: 3em;
     border-radius: 50%; /* Ensure the player icon is circular */
-  overflow: hidden;
+    overflow: hidden;
   }
+
+  .chat-box {
+    height: 100%;
+    align-items: center;
+    padding-top: 30%;
+    width: 90%;
+  }
+  
 </style>
 

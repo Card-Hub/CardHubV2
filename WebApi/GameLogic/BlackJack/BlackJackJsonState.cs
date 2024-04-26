@@ -12,8 +12,9 @@ public class BlackJackJsonState {
     public List<string> PlayerNames;
     public List<Player> Players;
     public string CurrentPlayer;
-    public string Winners;
-    public string Losers;
+    public List<string> Winners;
+    public List<string> Losers;
+    public List<string> Stalemates;
     public string State;
 
 
@@ -23,8 +24,9 @@ public class BlackJackJsonState {
         PlayerNames = new();
         Players = new();
         CurrentPlayer = "";
-        Winners = "";
-        Losers = "";
+        Winners = new();
+        Losers = new();
+        Stalemates = new();
         State = "";
     }
     public void Update(BlackJackGame game) {

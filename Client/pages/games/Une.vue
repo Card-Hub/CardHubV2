@@ -53,9 +53,6 @@
 
   const playerHand = ref<UNOCard[]>(unoDeck);
   
-  
-  
-  
   const getUNE = () => {
     return new URL(`../../assets/icons/unoDeck/UNE.svg`, import.meta.url);
   };

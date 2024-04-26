@@ -40,10 +40,19 @@ const getIconGivenName = (name: string) => {
     // console.log(value);
     if (user.Name == name) {
       return getIcon(user.Avatar);
+    }else{
+      return getIcon("lyssie");
     }
   });
   // if that fails
   return getIcon("lyssie");
+}
+
+const kickPlayer = (lobbyUser: LobbyUser) => {
+  console.log("Kicking player: " + lobbyUser.Name);
+  // send message to server to kick player
+  // BOOT PLAYER HERE
+  // kickPlayer(lobbyUser);
 }
 
 </script>
@@ -58,11 +67,8 @@ const getIconGivenName = (name: string) => {
         </h1>
         <div class="justify-left">
           <i class="pi pi-fw pi-comment" style="font-size: 2rem" @click="visible = true"></i>
-          <Dialog v-model="visible" header="Chat" :visible="visible" @update:visible="visible = $event">
+          <Dialog v-model="visible" class="chat-container" header="Chat" :visible="visible" @update:visible="visible = $event">
             <Chat/>
-            <div class="flex justify-content-end gap-2">
-<!--              <Button type="button" class="exit-button" label="Exit" @click="visible = false"></Button>-->
-            </div>
           </Dialog>
         </div>
       </div>
@@ -88,11 +94,12 @@ const getIconGivenName = (name: string) => {
           <SvgoStandardDeckHearts class="suit w-80 h-80 absolute z-0 -bottom-40 -right-10" :fontControlled="false" filled/>
           <SvgoStandardDeckSpades class="suit w-80 h-80 absolute z-0 bottom-12 -left-24 rotate-[-20deg]" :fontControlled="false" filled/>
           
-          <div class="m-8 flex flex-col gap-4">
+          <div class="m-8 flex justify-between gap-4">
             <div v-for="lobbyUser in lobbyUsers as LobbyUser[]" class="rounded-full flex card items-center justify-content h-16 w-full">
               <!--<i class="pi pi-user mx-4 text-neutral-300" style="font-size: 1.5rem"></i>-->
-              <img :src="getIcon(lobbyUser.Avatar)" alt="avatar Icon" class="lobby-player-icon-img">
-              <span class="text-2xl text-neutral-300">{{ lobbyUser.Name }} </span>
+                <img :src="getIcon(lobbyUser.Avatar)" alt="avatar Icon" class="lobby-player-icon-img">
+                <span class="text-2xl text-neutral-300">{{ lobbyUser.Name }} </span>
+                <Button class="kick-btn" @click="kickPlayer(lobbyUser)"> Kick </Button>
             </div>
           </div>
         </div>
@@ -143,6 +150,8 @@ const getIconGivenName = (name: string) => {
     width: 3em;
     border-radius: 50%; /* Ensure the player icon is circular */
     overflow: hidden;
+    margin-left: .5rem;
+    margin-right: 1rem;
   }
 
   .chat-box {
@@ -152,5 +161,20 @@ const getIconGivenName = (name: string) => {
     width: 90%;
   }
   
+  .chat-container {
+    width: 80%;
+    height: 80%;
+    max-height: 400px;
+  }
+  
+  .kick-btn {
+    background-color: transparent;
+    color: white;
+    font-size: 1em;
+    border: 1px solid white;
+    padding: 0.5em;
+    margin-left: 1.5em;
+    
+  }
 </style>
 

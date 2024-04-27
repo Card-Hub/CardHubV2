@@ -84,8 +84,10 @@ export const useWebSocketStore = defineStore("webSocket", () => {
     };
 
     const joinRoom = async (user: string, room: string, userType: UserType): Promise<void> => {
+        // console.log("\n\n\nIm IN the ts joinroom\n\n\n", user, room, userType);
         const webSocketUrl = `${ runtimeConfig.public.baseURL }/${ runtimeConfig.public.hubPath }`;
         try {
+            console.log("\n\n\nIm IN the ts joinroom1\n\n\n");
             // HubConnection configuration
             // https://learn.microsoft.com/en-us/aspnet/core/signalr/configuration?view=aspnetcore-8.0&tabs=dotnet#configure-client-options
             const joinConnection = new HubConnectionBuilder()
@@ -203,8 +205,9 @@ export const useWebSocketStore = defineStore("webSocket", () => {
                     }
                 }
             });
-
+            console.log("\n\n\n111Im IN the ts joinroom before invoke\n\n\n");
             await joinConnection.start();
+            console.log("\n\n\nIm IN the ts joinroom before invoke\n\n\n");
             await joinConnection.invoke("JoinRoom", { user, room, userType });
             connection.value = joinConnection;
 

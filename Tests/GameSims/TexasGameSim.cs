@@ -1,3 +1,4 @@
+using Tests.Messengers;
 using WebApi.GameLogic;
 using WebApi.Models;
 using Xunit.Abstractions;
@@ -15,7 +16,14 @@ public class TexasGameSim {
   }
   public void Simulate() {
     output.WriteLine("Started Texas Hold Em Game Sim.");
-    TexasHoldEmGame game = new TexasHoldEmGame();
-    output.WriteLine("Game state is: " + game.GetGameState());
+    UnoTestMessenger messenger = new UnoTestMessenger(output);
+    TexasHoldEmGame game = new TexasHoldEmGame(messenger);
+    output.WriteLine("Game state upon a fresh game is: " + game.GetGameState());
+    game.AddPlayer("A", "111");
+    game.AddPlayer("B", "222");
+    game.AddPlayer("C", "333");
+    //game.AddPlayer("D", "444");
+    output.WriteLine("Game state upon adding A, B, C, D is: " + game.GetGameState());
+    game.StartGame();
   }
 }

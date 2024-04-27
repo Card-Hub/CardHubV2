@@ -1,21 +1,25 @@
-﻿using WebApi.Models;
+﻿using WebApi.Common;
 
-namespace WebApi.Common;
+namespace WebApi.Models;
 
-public class PokerPlayer : CardPlayer<StandardCard>
-{
-    public bool IsDealer { get; set; }
-    public int Chips { get; set; }
-
-    public PokerPlayer(string name, int chips) : base(name)
-    {
-        Chips = chips;
-    }
-    
-    public PokerPlayer(string name, int chips, IEnumerable<StandardCard> cards) : base(name, cards)
-    {
-        Chips = chips;
-    }
-    
-    
+public class PokerPlayer : CardPlayerLyssie<StandardCard> {
+  public int AmountOfMoneyLeft { get; set; }
+  public int CurrentBet { get; set; }
+  public bool CurrentlyPlaying { get; set; } // someone can sit out a game. they are not playing
+  public bool CanAffordToPlay { get; set; } // someone can afford to play. if not, they sit out and must fold
+  public bool Folded { get; set; } // they have folded and are not playing
+  public bool CanFold {get; set; } // they can fold. only true on their turn
+  public bool CanRaise {get; set; } // they can raise. only true on their turn
+  public bool CanCall {get; set; } // they can call. only true on their turn
+  public bool CanCheck {get; set; } // they can check. only true on their turn
+  public PokerPlayer(string name, string connectionString) : base(name, connectionString) {
+    AmountOfMoneyLeft = 0;
+    CurrentBet = 0;
+    Afk = false;
+    Folded = false;
+    CanFold = false;
+    CanRaise = false;
+    CanCall = false;
+    CanCheck = false;
+  }
 }

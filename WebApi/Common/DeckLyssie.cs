@@ -2,8 +2,8 @@ namespace WebApi.Common;
 
 public class DeckLyssie<TCard> : IDeckLyssie<TCard>
 {
-    private List<TCard> _cards;
-    private readonly List<TCard> _drawnCards;
+    protected List<TCard> _cards;
+    protected List<TCard> _drawnCards;
 
     // for json purposes only
     public List<TCard> Cards { get { return _cards; } }

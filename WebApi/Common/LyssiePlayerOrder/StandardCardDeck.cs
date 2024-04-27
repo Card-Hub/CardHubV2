@@ -2,7 +2,7 @@ using System.ComponentModel;
 using WebApi.Models;
 namespace WebApi.Common;
 
-public class StandardCardDeck : Deck<StandardCard> {
+public class StandardCardDeck : DeckLyssie<StandardCard> {
   public StandardCardDeck() : base() {}
   // Initializes the Deck to have 52 cards.
   public void Init52() {

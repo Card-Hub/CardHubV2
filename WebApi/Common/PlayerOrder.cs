@@ -2,11 +2,11 @@
 
 namespace WebApi.Common;
 
-//public enum Direction
-//{
-//    Forward,
-//    Backward
-//}
+public enum Direction
+{
+    Forward,
+    Backward
+}
 
 public class PlayerOrder : IEnumerable<string>
 {
@@ -147,37 +147,3 @@ public class PlayerOrder : IEnumerable<string>
         return GetEnumerator();
     }
 }
-
-
-// Console.WriteLine("\n-- Players inserted --");
-// string[] p = { "alex", "rubi", "lyssie", "liam", "juno" };
-// var playerOrder = new PlayerOrder(p);
-// playerOrder.PrintPlayers();
-//
-// Console.WriteLine("\n-- Current player --");
-// Console.WriteLine(playerOrder.Current());
-//
-// Console.WriteLine("\n-- Next player --");
-// Console.WriteLine(playerOrder.SetNextCurrent());
-//
-// Console.WriteLine("\n-- Han added, Lyssie removed --");
-// playerOrder.Add("han");
-// playerOrder.Remove("lyssie");
-// playerOrder.PrintPlayers();
-//
-// Console.WriteLine("\n-- Liam disconnected --");
-// playerOrder.SetPlayerConnectionStatus("liam", false);
-// playerOrder.PrintPlayers();
-//
-// Console.WriteLine("\n-- Randomize order --");
-// playerOrder.ShuffleOrder();
-// playerOrder.PrintPlayers();
-//
-// Console.WriteLine("\n-- Test real game loop --");
-// playerOrder.TraversePlayers();
-//
-// playerOrder.ToggleDirection();
-// playerOrder.SetPlayerConnectionStatus("han", false);
-//
-// Console.WriteLine("\n-- Test real game loop (BACKWARD), Han disconnected --");
-// playerOrder.TraversePlayers();

@@ -93,12 +93,14 @@ public class BlackJackGame : IBaseGame<StandardCard>
                     continue;
             }
             foreach (KeyValuePair<string, BlackJackPlayer> player in Players) {
-                if (Players[player.Key].Busted == true || Players[player.Key].Winner == true || Players[player.Key].StillPlaying == false || player.Value.Standing == true){
+                if (state == "DealersTurn" && Players["Dealer"].CurrentScore >= 17){
                     state = "MakeListsAndPayPlayers";
                     MakeListsAndPayPlayers();
-                }//!!!!!!!!!!!!!!!!!!!!!!!!!
-                // else if (its in dealers turn, then keep it as a dealers turn, re run and see if dealer is < 21 and over > 17)
-                // !!!!!!!!!!!!!!!!!!!!!!!!!
+                }
+                else if (Players[player.Key].Busted == true || Players[player.Key].Winner == true || Players[player.Key].StillPlaying == false || player.Value.Standing == true){
+                    state = "MakeListsAndPayPlayers";
+                    MakeListsAndPayPlayers();
+                }
                 else {//might be bad state here else if
                     state = "DrawingCards";//will send json here.drawing cards section needs a check /s as well. it needs to manage turns from players having free will and shouldnt be allowed to.
                     break;
@@ -211,9 +213,7 @@ public class BlackJackGame : IBaseGame<StandardCard>
         foreach (KeyValuePair<string, BlackJackPlayer> player in Players){
             if (player.Value.Standing == true && player.Value.StillPlaying == false || player.Key == "Dealer") {
                 state = "DealersTurn";
-                // Console.WriteLine("\n\nHere in the if liam\n\n");
             } else{
-                // Console.WriteLine("\n\nHere in the else liam\n\n");
                 state = "DrawingCards";
                 break;
             }
@@ -227,7 +227,6 @@ public class BlackJackGame : IBaseGame<StandardCard>
                 if (player.Key != "Dealer") {
                     if (player.Value.CurrentScore > Players["Dealer"].CurrentScore) {
                         BlackJackJsonState.Winners.Add(player.Value.Name);
-                        // if (player.Value.CurrentScore == 21 && player.Value.Hand.Count == 2)
                         player.Value.TotalMoney += player.Value.CurrentBet * 2;
                     }
                     else if (player.Value.CurrentScore < Players["Dealer"].CurrentScore)
@@ -257,6 +256,8 @@ public class BlackJackGame : IBaseGame<StandardCard>
             }
             Players["Dealer"].Standing = true;
             Players["Dealer"].StillPlaying = false;
+            if (state == "DealersTurn")
+                CheckForWinnersOrLosers();
             return true;
         }
         else {

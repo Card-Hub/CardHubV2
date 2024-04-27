@@ -96,10 +96,12 @@ public class BlackJackGame : IBaseGame<StandardCard>
                 if (state == "DealersTurn" && Players["Dealer"].CurrentScore >= 17){
                     state = "MakeListsAndPayPlayers";
                     MakeListsAndPayPlayers();
+                    break;
                 }
                 else if (Players[player.Key].Busted == true || Players[player.Key].Winner == true || Players[player.Key].StillPlaying == false || player.Value.Standing == true){
                     state = "MakeListsAndPayPlayers";
                     MakeListsAndPayPlayers();
+                    break;
                 }
                 else {//might be bad state here else if
                     state = "DrawingCards";//will send json here.drawing cards section needs a check /s as well. it needs to manage turns from players having free will and shouldnt be allowed to.
@@ -222,14 +224,15 @@ public class BlackJackGame : IBaseGame<StandardCard>
     }
 
     public bool MakeListsAndPayPlayers(){// there are two cases, check the lsit of winners right off the bat or draws to dealer. Then need to check for lesser wins. also will need to set state to restart/givebets
+        // Console.WriteLine("\n\n\nIm here pogged up right now\n\n\n");
         if (state == "MakeListsAndPayPlayers"){
             foreach (KeyValuePair<string, BlackJackPlayer> player in Players) {
                 if (player.Key != "Dealer") {
-                    if (player.Value.CurrentScore > Players["Dealer"].CurrentScore) {
+                    if (player.Value.CurrentScore > Players["Dealer"].CurrentScore && player.Value.Busted == false || Players["Dealer"].Busted && player.Value.Busted == false) {
                         BlackJackJsonState.Winners.Add(player.Value.Name);
                         player.Value.TotalMoney += player.Value.CurrentBet * 2;
                     }
-                    else if (player.Value.CurrentScore < Players["Dealer"].CurrentScore)
+                    else if (player.Value.CurrentScore < Players["Dealer"].CurrentScore || player.Value.Busted == true)
                         BlackJackJsonState.Losers.Add(player.Value.Name);
                     else {
                         BlackJackJsonState.Stalemates.Add(player.Value.Name);
@@ -244,6 +247,16 @@ public class BlackJackGame : IBaseGame<StandardCard>
             Console.WriteLine("Not MakeListsAndPayPlayers states, in MakeListsAndPayPlayers");
             return false;
         }
+    }
+
+
+    private List<string> GetAllConnStrsIncGameboard() {
+      List<string> allConnStrs = new List<string>(PlayerOrder.GetAllPlayers())
+      {
+        GameboardConnStr
+      }; 
+      // shallow copy - the list is different but the objects are references and can be messed with
+      return allConnStrs;
     }
 
     public bool DealersTurn(){//dealer draws cards

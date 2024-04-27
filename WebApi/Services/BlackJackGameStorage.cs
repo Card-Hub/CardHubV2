@@ -11,9 +11,10 @@ public class BlackJackGameStorage {
   public BlackJackGameStorage(IHubContext<BaseHub> hubContext) {
     this.HubContext = hubContext;
   }
-  public void BuildGame(string roomCode, string gameboardConnStr) {
+  public async void BuildGame(string roomCode, string gameboardConnStr) {
     Console.WriteLine("In buildgame");
     var game = new BlackJackGame(new UnoMessenger(HubContext), gameboardConnStr);
+    await HubContext.Clients.Client(gameboardConnStr).SendAsync("Log", "In build log");
     GamesFromRoomCodes[roomCode] = game;
   }
 

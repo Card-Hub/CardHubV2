@@ -7,7 +7,7 @@ import {
     LogLevel
 } from "@microsoft/signalr";
 import { computed, ref } from "vue";
-import { useCookie, useRuntimeConfig } from "nuxt/app";
+import { navigateTo, useCookie, useRuntimeConfig } from "nuxt/app";
 import { useNuxtApp } from "nuxt/app";
 import { useUneStore } from "./uneStore";
 

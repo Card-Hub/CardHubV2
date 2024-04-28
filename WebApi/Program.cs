@@ -41,7 +41,7 @@ builder.Services.AddCors(options =>
     });
 });
 builder.Services.AddSingleton<IDictionary<string, UserConnection>>(_ => new Dictionary<string, UserConnection>());
-builder.Services.AddSingleton<HashSet<string>>(_ => []);
+builder.Services.AddSingleton<IDictionary<string, GameType>>(_ => new Dictionary<string, GameType>());
 builder.Services.AddSingleton<CardDbContext>();
 builder.Services.AddSingleton<UnoDeckBuilder>();
 builder.Services.AddSingleton<UnoGameMod>();

@@ -48,3 +48,10 @@ export enum CahType {
     White,
     Black
 }
+
+export enum GameType {
+    BlackJack,
+    Cah,
+    Poker,
+    Une
+}

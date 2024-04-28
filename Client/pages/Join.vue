@@ -1,12 +1,16 @@
 ﻿<script setup lang="ts">
-import { storeToRefs } from "pinia";
-import { useWebSocketStore } from "~/stores/webSocketStore";
 import toast from "@/utils/toast";
+import { storeToRefs } from "pinia";
+import { computed } from "vue";
+import { useBaseStore } from "~/stores/baseStore";
 
 
-const store = useWebSocketStore();
-const { connection, isConnected, messages, user, room } = storeToRefs(store);
+const store = useBaseStore();
+const { connection, isConnected, messages } = storeToRefs(store);
 const { tryJoinRoom } = store;
+
+const user = ref("");
+const room = ref("");
 
 const isValidRoomCode = computed(() => {
   const digitRegex = /^\d+$/;
@@ -14,9 +18,8 @@ const isValidRoomCode = computed(() => {
 });
 
 const connectPlayer = async (): Promise<void> => {
-  const isCorrectRoomCode = await tryJoinRoom();
+  const isCorrectRoomCode = await tryJoinRoom(user.value, room.value);
   if (isCorrectRoomCode) {
-    // await navigateTo('/playerview');
     await navigateTo("/lobby");
   } else {
     toast.add({

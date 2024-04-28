@@ -6,12 +6,15 @@ import { defineNuxtPlugin, useRuntimeConfig } from "nuxt/app";
 export default defineNuxtPlugin(nuxtApp => {
     const runtimeConfig = useRuntimeConfig();
     const instance = ofetch.create({
-        baseURL: runtimeConfig.public.baseURL as string
+        baseURL: runtimeConfig.public.baseURL as string,
+        headers: {
+            Accept: 'application/json'
+        }
     }) as typeof ofetch;
 
-    // return {
-    //     provide: {
-    //         api: instance
-    //     }
-    // }
+    return {
+        provide: {
+            api: instance
+        }
+    }
 })

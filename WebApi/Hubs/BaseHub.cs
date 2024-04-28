@@ -85,7 +85,7 @@ public partial class BaseHub : Hub
 
     public async Task JoinRoom(GameService gameService, UnoGameStorage unoGameStorage, UserConnection userConnection)
     {
-        Console.WriteLine("Join Room");
+        Console.WriteLine("\n\n\nInside of Join Room\n\n\n");
         await Groups.AddToGroupAsync(Context.ConnectionId, userConnection.Room);
         userConnection.ConnectionId = Context.ConnectionId;
         _userConnections[Context.ConnectionId] = userConnection;

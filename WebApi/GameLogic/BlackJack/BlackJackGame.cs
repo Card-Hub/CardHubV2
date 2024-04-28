@@ -13,6 +13,12 @@ using WebApi.Hubs.HubMessengers;
 namespace WebApi.GameLogic;
 
 
+
+//so first the gamebaord player will select blackjack and they will be put into a room. At that point, the game instance has been made.
+//after the game board is waiting in the room, players will begin to join that room code and in turn invoke the add player command while in the not started state.
+//after all player are there, the gamebaord will press start game button. This in turn should result in a page change for everyone to the blackjack table with their cards delivered.
+//
+
 public class BlackJackGame : IBaseGame<StandardCard>
 {
     public LyssiePlayerOrder PlayerOrder;
@@ -30,16 +36,17 @@ public class BlackJackGame : IBaseGame<StandardCard>
         BlackJackJsonState = new();
         Deck = new();
         state = "NotStarted";
-       GameboardConnStr = gameboardConnStr;
-        
+        GameboardConnStr = gameboardConnStr;
+        AddPlayer("Dealer", "Dealer");
+        Players["Dealer"].HasBet= true;
     }
 
-    public void StartGame()
+    public void StartGame()//waiting for palyers to join here before we continue, gameB will decide when to start the round
     {
-        AddPlayer("Dealer", "Dealer");//keep dealer in first pos and just pretend like they are last
-        //mkae dealer hasbet true;
-        Players["Dealer"].HasBet= true;
-        // StartRound();//will have to press button here
+        // AddPlayer("Dealer", "Dealer");
+        // Players["Dealer"].HasBet= true;
+        state = "Started";
+        StartRound();
     }
 
 
@@ -49,10 +56,11 @@ public class BlackJackGame : IBaseGame<StandardCard>
     //             player.Value.TotalMoney = 100;
     //     return true;
     // }
-    public bool StartRound(){//this may need a check before bets to see if players have joined
-        if (state == "NotStarted" && Players.Count >= 2) {
+
+    public bool StartRound(){
+        if (state == "Restart" || state == "Started" && Players.Count >= 2) {
             InitDeck();
-            PlayerOrder.NextTurn();
+            PlayerOrder.NextTurn();/////////!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!this will break code depending on where he is added
             //give promt to frontend to take bets
             state = "TakingBets";
             return true;
@@ -63,7 +71,7 @@ public class BlackJackGame : IBaseGame<StandardCard>
 
     public bool Restart(){
         if (state == "Restart") {
-            state = "NotStarted";
+            // state = "NotStarted";
             foreach(KeyValuePair<string, BlackJackPlayer> player in Players) {
                 Players[player.Key].Hand.Clear();
                 Players[player.Key].Busted = false;
@@ -78,36 +86,52 @@ public class BlackJackGame : IBaseGame<StandardCard>
     }
 
     public bool CheckForWinnersOrLosers(){//will just apply attributes to players. we can check those later.
-        if (state == "CheckingForWinners" || state == "DrawingCards" || state == "DealersTurn"){
+        if (state == "CheckingForQuickWinners" || state == "DrawingCards" || state == "DealersTurn"){
             int playerScore = 0;
             foreach (KeyValuePair<string, BlackJackPlayer> player in Players) {
                 playerScore = GetPlayerScoreFromGame(player.Key);
                 if (playerScore > 21) {
                     Players[player.Key].Busted = true;
                     Players[player.Key].StillPlaying = false;
+                    if (PlayerOrder.GetCurrentPlayer() == player.Key && player.Key != "Dealer")
+                        PlayerOrder.NextTurn();
                 }
                 else if (playerScore == 21) {
                     Players[player.Key].Winner = true;
                     Players[player.Key].StillPlaying = false;
+                    if (PlayerOrder.GetCurrentPlayer() == player.Key && player.Key != "Dealer")
+                        PlayerOrder.NextTurn();
+                    
                 } else
                     continue;
+            } 
+            if (state == "DealersTurn" && Players["Dealer"].CurrentScore >= 17) {
+                state = "MakeListsAndPayPlayers";
             }
-            foreach (KeyValuePair<string, BlackJackPlayer> player in Players) {
-                if (state == "DealersTurn" && Players["Dealer"].CurrentScore >= 17){
-                    state = "MakeListsAndPayPlayers";
-                    MakeListsAndPayPlayers();
-                    break;
+            else if (state != "DealersTurn") {
+                foreach (KeyValuePair<string, BlackJackPlayer> player in Players) {//fix this later, its ugly
+                    if (state == "DealersTurn" && Players["Dealer"].CurrentScore >= 17 && state != "CheckingForQuickwinners" && player.Value.Standing == false){
+                        state = "MakeListsAndPayPlayers";
+                        Console.WriteLine("\n\nooops im here\n\n");
+                        // MakeListsAndPayPlayers();
+                        // break;
+                    }
+                    else if (Players[player.Key].Busted == true || Players[player.Key].Winner == true || Players[player.Key].StillPlaying == false || player.Value.Standing == true && state != "CheckingForQuickwinners"){
+                        Console.WriteLine("\n\nim here in the place you think it will be\n\n");
+                        // state = "MakeListsAndPayPlayers";
+                        state = "DealersTurn";
+                        // MakeListsAndPayPlayers();
+                        // break;
+                    }
+                    else {//might be bad state here else if
+                        state = "DrawingCards";//will send json here.drawing cards section needs a check /s as well. it needs to manage turns from players having free will and shouldnt be allowed to.
+                    }
                 }
-                else if (Players[player.Key].Busted == true || Players[player.Key].Winner == true || Players[player.Key].StillPlaying == false || player.Value.Standing == true){
-                    state = "MakeListsAndPayPlayers";
-                    MakeListsAndPayPlayers();
-                    break;
-                }
-                else {//might be bad state here else if
-                    state = "DrawingCards";//will send json here.drawing cards section needs a check /s as well. it needs to manage turns from players having free will and shouldnt be allowed to.
-                    break;
-                }
+                if (state == "DealersTurn")
+                    DealersTurn();
             }
+            if (state == "MakeListsAndPayPlayers")
+                MakeListsAndPayPlayers();
             return true;
         }
         else {
@@ -126,7 +150,8 @@ public class BlackJackGame : IBaseGame<StandardCard>
                 if (player.Key != "Dealer")
                     DrawCard(player.Key);
             DrawCard("Dealer");
-            state = "CheckingForWinners";
+            Console.WriteLine("In giving cards");
+            state = "CheckingForQuickWinners";
             CheckForWinnersOrLosers();//may want a wait or something here for like 2 seconds.
             return true;//now the round either end or they draw cards. end round done, drwing cards not done.
         }
@@ -223,8 +248,7 @@ public class BlackJackGame : IBaseGame<StandardCard>
         return true;
     }
 
-    public bool MakeListsAndPayPlayers(){// there are two cases, check the lsit of winners right off the bat or draws to dealer. Then need to check for lesser wins. also will need to set state to restart/givebets
-        // Console.WriteLine("\n\n\nIm here pogged up right now\n\n\n");
+    public bool MakeListsAndPayPlayers(){
         if (state == "MakeListsAndPayPlayers"){
             foreach (KeyValuePair<string, BlackJackPlayer> player in Players) {
                 if (player.Key != "Dealer") {
@@ -251,11 +275,7 @@ public class BlackJackGame : IBaseGame<StandardCard>
 
 
     private List<string> GetAllConnStrsIncGameboard() {
-      List<string> allConnStrs = new List<string>(PlayerOrder.GetAllPlayers())
-      {
-        GameboardConnStr
-      }; 
-      // shallow copy - the list is different but the objects are references and can be messed with
+      List<string> allConnStrs = new List<string>(PlayerOrder.GetAllPlayers()){GameboardConnStr}; 
       return allConnStrs;
     }
 
@@ -269,8 +289,9 @@ public class BlackJackGame : IBaseGame<StandardCard>
             }
             Players["Dealer"].Standing = true;
             Players["Dealer"].StillPlaying = false;
-            if (state == "DealersTurn")
-                CheckForWinnersOrLosers();
+            // if (state == "DealersTurn")
+            CheckForWinnersOrLosers();
+            state = "MakeListsAndPayPlayers";
             return true;
         }
         else {

@@ -18,7 +18,6 @@ public class BlackJackGameStorage {
     GamesFromRoomCodes[roomCode] = game;
   }
 
-
   public BlackJackGame GetGame(string roomCode) {
     return GamesFromRoomCodes[roomCode];
   }

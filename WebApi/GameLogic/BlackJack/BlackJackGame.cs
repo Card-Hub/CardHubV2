@@ -110,13 +110,14 @@ public class BlackJackGame : IBaseGame<StandardCard>
             }
             else if (state != "DealersTurn") {
                 foreach (KeyValuePair<string, BlackJackPlayer> player in Players) {//fix this later, its ugly
-                    if (state == "DealersTurn" && Players["Dealer"].CurrentScore >= 17 && state != "CheckingForQuickwinners" && player.Value.Standing == false){
-                        state = "MakeListsAndPayPlayers";
-                        Console.WriteLine("\n\nooops im here\n\n");
-                        // MakeListsAndPayPlayers();
+                    // if (state == "DealersTurn" && Players["Dealer"].CurrentScore >= 17 && state != "CheckingForQuickwinners" && player.Value.Standing == false){
+                    //     state = "MakeListsAndPayPlayers";
+                    //     Console.WriteLine("\n\nooops im here\n\n");
+                    //     // MakeListsAndPayPlayers();
                         // break;
-                    }
-                    else if (Players[player.Key].Busted == true || Players[player.Key].Winner == true || Players[player.Key].StillPlaying == false || player.Value.Standing == true && state != "CheckingForQuickwinners"){
+                    // }
+                    // else
+                    if (Players[player.Key].Busted == true || Players[player.Key].Winner == true || Players[player.Key].StillPlaying == false || player.Value.Standing == true && state != "CheckingForQuickwinners"){
                         Console.WriteLine("\n\nim here in the place you think it will be\n\n");
                         // state = "MakeListsAndPayPlayers";
                         state = "DealersTurn";
@@ -291,7 +292,7 @@ public class BlackJackGame : IBaseGame<StandardCard>
             Players["Dealer"].StillPlaying = false;
             // if (state == "DealersTurn")
             CheckForWinnersOrLosers();
-            state = "MakeListsAndPayPlayers";
+            // state = "MakeListsAndPayPlayers";
             return true;
         }
         else {

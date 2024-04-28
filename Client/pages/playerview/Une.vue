@@ -13,10 +13,10 @@
   const chatVisible = ref(false); // for popup dialog
 
   const store = useWebSocketStore(); 
-  const {user, users, room } = storeToRefs(store);
+  const {user, users, room, connection } = storeToRefs(store);
   const { playCard, selectColor, drawCard } = store;
   const uneStore = useUneStore();
-  const { winner, currentPlayer, yourCards, players, discardPile, someoneNeedsToSelectColor } = storeToRefs(uneStore);
+  const { winner, currentPlayer, players, discardPile, someoneNeedsToSelectColor } = storeToRefs(uneStore);
  interface Player {
          Name: string
          Avatar: string
@@ -66,9 +66,42 @@
   };
   
   // enable une button if player has one card left
-  const enableUne = computed(() => {
-    return myCards.value.length >= 1;
-  });
+  const validateUneCall = () => {
+    let isValid = false;
+    players.value.forEach(player => {
+      if (player.Name === currentPlayer.value) {
+        if (player.Hand.length < 3) {
+          isValid = true;
+        }
+      }
+    });
+    return isValid;
+  };
+  
+  const getWinnerIcon = (player: string) => {
+    // iterate through players to find the winner's avatar
+    let winnerIcon = "";
+    players.value.forEach(p => { if (p.Name == player) { winnerIcon = p.Avatar; } });
+    
+    return new URL(`../../assets/icons/avatars/${winnerIcon}.png`, import.meta.url);
+  };
+  
+  const getUserIcon = () => {
+    // iterate through players to find the user's avatar
+    let userIcon = "";
+    players.value.forEach(p => { if (p.Name === user.value) { userIcon = p.Avatar; } });
+    
+    return new URL(`../../assets/icons/avatars/${userIcon}.png`, import.meta.url);
+  };
+  
+  const handleExit = async () => {
+    // store.leaveRoom();
+    connection.value = null;
+    room.value = '';
+
+    // redirect to join page
+    await navigateTo("/join");
+  };
 </script>
 
 
@@ -77,7 +110,7 @@
     
     <div class="flex flex-row-reverse">
       <div class="card flex justify-left">
-        <i class="pi pi-fw pi-info-circle" style="font-size: 2rem" @click="rulesVisible = true"></i>
+        <i class="pi pi-fw pi-info-circle" style="font-size: 2.5rem" @click="rulesVisible = true"></i>
         <Dialog v-model="rulesVisible" header="Rules" :visible="rulesVisible" @update:visible="rulesVisible = $event">
           <UnoRules/>
           <div class="flex justify-content-end gap-2">
@@ -87,14 +120,13 @@
       </div>
       
       <div class="justify-left">
-        <i class="pi pi-fw pi-comment" style="font-size: 2rem" @click="chatVisible = true"></i>
-        <Dialog v-model="chatVisible" header="Chat" :visible="chatVisible" @update:visible="chatVisible = $event">
+        <i class="pi pi-fw pi-comment" style="font-size: 2.5rem" @click="chatVisible = true"></i>
+        <Dialog v-model="chatVisible" class="chat-container" header="Chat" :visible="chatVisible" @update:visible="chatVisible = $event">
           <Chat/>
-          <div class="flex justify-content-end gap-2">
-            <!--              <Button type="button" class="exit-button" label="Exit" @click="visible = false"></Button>-->
-          </div>
         </Dialog>
       </div>
+      
+      <img :src="getUserIcon()" alt="user" class="user-avatar"/>
     </div>
     
     
@@ -114,10 +146,10 @@
       </h1>
     </div>
     
-    <Button class="float-right font-bold drawButton shadow mb-4" @click="drawCard">Draw</Button>
-    <Button class="float-left font-bold uneButton shadow mb-4" disabled @click="callUne">UNE!</Button>
+    <Button v-if="winner===''" class="float-right font-bold drawButton shadow mb-4" @click="drawCard">Draw</Button>
+    <Button v-if="winner===''" class="float-left font-bold uneButton shadow mb-4" :disabled="validateUneCall" @click="callUne">UNE!</Button>
     
-    <div v-if="winner===''" class=" w-full flex overflow-x-auto border-2 border-solid border-[#960E16] border-radius-4 justify-center">
+    <div v-if="winner===''" class=" w-full flex flex-wrap justify-center">
       <UNOCardDisplay class="uneCard flex-wrap"
                       v-for="card in myCards"
                       :key="card.Id"
@@ -131,15 +163,20 @@
     </div>
     
     <!--  winner -->
-    <div v-if="winner!=''" class="winner">
-      <div class="winner-inner">
-        <span v-if="winner == user">
-          You Won!
-        </span>
-        <span v-if="currentPlayer !== user && winner !== ''">
-          {{ winner }} won!
-        </span>
+    <div v-if="winner!=''" class="">
+      <div class="winner">
+        <div class="winner-inner">
+          <span v-if="winner == user" class="flex flex-col">
+            <img :src="getWinnerIcon(user)" alt="winner" class="avatar-inner"/>
+            You Won!
+          </span>
+            <span v-if="currentPlayer !== user && winner !== ''" class="flex flex-col">
+            <img :src="getWinnerIcon(winner)" alt="winner" class="avatar-inner"/>
+            {{ winner }} won!
+          </span>
+        </div>
       </div>
+      <Button class="exit-btn" @click="handleExit()"> Exit </Button>
     </div>
     
     <div v-if="winner==='' && someoneNeedsToSelectColor && currentPlayer === user && someoneNeedsToSelectColor" class="select-color">
@@ -180,19 +217,19 @@
   color: white;
   font-size: 2em;
 }
+
 .shadow {
   box-shadow: 4px -4px 6px rgba(256, 256, 256, 0.15);
 }
 .winner {
   position: absolute;
   top: 50%;
-  
   /* scooches it halfway its own width down and left, centering it*/
-transform: translateY(-50%) translateX(-50%);
+  transform: translateY(-50%) translateX(-50%);
   left: 50%;
   background-color: rgba(243, 19, 19, 0.5);
   width: 80%;
-  height: 20%;
+  height: 25%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -211,19 +248,19 @@ transform: translateY(-50%) translateX(-50%);
   height: 100%;
   display: flex;
   justify-content: center; /* center*/
-  /*text-align: center;*/
   align-items: center; /*height*/
+  flex-direction: column;
 }
 
 .select-color {
   position: absolute;
   top: 50%;
   /* scooches it halfway its own width down and left, centering it*/
-transform: translateY(-50%) translateX(-50%);
+  transform: translateY(-50%) translateX(-50%);
   left: 50%;
   background-color: rgb(63, 8, 14);
   width: 40%;
-  height: 30%;
+  height: 50%;
   /*display: flex;*/
   /*flex-direction: column;*/
   /*align-items: center;*/
@@ -278,4 +315,41 @@ transform: translateY(-50%) translateX(-50%);
   font-size: 2em;
 }
 
+.chat-container {
+  width: 80%;
+  height: 80%;
+  max-height: 400px;
+}
+
+.avatar-inner {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  margin-right: 10px;
+  background: rgba(255, 255, 255, 0.2);
+  margin-bottom: 10px;
+}
+
+.user-avatar {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  margin-right: 10px;
+  background: rgba(255, 255, 255, 0.2);
+  margin-bottom: 10px;
+}
+
+.exit-btn {
+  background-color: transparent;
+  width: 15%;
+  height: 5%;
+  justify-content: center;
+  color: white;
+  font-size: 1.5em;
+  border: 2px solid white;
+  transform: translateY(-50%) translateX(-50%);
+  position: absolute;
+  top: 70%;
+  left: 50%;
+}
 </style>

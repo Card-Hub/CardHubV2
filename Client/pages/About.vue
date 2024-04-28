@@ -92,7 +92,8 @@ const getPoster = () => {
         <br> <a href="https://medium.com/made-with-creative-commons/card-against-humanity-8c0cc2c6c299"> Cards Against Humanity licensing information and context </a>
         <br> <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/"> Creative Commons Attribution-NonCommercial-ShareAlike 4.0 license </a>
         <br> <a href="https://learn.microsoft.com/en-us/dotnet/"> .net C# documentation </a>
-        <br> <a href="https://www.w3.org/WAI/WCAG22/quickref/"> WCAG Guidelines </a> </p>
+        <br> <a href="https://www.w3.org/WAI/WCAG22/quickref/"> WCAG Guidelines </a>
+        <br> <a href="https://github.com/tsparticles/vue3"> Particles License </a> </p>
     </div>
   </div>
   <Footer />

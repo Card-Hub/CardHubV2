@@ -54,7 +54,6 @@ const kickPlayer = (lobbyUser: LobbyUser) => {
   // BOOT PLAYER HERE
   // kickPlayer(lobbyUser);
 }
-
 </script>
 
 <template>
@@ -78,7 +77,10 @@ const kickPlayer = (lobbyUser: LobbyUser) => {
       </p>
       
       <AvatarSelection class="align-center"/>
-      <div class="">
+      <div v-if="gameStarted" >
+        <NuxtLink to="/gameboard/une" class="mt-5">
+<!--          <Button>Join Game</Button>-->
+        </NuxtLink>
         <Button class="mt-5" @click="playerStart" v-if="gameStarted">Join Game</Button>
       </div>
     </div>
@@ -94,12 +96,14 @@ const kickPlayer = (lobbyUser: LobbyUser) => {
           <SvgoStandardDeckHearts class="suit w-80 h-80 absolute z-0 -bottom-40 -right-10" :fontControlled="false" filled/>
           <SvgoStandardDeckSpades class="suit w-80 h-80 absolute z-0 bottom-12 -left-24 rotate-[-20deg]" :fontControlled="false" filled/>
           
-          <div class="m-8 flex justify-between gap-4">
-            <div v-for="lobbyUser in lobbyUsers as LobbyUser[]" class="rounded-full flex card items-center justify-content h-16 w-full">
+          <div class="m-8 flex flex-col gap-4">
+            <div v-for="lobbyUser in lobbyUsers as LobbyUser[]" class="rounded-full flex card items-center justify-content h-16 w-full justify-between">
               <!--<i class="pi pi-user mx-4 text-neutral-300" style="font-size: 1.5rem"></i>-->
+              <div class="flex flex-row  items-center">
                 <img :src="getIcon(lobbyUser.Avatar)" alt="avatar Icon" class="lobby-player-icon-img">
-                <span class="text-2xl text-neutral-300">{{ lobbyUser.Name }} </span>
-                <Button class="kick-btn" @click="kickPlayer(lobbyUser)"> Kick </Button>
+                <span class="text-2xl text-neutral-300 ">{{ lobbyUser.Name }} </span>
+              </div>
+              <Button class="kick-btn" @click="kickPlayer(lobbyUser)"> Kick </Button>
             </div>
           </div>
         </div>
@@ -173,8 +177,7 @@ const kickPlayer = (lobbyUser: LobbyUser) => {
     font-size: 1em;
     border: 1px solid white;
     padding: 0.5em;
-    margin-left: 1.5em;
-    
+    margin-right: 1em;
   }
 </style>
 

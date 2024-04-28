@@ -2,10 +2,13 @@
 import {defineComponent, ref, onMounted} from "vue";
 import {storeToRefs} from "pinia";
 import {useWebSocketStore} from "~/stores/webSocketStore";
+import {tsParticles} from "@tsparticles/engine";
 
 import UNEnoshadowCard from "~/components/noShadowCard/UNEnoshadowCard.vue";
 
 const store = useWebSocketStore();
+const {user, users, room, connection} = storeToRefs(store);
+const {startGame} = store;
 const uneStore = useUneStore();
 // uncomment these out later
 // const {  cards, users, room } = storeToRefs(store);
@@ -13,42 +16,11 @@ const uneStore = useUneStore();
 
 const newCards = ref<number[]>([]);
 //const currentColor = ref<string>("red");
-const { currentColor, players, currentPlayer, discardPile  } = storeToRefs(uneStore);
-
-// const players = ref<Player[]>([
-//   {name: "juno", avatar: "juno", cards: [1, 2, 3, 4, 5]},
-//   {name: "fairy", avatar: "fairy", cards: [6, 7, 8, 9, 10]},
-//   {name: "oli", avatar: "oli", cards: [11, 12, 13, 14, 15]},
-//   { name: "femaleJuno", avatar: "femaleJuno", cards: [16, 17, 18, 19, 20] },
-//   {name: "andy", avatar: "andy", cards: [12, 22, 19]},
-//   {name: "lyssie", avatar: "lyssie", cards: [1, 2, 3, 4, 5]},
-//   {name: "star", avatar: "star", cards: [6, 7, 8, 9, 10]},
-//   {name: "rubi", avatar: "ruby", cards: [11, 12, 13, 14, 15]},
-// ]);
+const {currentColor, players, winner, currentPlayer, discardPile, direction} = storeToRefs(uneStore);
 
 // const currentTurn = ref<string>("fairy");
 //const currentTurn = ref<string>(currentPlayer);
 const cards = ref<UNOCard[]>(discardPile);
-
-// placeholder bc i don't want to use websockets every time
-// const cards = ref<UNOCard[]>([
-//   {id: 1, color: "red", value: "0"},
-//   {id: 2, color: "red", value: "1"},
-//   {id: 3, color: "red", value: "2"},
-//   {id: 4, color: "red", value: "3"},
-//   {id: 15, color: "red", value: "Skip"},
-//   {id: 16, color: "red", value: "Reverse"},
-//   {id: 17, color: "red", value: "Draw Two"},
-//   {id: 18, color: "red", value: "Skip All"},
-//   {id: 19, color: "yellow", value: "0"},
-//   {id: 20, color: "yellow", value: "1"},
-//   {id: 21, color: "yellow", value: "2"},
-//   {id: 22, color: "yellow", value: "3"},
-//   {id: 23, color: "yellow", value: "4"},
-//   {id: 24, color: "yellow", value: "5"},
-//   {id: 25, color: "yellow", value: "6"},
-//   {id: 26, color: "yellow", value: "7"},
-//   {id: 27, color: "blue", value: "Wild Draw Four"}]);
 
 const getCardStyle = (index: number) => {
   const randomX = Math.floor(Math.random() * 50) - 5; // Random offset for X-axis
@@ -80,8 +52,12 @@ const discardedCardsToDisplay = computed(() => {
   var DC = [] as [UNOCard, number][];
   // grab first 5 cards in discardedCards
   for (let i = 0; i < discardPile.value.length && i < 5; i++) {
-    var card:UNOCard = {Id: discardPile.value[i].Id, Color: discardPile.value[i].Color, Value:discardPile.value[i].Value};
-    DC.push([card, 5-i]);
+    var card: UNOCard = {
+      Id: discardPile.value[i].Id,
+      Color: discardPile.value[i].Color,
+      Value: discardPile.value[i].Value
+    };
+    DC.push([card, 5 - i]);
   }
   return DC;
 });
@@ -90,11 +66,11 @@ const getPlayerIconStyle = (index: number) => {
   const totalPlayers = players.value.length;
   let xpos = 0;
   let ypos = 0;
-  
+
   if (totalPlayers === 2) {
     xpos = index === 0 ? 50 : -51;
     ypos = index === 0 ? -300 : 300;
-  }else if(totalPlayers === 3){
+  } else if (totalPlayers === 3) {
     xpos = index === 0 ? 151 : index === 1 ? -251 : 251;
     ypos = index === 0 ? -300 : index === 1 ? 300 : 300;
   } else if (totalPlayers === 4) {
@@ -110,8 +86,8 @@ const getPlayerIconStyle = (index: number) => {
     xpos = index === 0 ? 550 : index === 1 ? -25 : index === 2 ? -425 : index === 3 ? -530 : index === 4 ? -350 : index === 5 ? 0 : 265;
     ypos = index === 0 ? -300 : index === 1 ? -300 : index === 2 ? -150 : index === 3 ? 150 : index === 4 ? 300 : index === 5 ? 300 : 0;
   } else if (totalPlayers === 8) {
-    xpos = index === 0 ? 600 : index === 1 ? 30 : index === 2 ? -375 : index === 3 ? -475 : index === 4 ? -300 : index === 5 ? 50 : index === 6 ? 265: 150;
-    ypos = index === 0 ? -300 : index === 1 ? -300 : index === 2 ? -150 : index === 3 ? 150 : index === 4 ? 300 : index === 5 ? 300 : index === 6 ? 150: -150;
+    xpos = index === 0 ? 600 : index === 1 ? 30 : index === 2 ? -375 : index === 3 ? -475 : index === 4 ? -300 : index === 5 ? 50 : index === 6 ? 265 : 150;
+    ypos = index === 0 ? -300 : index === 1 ? -300 : index === 2 ? -150 : index === 3 ? 150 : index === 4 ? 300 : index === 5 ? 300 : index === 6 ? 150 : -150;
   }
   return {
     transform: `translate(${xpos}%, ${ypos}%)`,
@@ -129,20 +105,194 @@ const isCurrentPlayer = (player: string) => {
   }
 };
 
+const getWinnerAvatar = (winner: string) => {
+  for (let i = 0; i < players.value.length; i++) {
+    if (players.value[i].Name === winner) {
+      return players.value[i].Avatar;
+    }
+  }
+  return "lyssie";
+};
+
 const getUNE = () => {
   return new URL(`../../assets/icons/unoDeck/UNE.svg`, import.meta.url);
 };
 
-const getCurrentColor = () => {
-  const color = currentColor.value;
-  return "background: ${currentColor.value}";
+const getNumofCards = (player: unePlayer) => {
+  let hand: UNOCard[] = player.Hand;
+  return hand.length;
+};
+
+const getArrow = () => {
+  return new URL(`../../assets/icons/directionArrows/${currentColor.value.toLowerCase()}Arrow.svg`, import.meta.url);
+};
+
+const getleftArrow = () => {
+  let angle = 0;
+  if (direction.value.toLowerCase() === "counterclockwise") {
+    angle = 180;
+  }
+
+  return {
+    transform: `skew(${angle}deg)`,
+  };
+};
+
+const getRightArrow = () => {
+  let angle = 0;
+  if (direction.value.toLowerCase() === "counterclockwise") {
+    angle = 180;
+  }
+
+  return {
+    transform: `skew(${angle}deg)`,
+  };
+};
+
+const particlesLoaded = (container: any) => {
+  console.log("Particles loaded", container);
+};
+
+const restartGame = () => {
+  // startGame();
+};
+
+const handleExit = () => {
+  connection.value = null;
+  users.value = [];
+  players.value = [];
+  navigateTo("/games");
+};
+
+const options = {
+  fullScreen: {
+    zIndex: 1
+  },
+  particles: {
+    number: {
+      value: 0
+    },
+    color: {
+      value: ['#00FFFC', '#FC00FF', '#fffc00']
+    },
+    shape: {
+      type: ['circle', 'square'],
+      options: {}
+    },
+    opacity: {
+      value: {
+        min: 0,
+        max: 1
+      },
+      animation: {
+        enable: true,
+        speed: 2,
+        startValue: 'max',
+        destroy: 'min'
+      }
+    },
+    size: {
+      value: {
+        min: 2,
+        max: 4
+      }
+    },
+    links: {
+      enable: false
+    },
+    life: {
+      duration: {
+        sync: true,
+        value: 5
+      },
+      count: 1
+    },
+    move: {
+      enable: true,
+      gravity: {
+        enable: true,
+        acceleration: 10
+      },
+      speed: {
+        min: 10,
+        max: 20
+      },
+      decay: 0.1,
+      direction: 'none',
+      straight: false,
+      outModes: {
+        default: 'destroy',
+        top: 'none'
+      }
+    },
+    rotate: {
+      value: {
+        min: 0,
+        max: 360
+      },
+      direction: 'random',
+      move: true,
+      animation: {
+        enable: true,
+        speed: 60
+      }
+    },
+    tilt: {
+      direction: 'random',
+      enable: true,
+      move: true,
+      value: {
+        min: 0,
+        max: 360
+      },
+      animation: {
+        enable: true,
+        speed: 60
+      }
+    },
+    roll: {
+      darken: {
+        enable: true,
+        value: 25
+      },
+      enable: true,
+      speed: {
+        min: 15,
+        max: 25
+      }
+    },
+    wobble: {
+      distance: 30,
+      enable: true,
+      move: true,
+      speed: {
+        min: -15,
+        max: 15
+      }
+    }
+  },
+  emitters: {
+    life: {
+      count: 0,
+      duration: 0.1,
+      delay: 0.4
+    },
+    rate: {
+      delay: 0.1,
+      quantity: 150
+    },
+    size: {
+      width: 0,
+      height: 0
+    }
+  }
 };
 </script>
 
 <template>
-<!--  <p> {{ currentPlayer }}</p>-->
-<!--  <p> {{ discardPile }}</p>-->
-<!--  <p> {{ discardedCardsToDisplay }}</p>-->
+  <!--  <p> {{ currentPlayer }}</p>-->
+  <!--  <p> {{ discardPile }}</p>-->
+  <!--  <p> {{ discardedCardsToDisplay }}</p>-->
   <div class="gameboard-container">
     <div class="gameboard">
       <div class="player-icons">
@@ -150,42 +300,193 @@ const getCurrentColor = () => {
              :style="{ ...getPlayerIconStyle(index), ...isCurrentPlayer(player.Name) }">
           <img :src="getPlayerIcon(player.Avatar)" alt="Player Icon" class="player-icon-img"/>
           <p class="player-name"> {{ player.Name }} </p>
+
+          <div class="num-cards-container">
+            <div class="uno-small-card">
+              <!--              <div class="color-option" v-for="color in ['red', 'yellow', 'green', 'blue']" :key="color"-->
+              <!--                   :style="{ backgroundColor: color }"-->
+              <!--                   @click="store.setWildColor(color)"></div>-->
+            </div>
+            <p>{{ getNumofCards(player) }}</p>
+          </div>
+
         </div>
       </div>
 
-<!--      TODO: ARROWS -->
-     <div class="game-table rounded-tr-full shadow-lg" v-bind:class="currentColor">
-       <div class="arrow-container">
-         <div id="curvedarrow"></div>
-       </div>
-
-        <div class="column-container">
-          <div class="column left-column">
-            <div class="deck-view">
-              <!--            <div class="flex justify-center items-center w-52 h-80 bg-zinc-800 rounded-md shadow-md mb-2">-->
-              <div class="deck-card flex justify-center items-center bg-zinc-800 rounded-md shadow-md mb-2"
-                   v-for="n in 5" :key="n" :style="cardStyle(n)">
-                <img :src="getUNE()" alt="game icon" class="une-logo"/>
-              </div>
-            </div>
+      <div class="game-table rounded-tr-full shadow-lg" v-bind:class="currentColor">
+        <div v-if="winner === ''">
+          <div class="right-arrow absolute">
+            <img :src="getArrow()" alt="right arrow" class="arrow"
+                 :style="getRightArrow()"/>
           </div>
 
-          <div class="column right-column">
-            <div class="card-pile">
-              <UNEnoshadowCard class="singular-card" v-for="[card, index] in discardedCardsToDisplay"
-                               :key="card.Id"
-                               :card="card"
-                               :style="{ ...getCardStyle(index) }"
+          <div class="left-arrow">
+            <img :src="getArrow()" alt="left arrow" class="arrow"
+                 :style="getleftArrow()"/>
+          </div>
+
+          <div class="column-container">
+            <div class="column left-column">
+              <div class="deck-view">
+                <!--            <div class="flex justify-center items-center w-52 h-80 bg-zinc-800 rounded-md shadow-md mb-2">-->
+                <div class="deck-card flex justify-center items-center bg-zinc-800 rounded-md shadow-md mb-2"
+                     v-for="n in 5" :key="n" :style="cardStyle(n)">
+                  <img :src="getUNE()" alt="game icon" class="une-logo"/>
+                </div>
+              </div>
+            </div>
+
+            <div class="column right-column">
+              <div class="card-pile">
+                <UNEnoshadowCard class="singular-card" v-for="[card, index] in discardedCardsToDisplay"
+                                 :key="card.Id"
+                                 :card="card"
+                                 :style="{ ...getCardStyle(index) }"
+                />
+              </div>
+            </div>
+
+          </div>
+        </div>
+        <div v-if="winner !== ''">
+          <div class="announcement fade-in flex flex-col justify-center">
+            <img :src="getPlayerIcon(getWinnerAvatar(winner))" alt="Player Icon" class="winner-icon"/>
+            <h1> {{ winner }} won! </h1>
+          </div>
+
+          <div class="end-btns">
+            <Button class="restart-btn end-btns" @click="restartGame()"> Play Again</Button>
+            <Button class="exit-btn end-btns" @click="handleExit()"> Exit</Button>
+          </div>
+
+          <div class="explosions absolute flex flex-col justify-center items-center">
+            <div id="app">
+              <!--                  <tsparticles id="tsparticles" @particlesLoaded="particlesLoaded" :options="options" />                  -->
+              <vue-particles id="tsparticles" @particles-loaded="particlesLoaded" url="http://foo.bar/particles.json"/>
+
+              <vue-particles
+                  id="tsparticles"
+                  @particles-loaded="particlesLoaded"
+                  :options="{
+                    background: {
+                        color: {
+                            value: 'transparent'
+                        }
+                    },
+                    particles: {
+                        number: {
+                            value: 0
+                        },
+                        color: {
+                            value: ['#8338ec', '#ff006e', '#ffbe0b', '#3a86ff']
+                        },
+                        animation: {
+                            enable: true,
+                            speed: 2,
+                            startValue: 'max',
+                            destroy: 'min'
+                        },
+                        links: {
+                            enable: false
+                        },
+                        life: {
+                            count: 1,
+                            duration: {
+                              sync: true,
+                                value: 5
+                            }
+                        },
+                        move: {
+                            enable: true,
+                            gravity: {
+                                enable: true,
+                                acceleration: 10
+                            },
+                          speed: {
+                              min: 10,
+                              max: 20
+                          },
+                          decay: 0.1,
+                          direction: 'none',
+                          straight: false,
+                          outModes: {
+                              default: 'destroy',
+                              top: 'none'
+                          }
+                        },
+                        rotate: {
+                            value: {min: 0, max: 360},
+                            move: true,
+                            direction: 'random',
+                            animation: {
+                                enable: true,
+                                speed: 60
+                            }
+                        },
+                        tilt: {
+                            enable: true,
+                            value: {min: 0, max: 360},
+                            direction: 'random',
+                            move: true,
+                            animation: {
+                                enable: true,
+                                speed: 60
+                            }
+                        },
+                        roll: {
+                          darken: {
+                            enable: true,
+                            value: 25
+                          },
+                          enable: true,
+                          speed: {
+                            min: 15,
+                            max: 25
+                          }
+                        },
+                        wobble: {
+                            distance: 30,
+                            enable: true,
+                            move: true,
+                            speed: {
+                                min: -15,
+                                max: 15}
+                        },
+                        opacity: {
+                            value: {min: 0, max: 2}
+                        },
+                        shape: {
+                            type: ['circle', 'triangle', 'square'],
+                        },
+                        size: {
+                            value: { min: 2, max: 4 }
+                        }
+                    },
+                    emitters: {
+                      life: {
+                        count: 0,
+                        duration: 0.1,
+                        delay: 0.4
+                      },
+                      rate: {
+                        delay: 0.5,
+                        quantity: 150
+                      },
+                      size: {
+                        width: 0,
+                        height: 0
+                      },
+                    }
+                }"
               />
             </div>
           </div>
-
-
         </div>
       </div>
+
+
     </div>
   </div>
-
 
 </template>
 
@@ -208,36 +509,6 @@ const getCurrentColor = () => {
   height: 100%;
   width: 100%;
 }
-
-.arrow-container {
-  position: absolute; /* Use absolute positioning to place arrows relative to the screen */
-  top: 100px;
-  left: 100px;
-  width: 100%;
-  height: 100%;
-}
-
-#curvedarrow {
-  position: relative;
-  width: 0;
-  height: 0;
-  border-top: 9px solid transparent;
-  border-right: 9px solid red;
-  transform: rotate(10deg);
-}
-#curvedarrow:after {
-  content: "";
-  position: absolute;
-  border: 0 solid transparent;
-  border-top: 3px solid red;
-  border-radius: 20px 0 0 0;
-  top: -12px;
-  left: -9px;
-  width: 12px;
-  height: 12px;
-  transform: rotate(45deg);
-}
-
 
 .player-name {
   font-size: 1.5rem;
@@ -341,4 +612,113 @@ const getCurrentColor = () => {
   background: rgba(255, 255, 255, 0.2); /* Adjust the background color of the player icon and opacity */
 }
 
+.left-arrow {
+  align-items: center;
+  justify-content: center;
+  width: 55%;
+  transform: translate(-75%, -10%);
+}
+
+.right-arrow {
+  align-items: center;
+  justify-content: center;
+  width: 55%;
+  transform: translate(175%, 10%);
+}
+
+.winner-icon {
+  width: 250px;
+  height: 250px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-right: 10px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.announcement {
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  background-color: rgb(59, 9, 14);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  border-radius: 10%;
+  margin-bottom: 20px;
+}
+
+.explosions i {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform: translate(0%, 900%);
+  animation: expand 3s ease forwards;
+}
+
+@keyframes expand {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.end-btns i {
+  animation: expand 3s ease forwards;
+}
+
+.restart-btn {
+  background-color: #4CAF50; /* Green */
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 12px;
+  margin-left: 12px;
+  margin-right: 20px;
+}
+
+.restart-btn:hover {
+  background-color: #45a049;
+}
+
+.exit-btn {
+  background-color: var(--cardhub-red);
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 12px;
+  margin-left: 20px;
+}
+
+.fade-in {
+  opacity: 0;
+  transform: translateY(-50px); /* Start slightly above */
+  animation: fadeIn 2s forwards; /* Animation duration and fill mode */
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 </style>

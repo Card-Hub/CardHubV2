@@ -1,16 +1,17 @@
 ﻿import { ofetch } from 'ofetch'
+import { defineNuxtPlugin, useRuntimeConfig } from "nuxt/app";
 
 // Allows client-side fetching configured with a global header URL
 // https://stackoverflow.com/a/75605263/18790415
-export default defineNuxtPlugin(() => {
+export default defineNuxtPlugin(nuxtApp => {
     const runtimeConfig = useRuntimeConfig();
     const instance = ofetch.create({
-        baseURL: runtimeConfig.public.baseURL
-    })
+        baseURL: runtimeConfig.public.baseURL as string
+    }) as typeof ofetch;
 
-    return {
-        provide: {
-            api: instance
-        }
-    }
+    // return {
+    //     provide: {
+    //         api: instance
+    //     }
+    // }
 })

@@ -10,11 +10,11 @@ public enum CahCardType
 
 public class CahCard
 {
-    [JsonIgnore] private string? _text;
+    [JsonIgnore] private string _text;
     [JsonIgnore] private CahCardType? _type;
 
     [JsonPropertyName("text")]
-    public string? Text
+    public string Text
     {
         get => _text;
         set
@@ -52,14 +52,24 @@ public class CahCard
         }
     }
 
-    public CahCard()
-    {
-    }
+    public CahCard() { }
 
     public CahCard(string text, CahCardType type)
     {
         Text = text;
         Type = type;
+    }
+
+    public int PickAmount
+    {
+        get
+        {
+            if (Type != CahCardType.Black) throw new InvalidOperationException("Pick amount is only for black cards");
+            
+            // If the card has no underscores, it's a regular black card with a pick amount of 1
+            var underscores = Text.Count(c => c == '_');
+            return underscores == 0 ? 1 : underscores;
+        }
     }
 
     private static bool IsValidBlackText(string text)

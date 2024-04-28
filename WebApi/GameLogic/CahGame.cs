@@ -9,8 +9,16 @@ using Timer = System.Timers.Timer;
 
 namespace WebApi.GameLogic;
 
+/*
+ * Required player data
+ * - List<CahCard>
+ * - 
+ */
+
 public enum CahHouseRules
 {
+    RandoCardrissian,
+    HappyEnding,
     WheatonsLaw,
     RebootingTheUniverse,
     PackingHeat,
@@ -43,12 +51,14 @@ public class CahGame
 {
     private Deck<CahCard> _whiteDeck = new();
     private Deck<CahCard> _blackDeck = new();
-    private PlayerOrder _cardCzarOrder = [];
-    private Dictionary<string, CahPlayer> _players = new();
-    private HashSet<string> _playersMoved = [];
+    private List<CahCard> _gambledCards = [];
     private CahCard? _currentBlackCard;
     private int _pickAmount;
-
+        
+    private PlayerOrder _playerOrder = [];
+    private Dictionary<string, CahPlayer> _players = new();
+    private HashSet<string> _playersMoved = [];
+    
     private TimeSpan _pickingTimeLimit;
     private TimeSpan _judgingTimeLimit;
     private Timer _pickingTimer;
@@ -56,77 +66,85 @@ public class CahGame
     private readonly object _lock = new();
 
     public string Gameboard { get; set; }
+    public string Room { get; set; }
 
     IHubContext<BaseHub> _hubContext;
 
-    private readonly List<CahPack> _cahPacks;
+    private static List<CahPack>? _cahPacks;
+    
+    public event EventHandler PickingFinished;
 
     public CahGame(IHubContext<BaseHub> hubContext)
     {
-        var json = File.ReadAllText(
-            "C:\\Users\\admoz\\source\\repos\\SeniorProjects\\CardHubV2\\WebApi\\Data\\cah-cards-full.json");
-        _cahPacks = JsonSerializer.Deserialize<List<CahPack>>(json)!;
-        foreach (var pack in _cahPacks)
+        if (_cahPacks is null)
         {
-            foreach (var card in pack.WhiteCards)
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "Data", "cah-cards-full.json");
+            var json = File.ReadAllText(path);
+            _cahPacks = JsonSerializer.Deserialize<List<CahPack>>(json)!;
+            foreach (var pack in _cahPacks)
             {
-                card.Type = CahCardType.White;
-            }
+                foreach (var card in pack.WhiteCards)
+                {
+                    card.Type = CahCardType.White;
+                }
 
-            foreach (var card in pack.BlackCards)
-            {
-                card.Type = CahCardType.Black;
+                foreach (var card in pack.BlackCards)
+                {
+                    card.Type = CahCardType.Black;
+                }
             }
         }
 
         _pickingTimeLimit = TimeSpan.FromSeconds(5);
         _pickingTimer = new Timer(_pickingTimeLimit);
         _pickingTimer.Elapsed += OnPickingTimeElapsed;
-        
+        _pickingTimer.Elapsed += (_, _) => PickingFinished?.Invoke(this, EventArgs.Empty);
+
         _judgingTimeLimit = TimeSpan.FromSeconds(5);
         _judgingTimer = new Timer(_judgingTimeLimit);
         _judgingTimer.Elapsed += OnJudgingTimeElapsed;
+        
         _hubContext = hubContext;
     }
 
     public bool AddPlayer(string playerName)
     {
-        if (_players.ContainsKey(playerName))
+        if (_players.ContainsKey(playerName) || playerName == Gameboard)
         {
             return false;
         }
 
         _players.Add(playerName, new CahPlayer(playerName));
-        _cardCzarOrder.Add(playerName);
+        _playerOrder.Add(playerName);
         return true;
     }
 
-    public async Task InitGame()
+    public void InitGame()
     {
-        _whiteDeck = new Deck<CahCard>(_cahPacks[1].WhiteCards);
+        _whiteDeck = new Deck<CahCard>(_cahPacks![1].WhiteCards);
         _blackDeck = new Deck<CahCard>(_cahPacks[1].BlackCards);
     }
 
-    public async Task StartGame()
+    public Dictionary<string, List<CahCard>> StartGame()
     {
-        await InitGame();
-        
+        InitGame();
+
         _whiteDeck.Shuffle();
         _blackDeck.Shuffle();
-        _cardCzarOrder.ShuffleOrder();
+        _playerOrder.ShuffleOrder();
 
-        foreach (var player in _cardCzarOrder)
+        var playerHands = new Dictionary<string, List<CahCard>>();
+        foreach (var player in _playerOrder)
         {
             var drawnCards = _whiteDeck.Draw(10);
             _players[player].AddCards(drawnCards);
-            
-            await _hubContext.Clients.Client(player).SendAsync("ReceiveWhiteCards", drawnCards);
+            playerHands.Add(player, drawnCards);
         }
-
-        await InitiatePicking();
+        
+        return playerHands;
     }
 
-    public async Task InitiatePicking()
+    public object InitiatePicking()
     {
         lock (_lock)
         {
@@ -134,58 +152,76 @@ public class CahGame
         }
 
         _currentBlackCard = _blackDeck.Draw();
-        _pickAmount = _currentBlackCard.Text!.Count(c => c == '_');
-        await _hubContext.Clients.All.SendAsync("ReceiveBlackCard", _currentBlackCard);
+        _pickAmount = _currentBlackCard.PickAmount;
 
-        var cardCzar = _cardCzarOrder.Current();
+        var nonCzarPlayers = GetNonCzarPlayers();
+        var cardCzar = _playerOrder.Current();
         if (_pickAmount == 3)
         {
-            var cards = _whiteDeck.Draw(2);
-            await _hubContext.Clients.AllExcept(cardCzar).SendAsync("ReceiveWhiteCards", cards);
+            foreach (var player in nonCzarPlayers)
+            {
+                var cards = _whiteDeck.Draw(2);
+                _players[player].AddCards(cards);
+            }
+        }
+        
+        // return object that contains the current black card, the pick amount, playerhands, and the card czar
+        return new
+        {
+            BlackCard = _currentBlackCard,
+            PickAmount = _pickAmount,
+            PlayerHands = _playerOrder.Select(player => new
+            {
+                Player = player,
+                Cards = _players[player].GetHand()
+            }),
+            CardCzar = cardCzar
+        };
+    }
+
+    public bool PlayCards(string playerName, List<CahCard> cards)
+    {
+        if (IsCzar(playerName) || _pickAmount != cards.Count) return false;
+        if (!_players[playerName].EnqueueCards(cards)) return false;
+        
+        _playersMoved.Add(playerName);
+        return true;
+    }
+    
+    public bool Gamble(string playerName, CahCard pickedCard, CahCard gambledCard)
+    {
+        if (IsCzar(playerName) || _pickAmount != 1) return false;
+        if (!_players[playerName].Gamble(pickedCard, gambledCard)) return false;
+        
+        _gambledCards.Add(gambledCard);
+        return true;
+    }
+    
+    // All players have picked their cards
+    private async Task AllPlayersMoved()
+    {
+        lock (_lock)
+        {
+            _pickingTimer.Stop();
         }
 
         var nonCzarPlayers = GetNonCzarPlayers();
-        await _hubContext.Clients.Clients(nonCzarPlayers).SendAsync("StartTimer", _pickingTimeLimit.Seconds);
-        await _hubContext.Clients.Clients(nonCzarPlayers).SendAsync("SetPickAmount", _pickAmount);
-
-        await _hubContext.Clients.Client(cardCzar).SendAsync("CardCzar");
-    }
-
-    public async Task<bool> PlayCard(string playerName, CahCard card)
-    {
-        var playerPickedCards = _players[playerName].PickedCards;
-        if (playerPickedCards.Contains(card))
+        foreach (var playerName in nonCzarPlayers)
         {
-            return false;
+            await _hubContext.Clients.Client(_playerOrder.Current()).SendAsync("ReceivePlayerCardPicks", playerName,
+                _players[playerName].DequeueCards());
         }
 
-        if (playerPickedCards.Count >= _pickAmount)
+        await _hubContext.Clients.Client(_playerOrder.Current())
+            .SendAsync("StartTimer", _judgingTimeLimit.Seconds);
+        
+        lock (_lock)
         {
-            _playersMoved.Add(playerName);
-            if (_playersMoved.Count == _players.Count)
-            {
-                await AllPlayersMoved();
-            }
+            _judgingTimer.Start();
         }
-
-        _players[playerName].RemoveCard(card);
-        _players[playerName].PickedCards.Enqueue(card);
-        return true;
     }
 
-    public async Task<bool> SelectWinner(string playerSelecting, string playerSelected)
-    {
-        if (_cardCzarOrder.Current() != playerSelecting || _cardCzarOrder.Current() == playerSelected)
-        {
-            return false;
-        }
-
-        _players[playerSelected].AddWonCard(_currentBlackCard!);
-        _cardCzarOrder.SetNextCurrent();
-        await InitiatePicking();
-        return true;
-    }
-
+    // Some players did not pick their cards in time
     private async void OnPickingTimeElapsed(object? source, ElapsedEventArgs e)
     {
         var nonCzarPlayers = GetNonCzarPlayers();
@@ -196,61 +232,52 @@ public class CahGame
             {
                 pickedCards.Enqueue(_players[playerName].PickRandomCard());
             }
-            
-            await _hubContext.Clients.Client(_cardCzarOrder.Current()).SendAsync("ReceivePlayerCardPicks", playerName,
-                _players[playerName].PickedCards);
+
+            await _hubContext.Clients.Client(_playerOrder.Current()).SendAsync("ReceivePlayerCardPicks", playerName,
+                _players[playerName].DequeueCards());
         }
-        
-        await _hubContext.Clients.Client(_cardCzarOrder.Current())
+
+        await _hubContext.Clients.Client(_playerOrder.Current())
             .SendAsync("StartTimer", _judgingTimeLimit.Seconds);
-    }
-
-    private async Task AllPlayersMoved()
-    {
-        lock (_lock)
-        {
-            _pickingTimer.Stop();
-            _judgingTimer.Start();
-        }
-
-        var nonCzarPlayers = GetNonCzarPlayers();
-        foreach (var playerName in nonCzarPlayers)
-        {
-            await _hubContext.Clients.Client(_cardCzarOrder.Current()).SendAsync("ReceivePlayerCardPicks", playerName,
-                _players[playerName].PickedCards);
-        }
-        
-        await _hubContext.Clients.Client(_cardCzarOrder.Current())
-            .SendAsync("StartTimer", _judgingTimeLimit.Seconds);
-    }
-
-    private async Task InitiateJudging()
-    {
-        lock (_lock)
-        {
-            _pickingTimer.Stop();
-            _judgingTimer.Start();
-        }
-        
-        var nonCzarPlayers = GetNonCzarPlayers();
-        foreach (var playerName in nonCzarPlayers)
-        {
-            await _hubContext.Clients.Clients(nonCzarPlayers).SendAsync("ReceivePlayerCardPicks", playerName,
-                _players[playerName].PickedCards);
-        }
     }
     
+    // Czar selects a winner
+    public bool SelectWinner(string playerSelecting, string playerSelected)
+    {
+        if (!IsCzar(playerSelecting) || IsCzar(playerSelected)) return false;
+
+        _players[playerSelected].AddWonCard(_currentBlackCard!);
+        _playerOrder.SetNextCurrent();
+
+        lock (_lock)
+        {
+            _judgingTimer.Stop();
+        }
+
+        return true;
+    }
+    
+    // Czar did not select a winner in time
     private async void OnJudgingTimeElapsed(object? sender, ElapsedEventArgs e)
     {
-        _cardCzarOrder.SetNextCurrent();
-        await InitiatePicking();
+        _playerOrder.SetNextCurrent();
+        InitiatePicking();
     }
 
-    private string[] GetNonCzarPlayers() => _cardCzarOrder.Where(player => player != _cardCzarOrder.Current()).ToArray();
+    #region Helper methods
 
     public List<CahCard> GetPlayerHand(string playerName)
     {
-        var player = _cardCzarOrder.GetPlayer(playerName);
+        var player = _playerOrder.GetPlayer(playerName);
         return _players[player].GetHand();
     }
+
+    private bool IsCzar(string playerName) =>
+        _playerOrder.Current() == playerName;
+
+
+    private IEnumerable<string> GetNonCzarPlayers() =>
+        _playerOrder.Where(player => player != _playerOrder.Current()).ToArray();
+
+    #endregion
 }

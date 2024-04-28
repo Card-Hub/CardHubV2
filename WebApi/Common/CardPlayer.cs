@@ -67,4 +67,13 @@ public class CardPlayer<TCard> : ICardPlayer<TCard>
     {
         _hand.Clear();
     }
+    
+    public TCard PickRandomCard()
+    {
+        var random = new Random();
+        var index = random.Next(0, _hand.Count);
+        var card = _hand[index];
+        RemoveCard(index);
+        return card;
+    }
 }

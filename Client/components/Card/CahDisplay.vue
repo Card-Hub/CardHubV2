@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import {defineProps, defineEmits} from 'vue';
-import { CahType } from "../../types";
 
 export interface Props {
   card?: CahCard;
@@ -10,7 +8,7 @@ export interface Props {
 const props = defineProps<Props>();
 const emits = defineEmits();
 const handleClick = () => {
-  emits('cardClicked', props.card);
+  emits("cardClicked", props.card);
 };
 
 const displayText = (text: string) => {
@@ -21,11 +19,11 @@ const displayText = (text: string) => {
 </script>
 
 <template>
-<div id="card">
-  <div id="text-container">
-    <span>{{ card.text }}</span>
+  <div id="card">
+    <div id="text-container">
+      <span>{{ card.text }}</span>
+    </div>
   </div>
-</div>
 </template>
 
 <style scoped>

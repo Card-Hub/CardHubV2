@@ -12,8 +12,5 @@ public class CahFactory
         _serviceProvider = serviceProvider;
     }
     
-    public CahGame Build()
-    {
-        return _serviceProvider.GetRequiredService<CahGame>();
-    }
+    public CahGame Build() => _serviceProvider.GetRequiredService<CahGame>();
 }

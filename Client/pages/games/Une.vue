@@ -1,9 +1,12 @@
 <script setup lang="ts">
+  //https://primevue.org/tabmenu/
+  import TabMenu from 'primevue/tabmenu';
   import { ref, computed } from 'vue';
   import UNOCardDisplay from "~/components/Card/UNOCardDisplay.vue";
 
   import { storeToRefs } from "pinia";
   import { useWebSocketStore } from "~/stores/webSocketStore";
+  import UnoRules from "~/components/gameRules/UnoRules.vue";
 
   const store = useWebSocketStore();
   const { connection, isConnected, messages, user, room } = storeToRefs(store);
@@ -27,9 +30,9 @@
   for (const color of colors) {
     for (const value of unoValues) {
       unoDeck.push({
-        id: unoDeck.length + 1,
-        color,
-        value
+        Id: unoDeck.length + 1,
+        Color: color,
+        Value: value
       });
     }
   }
@@ -37,32 +40,30 @@
   // push 4 wild cards and 4 draw 4 wild cards
   for (let i = 0; i < 4; i++) {
     unoDeck.push({
-      id: unoDeck.length + 1,
-      color: "#151515",
-      value: "Wild"
+      Id: unoDeck.length + 1,
+      Color: "#151515",
+      Value: "Wild"
     });
     unoDeck.push({
-      id: unoDeck.length + 1,
-      color: "#151515",
-      value: "Wild Draw Four"
+      Id: unoDeck.length + 1,
+      Color: "#151515",
+      Value: "Wild Draw Four"
     });
   }
 
   const playerHand = ref<UNOCard[]>(unoDeck);
   
-  
-  const showCards = ref(false);
-  const buttonText = ref('Show Cards');
-  
-  const showCardContainer = () => {
-    showCards.value = !showCards.value;
-    buttonText.value = showCards.value ? 'Hide Cards' : 'Show Cards';
-    
-  };
-  
   const getUNE = () => {
     return new URL(`../../assets/icons/unoDeck/UNE.svg`, import.meta.url);
   };
+
+  const active = ref(0); // 0 = none, 1 = rules, 2 = cards
+  //for the tab menu
+  const items = ref([
+      { label: "None", icon: "pi pi-fw pi-eye-slash" },
+      { label: "Rules", icon: "pi pi-fw pi-info-circle" },
+      { label: "Cards", icon: "pi pi-fw pi-mobile" }
+  ]);
 </script>
 
 <template>
@@ -95,12 +96,24 @@
 <!--        <h1>UNO</h1>-->
 <!--      </div>-->
     </div>
-    <Button @click='showCardContainer()' class="show-cards">{{ buttonText }}</Button>
-    <div v-if="showCards" class="card-container">
+    
+    <div class="menu-container">
+      <TabMenu v-model:activeIndex="active" :model="items" activeItem="None" class="tab-menu"/>
+    </div>
+    
+    <div class="rules-container" v-if="active === 1">
+      <UnoRules />
+    </div>
+    
+    <div class="card-container" v-else-if="active === 2">
       <UNOCardDisplay v-for="card in unoDeck"
-                      :key="card.id"
+                      :key="card.Id"
                       :card="card"
       />
+    </div>
+    
+    <div v-else-if="active === 0">
+
     </div>
     
   </div> 
@@ -131,7 +144,7 @@
   align-items: center;
 }
 
-.show-cards {
+.show-cards, .show-rules {
   margin-top: 20px;
   margin-bottom: 20px;
   align-self: center;
@@ -192,5 +205,20 @@
   align-items: center;
   height: 100%;
   width: 85%;
+}
+
+.rules-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.menu-container{
+  width: 90%;
+  align-self: center;
+  margin-top: 2.5%;
+  margin-bottom: 2%;
 }
 </style>

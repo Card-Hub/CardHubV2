@@ -32,6 +32,10 @@ const navigateToLibrary = async (): Promise<void> => {
   await navigateTo("/games");
 };
 
+const navigateToHome = async (): Promise<void> => {
+  await navigateTo("/");
+};
+
 // const connectGameboard = async (): Promise<void> => {
 //   const isRoomCreated = await tryCreateRoom();
 //   if (isRoomCreated) {
@@ -50,7 +54,7 @@ console.log("check here for obj", connection.value);
     <template v-if="connection === null">
       <div class="flex flex-col justify-center h-screen items-center">
         <div class="flex flex-col justify-center gap-4">
-          <svgo-logo-combination class="w-52 h-52" :fontControlled="false" filled/>
+          <svgo-logo-combination class="w-52 h-52" :fontControlled="false" filled @click="navigateToHome"/>
         </div>
         <div class="flex flex-col justify-center gap-4 mb-8">
           <InputText type="text" v-model="user" placeholder="Name"/>

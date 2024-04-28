@@ -87,8 +87,8 @@ public partial class BaseHub : Hub
         await Clients.Group(userConnection.Room).SendAsync("ReceiveMessage",
             new UserMessage
             {
-                User = BotUser,
-                Message = $"{userConnection.User} has joined the room {userConnection.Room}"
+                User = "System",
+                Message = $"{userConnection.User} has joined!"
             });
         //await SendConnectedUsers(userConnection.Room);
         switch (userConnection.UserType)
@@ -152,13 +152,13 @@ public partial class BaseHub : Hub
                 await Clients.Caller.SendAsync("ReceiveMessage",
                     new UserMessage
                     {
-                        User = BotUser,
+                        User = userConnection.User,
                         Message = $"It's not your turn, {userName}"
                     });
             }
         }   
     }
-    public async Task SendAvatar(GameService gameService, UnoGameStorage unoGameStorage, string avatar) {
+public async Task SendAvatar(GameService gameService, UnoGameStorage unoGameStorage, string avatar) {
       if (_userConnections.TryGetValue(Context.ConnectionId, out var userConnection))
         {
           if (gameService.GameTypeFromRoomCode[userConnection.Room].ToLower() == "une") { // game is uno
@@ -238,7 +238,7 @@ public partial class BaseHub : Hub
               var cardColor = UnoColorLyssie.Black;
               var cardValue = UnoValueLyssie.One;
               // color switch
-              switch (cardJToken["color"].ToString().ToLower()) {
+              switch (cardJToken["Color"].ToString().ToLower()) {
                 case "red":
                   cardColor = UnoColorLyssie.Red;
                   break;
@@ -258,7 +258,7 @@ public partial class BaseHub : Hub
                   Console.WriteLine("INVALID CARD COLOR PLAYED???");
                   break;
               }
-              switch (cardJToken["value"].ToString().ToLower()) {
+              switch (cardJToken["Value"].ToString().ToLower()) {
                 case "0":
                   cardValue = UnoValueLyssie.Zero;
                   break;
@@ -311,7 +311,7 @@ public partial class BaseHub : Hub
                   Console.WriteLine("INVALID CARD VALUE PLAYED???");
                   break;
               }
-              var card = new UnoCardModLyssie(int.Parse(cardJToken["id"].ToString()), cardColor, cardValue);
+              var card = new UnoCardModLyssie(int.Parse(cardJToken["Id"].ToString()), cardColor, cardValue);
               await game.PlayCard(userConnection.ConnectionId, card);
               break;
             default:
@@ -342,7 +342,7 @@ public partial class BaseHub : Hub
         Clients.Group(userConnection.Room).SendAsync("ReceiveMessage",
             new UserMessage
             {
-                User = BotUser,
+                User = userConnection.User,
                 Message = $"{userConnection.User} has left the room {userConnection.Room}"
             });
         SendConnectedUsers(userConnection.Room);

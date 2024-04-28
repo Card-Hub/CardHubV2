@@ -6,6 +6,8 @@ import StandardCardDisplay from "~/components/Card/StandardCardDisplay.vue";
 
 import { storeToRefs } from "pinia";
 import { useWebSocketStore } from "~/stores/webSocketStore";
+import UnoRules from "~/components/gameRules/UnoRules.vue";
+import TexasholdemRules from "~/components/gameRules/TexasholdemRules.vue";
 
 const store = useWebSocketStore();
 const { connection, isConnected, messages, user, room } = storeToRefs(store);
@@ -37,19 +39,17 @@ for (const suit of suits) {
 
 const playerHand = ref<StandardCard[]>(standardDeck);
 
-
-const showCards = ref(false);
-const buttonText = ref('Show Cards');
-
-const showCardContainer = () => {
-  showCards.value = !showCards.value;
-  buttonText.value = showCards.value ? 'Hide Cards' : 'Show Cards';
-
-};
-
 const getCards = () => {
   return new URL(`../../assets/icons/standardDeck/hearts.svg`, import.meta.url);
 };
+
+const active = ref(0); // 0 = none, 1 = rules, 2 = cards
+//for the tab menu
+const items = ref([
+  { label: "None", icon: "pi pi-fw pi-eye-slash" },
+  { label: "Rules", icon: "pi pi-fw pi-info-circle" },
+  { label: "Cards", icon: "pi pi-fw pi-mobile" }
+]);
 </script>
 
 <template>
@@ -72,7 +72,12 @@ const getCards = () => {
       <div class="column right-column">
         <h1 class="text-7xl">Texas Hold 'Em</h1>
         <h3>Game Description: </h3>
-        <p> In this classic card game, ... </p>
+        <p> Texas Hold'em is a popular variation of poker played in both casual settings and professional tournaments worldwide. In Texas Hold'em, each player is dealt two private cards (known as "hole cards") that belong to them alone, and five community cards are dealt face-up on the "board." Players use a combination of their hole cards and the community cards to make the best possible five-card poker hand.
+
+          The game proceeds through several rounds of betting, with players having the option to check, bet, raise, or fold depending on the strength of their hand and their confidence in winning the pot. The community cards are dealt in stages: three cards, known as the "flop," are dealt first, followed by another single card called the "turn" or "fourth street," and finally, a fifth card called the "river" or "fifth street."
+
+          The objective of Texas Hold'em is to win chips or money by either having the best hand at showdown or by getting all opponents to fold their hands before the showdown. It's a game of skill, strategy, and psychology, where players must carefully manage their resources and make calculated decisions based on their understanding of the game and their opponents.
+        </p>
         <NuxtLink href="/lobby">
           <Button class="play" label="Secondary" severity="secondary" @click="connectGameboard"> Play Texas Hold 'Em </Button>
         </NuxtLink>
@@ -82,15 +87,23 @@ const getCards = () => {
       <!--        <h1>UNO</h1>-->
       <!--      </div>-->
     </div>
-    <Button @click='showCardContainer()' class="show-cards">{{ buttonText }}</Button>
 
-    <div v-if="showCards" class="card-container">
-      <div v-if="showCards" class="card-container">
+    <div class="menu-container">
+      <TabMenu v-model:activeIndex="active" :model="items" activeItem="None" class="tab-menu"/>
+    </div>
+
+    <div class="rules-container" v-if="active === 1">
+      <TexasholdemRules />
+    </div>
+    
+    <div v-if="active === 2" class="card-container">
         <StandardCardDisplay v-for="card in standardDeck"
                              :key="card.id"
                              :card="card"
         />
-      </div>
+    </div>
+    
+    <div v-else-if="active === 0">
     </div>
   </div>
 </template>
@@ -181,5 +194,20 @@ const getCards = () => {
   align-items: center;
   height: 100%;
   width: 85%;
+}
+
+.rules-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.menu-container{
+  width: 90%;
+  align-self: center;
+  margin-top: 2.5%;
+  margin-bottom: 2%;
 }
 </style>

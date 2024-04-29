@@ -3,6 +3,7 @@ import {defineComponent, ref, onMounted} from "vue";
 import {storeToRefs} from "pinia";
 import {useWebSocketStore} from "~/stores/webSocketStore";
 import {tsParticles} from "@tsparticles/engine";
+declare module "@tsparticles/vue";
 
 import UNEnoshadowCard from "~/components/noShadowCard/UNEnoshadowCard.vue";
 
@@ -74,8 +75,8 @@ const getPlayerIconStyle = (index: number) => {
     xpos = index === 0 ? 151 : index === 1 ? -251 : 251;
     ypos = index === 0 ? -300 : index === 1 ? 300 : 300;
   } else if (totalPlayers === 4) {
-    xpos = index === 0 ? 150 : index === 1 ? -526 : index === 2 ? -56 : 426;
-    ypos = index === 0 ? -300 : index === 1 ? 0 : index === 2 ? 300 : 0;
+    xpos = index === 0 ? 150 : index === 1 ? -456 : index === 2 ? -56 : 356;
+    ypos = index === 0 ? -350 : index === 1 ? 0 : index === 2 ? 350 : 0;
   } else if (totalPlayers === 5) {
     xpos = index === 0 ? 225 : index === 1 ? -475 : index === 2 ? -251 : index === 3 ? 151 : 375;
     ypos = index === 0 ? -300 : index === 1 ? 0 : index === 2 ? 300 : index === 3 ? 300 : 0;
@@ -128,24 +129,24 @@ const getArrow = () => {
 };
 
 const getleftArrow = () => {
-  let angle = 0;
-  if (direction.value.toLowerCase() === "counterclockwise") {
-    angle = 180;
+  let angle = 180;
+  if (direction.value.toLowerCase() != "clockwise") {
+    angle = 0;
   }
 
   return {
-    transform: `skew(${angle}deg)`,
+    transform: `rotate(${angle}deg)`,
   };
 };
 
 const getRightArrow = () => {
   let angle = 0;
-  if (direction.value.toLowerCase() === "counterclockwise") {
+  if (direction.value.toLowerCase() !== "clockwise") {
     angle = 180;
   }
 
   return {
-    transform: `skew(${angle}deg)`,
+    transform: `rotate(${angle}deg)`,
   };
 };
 
@@ -163,130 +164,6 @@ const handleExit = () => {
   players.value = [];
   navigateTo("/games");
 };
-
-const options = {
-  fullScreen: {
-    zIndex: 1
-  },
-  particles: {
-    number: {
-      value: 0
-    },
-    color: {
-      value: ['#00FFFC', '#FC00FF', '#fffc00']
-    },
-    shape: {
-      type: ['circle', 'square'],
-      options: {}
-    },
-    opacity: {
-      value: {
-        min: 0,
-        max: 1
-      },
-      animation: {
-        enable: true,
-        speed: 2,
-        startValue: 'max',
-        destroy: 'min'
-      }
-    },
-    size: {
-      value: {
-        min: 2,
-        max: 4
-      }
-    },
-    links: {
-      enable: false
-    },
-    life: {
-      duration: {
-        sync: true,
-        value: 5
-      },
-      count: 1
-    },
-    move: {
-      enable: true,
-      gravity: {
-        enable: true,
-        acceleration: 10
-      },
-      speed: {
-        min: 10,
-        max: 20
-      },
-      decay: 0.1,
-      direction: 'none',
-      straight: false,
-      outModes: {
-        default: 'destroy',
-        top: 'none'
-      }
-    },
-    rotate: {
-      value: {
-        min: 0,
-        max: 360
-      },
-      direction: 'random',
-      move: true,
-      animation: {
-        enable: true,
-        speed: 60
-      }
-    },
-    tilt: {
-      direction: 'random',
-      enable: true,
-      move: true,
-      value: {
-        min: 0,
-        max: 360
-      },
-      animation: {
-        enable: true,
-        speed: 60
-      }
-    },
-    roll: {
-      darken: {
-        enable: true,
-        value: 25
-      },
-      enable: true,
-      speed: {
-        min: 15,
-        max: 25
-      }
-    },
-    wobble: {
-      distance: 30,
-      enable: true,
-      move: true,
-      speed: {
-        min: -15,
-        max: 15
-      }
-    }
-  },
-  emitters: {
-    life: {
-      count: 0,
-      duration: 0.1,
-      delay: 0.4
-    },
-    rate: {
-      delay: 0.1,
-      quantity: 150
-    },
-    size: {
-      width: 0,
-      height: 0
-    }
-  }
-};
 </script>
 
 <template>
@@ -303,11 +180,12 @@ const options = {
 
           <div class="num-cards-container">
             <div class="uno-small-card">
-              <!--              <div class="color-option" v-for="color in ['red', 'yellow', 'green', 'blue']" :key="color"-->
-              <!--                   :style="{ backgroundColor: color }"-->
-              <!--                   @click="store.setWildColor(color)"></div>-->
+              <div class="small-deck-card flex justify-center items-center bg-zinc-800 rounded-md shadow-md mb-2">
+                <img :src="getUNE()" alt="game icon" class="une-logo"/>
+              </div>
+              <p>{{ getNumofCards(player) }}</p>
             </div>
-            <p>{{ getNumofCards(player) }}</p>
+            
           </div>
 
         </div>
@@ -315,17 +193,13 @@ const options = {
 
       <div class="game-table rounded-tr-full shadow-lg" v-bind:class="currentColor">
         <div v-if="winner === ''">
-          <div class="right-arrow absolute">
-            <img :src="getArrow()" alt="right arrow" class="arrow"
-                 :style="getRightArrow()"/>
-          </div>
-
-          <div class="left-arrow">
-            <img :src="getArrow()" alt="left arrow" class="arrow"
-                 :style="getleftArrow()"/>
-          </div>
-
-          <div class="column-container">
+          <div class="column-container columns-4xl">
+            
+            <div class="column leftmost-column">
+              <img :src="getArrow()" alt="left arrow" class="arrow"
+                   :style="getleftArrow()"/>
+            </div>
+            
             <div class="column left-column">
               <div class="deck-view">
                 <!--            <div class="flex justify-center items-center w-52 h-80 bg-zinc-800 rounded-md shadow-md mb-2">-->
@@ -346,6 +220,11 @@ const options = {
               </div>
             </div>
 
+            <div class="column rightmost-column">
+              <img :src="getArrow()" alt="right arrow" class="arrow"
+                   :style="getRightArrow()"/>
+            </div>
+            
           </div>
         </div>
         <div v-if="winner !== ''">
@@ -533,6 +412,8 @@ const options = {
 }
 
 .column-container {
+  max-height: 800px;
+  max-width: 1000px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -541,7 +422,7 @@ const options = {
   width: 75%;
 }
 
-.left-column, .right-column {
+.left-column, .right-column, .leftmost-column, .rightmost-column {
   flex: 1;
   align-items: center;
   justify-content: center;
@@ -615,15 +496,13 @@ const options = {
 .left-arrow {
   align-items: center;
   justify-content: center;
-  width: 55%;
-  transform: translate(-75%, -10%);
+  transform: translate(-10%, 40%);
 }
 
 .right-arrow {
   align-items: center;
   justify-content: center;
-  width: 55%;
-  transform: translate(175%, 10%);
+  transform: translate(110%, -40%);
 }
 
 .winner-icon {
@@ -720,5 +599,15 @@ const options = {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.small-deck-card {
+  position: relative;
+  width: 75px;
+  height: 150px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-right: 10px;
+  background: rgba(255, 255, 255, 0.2);
 }
 </style>

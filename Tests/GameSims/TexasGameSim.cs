@@ -33,5 +33,6 @@ public class TexasGameSim {
       output.WriteLine($"Turn starting for {playerTuple.Item1}");
       game.Call(playerTuple.Item2);
     }
+    output.WriteLine("End Texas sim");
   }
 }

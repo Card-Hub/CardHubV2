@@ -291,17 +291,37 @@ public class TexasHoldEmGame
 
   public bool Raise(string connStr, int amtToRaiseBy) {
     // your turn, you can afford it, you aren't the last to raise
-    if (Players[connStr].CanRaise) {
-
+    PokerPlayer thisPlayer = Players[connStr];
+    if (thisPlayer.CanRaise) {
+      int amtExtraToPutIn = CurrentBet + amtToRaiseBy - thisPlayer.CurrentBet;
+      if (amtExtraToPutIn > thisPlayer.AmountOfMoneyLeft) {
+        Messenger.SendFrontendError(new List<string>() {connStr}, "You can't afford to raise that much!");
+        return false;
+      }
+      else { // can afford to raise by that amount
+        thisPlayer.CurrentBet += amtExtraToPutIn;
+        CurrentBet = thisPlayer.CurrentBet;
+        thisPlayer.AmountOfMoneyLeft -= amtExtraToPutIn;
+        return true;
+      }
     }
-    // for some reason, you can't raise
+    // for some reason, you can't raise at all
     else {
-      var playerCanAffordToRaise = currentPlayer.AmountOfMoneyLeft >= (MinIncrease + CurrentBet - currentPlayer.CurrentBet);
-      currentPlayer.CanRaise = currentPlayer.Name != LastPlayerWhoRaised && playerCanAffordToRaise;
-
-        Messenger.SendFrontendError(new List<string>() {connStr},"It's your turn but you can't raise right now");
+      if (connStr != PlayerOrder.GetCurrentPlayer()) {
+        // it's not your turn!
+        Messenger.SendFrontendError(new List<string>() {connStr}, "You can only raise on your turn!");
+      }
+      else if (thisPlayer.Name == LastPlayerWhoRaised) {
+        Messenger.SendFrontendError(new List<string>() {connStr}, "You aren't elegible to raise!");
+      }
+      else if (thisPlayer.AmountOfMoneyLeft < (MinIncrease + CurrentBet - thisPlayer.CurrentBet)) {
+        Messenger.SendFrontendError(new List<string>() {connStr}, "You can't afford to raise!");
+      }
+      else {
+        Messenger.SendFrontendError(new List<string>() {connStr},"You can't raise right now!");
+      }
+      return false;
     }
-      Messenger.SendFrontendError(new List<string>() {connStr}, "Can't raise right now!");
   }
 
   private List<string> GetAllConnStrsIncGameboard() {

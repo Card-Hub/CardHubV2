@@ -3,7 +3,7 @@ import {defineComponent, ref, onMounted} from "vue";
 import {storeToRefs} from "pinia";
 import {useWebSocketStore} from "~/stores/webSocketStore";
 import {tsParticles} from "@tsparticles/engine";
-declare module "@tsparticles/vue";
+declare module "@tsparticles/vue3";
 
 import UNEnoshadowCard from "~/components/noShadowCard/UNEnoshadowCard.vue";
 

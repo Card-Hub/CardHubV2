@@ -185,17 +185,51 @@ public class BlackJackTests {
     game.TakeBet("03", 44);
     game.TakeBet("04", 45);
     game.DrawCard("01");
+    game.DrawCard("01");
     game.Stand("01");
-    // game.DrawCard("01");
+    game.DrawCard("02");
     game.DrawCard("02");
     game.Stand("02");
     game.DrawCard("03");
+    game.DrawCard("03");
     game.Stand("03");
+    game.DrawCard("04");
     game.DrawCard("04");
     game.Stand("04");
     output.WriteLine(game.GetGameState());
   }
+
+  [Fact]
+  [Trait("Integration_test", "test_5")]
+  public async void TestRoundRestarting() {
+    var messenger = new BlackJackTestMessenger(output);
+    var game = new BlackJackGame(messenger, "abcd");
+    game.AddPlayer("Alex", "01");
+    game.AddPlayer("Liam", "02");
+    game.AddPlayer("Lyssie", "03");
+    game.AddPlayer("Rubi", "04");
+    game.StartGame();
+    // game.StartRound();
+    for(int i = 0; i < 3; i++) {
+      output.WriteLine("\n\nhere breh\n\n");
+      game.TakeBet("01", 42);
+      game.TakeBet("02", 43);
+      game.TakeBet("03", 44);
+      game.TakeBet("04", 45);
+      game.DrawCard("01");
+      game.DrawCard("01");
+      game.Stand("01");
+      game.DrawCard("02");
+      game.DrawCard("02");
+      game.Stand("02");
+      game.DrawCard("03");
+      game.DrawCard("03");
+      game.Stand("03");
+      game.DrawCard("04");
+      game.DrawCard("04");
+      game.Stand("04");
+      output.WriteLine(game.GetGameState());
+      game.Restart();
+    }
+  }
 }
-
-
-

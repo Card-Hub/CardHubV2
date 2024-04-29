@@ -15,9 +15,14 @@ namespace WebApi.GameLogic;
 
 
 //so first the gamebaord player will select blackjack and they will be put into a room. At that point, the game instance has been made.
-//after the game board is waiting in the room, players will begin to join that room code and in turn invoke the add player command while in the not started state.
-//after all player are there, the gamebaord will press start game button. This in turn should result in a page change for everyone to the blackjack table with their cards delivered.
-//
+//after the game board is waiting in the room, players willbe joined as the enter the lobby by invoking the add player command while in the not started state.
+//The gamebaord will press start game button. This in turn should result in a page change for everyone, the gamebaord will show everyones cards and the dealers hand once everyone has placed a bet. (Their cards should be delivered on start and will be individual per device)
+//Each player will have all the buttons on their page and wont be allowed to press when its not their turn. Players turn will be known but PlayerOrder
+//When it is their trun, they may press the hit button which will invoke the draw card function.
+// If they bust or win it will make it next players turn, oitherwise the may hit stand to change turns.
+// once last player has hit stand or bust/win the dealers turn will be called and they will draw carsd until 17 or bust/win.
+//at that point winners are shown and bet money is given.
+
 
 public class BlackJackGame : IBaseGame<StandardCard>
 {
@@ -38,7 +43,6 @@ public class BlackJackGame : IBaseGame<StandardCard>
         state = "NotStarted";
         GameboardConnStr = gameboardConnStr;
         AddPlayer("Dealer", "Dealer");
-        Players["Dealer"].HasBet= true;
     }
 
     public void StartGame()//waiting for palyers to join here before we continue, gameB will decide when to start the round
@@ -60,24 +64,33 @@ public class BlackJackGame : IBaseGame<StandardCard>
     public bool StartRound(){
         if (state == "Restart" || state == "Started" && Players.Count >= 2) {
             InitDeck();
-            PlayerOrder.NextTurn();/////////!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!this will break code depending on where he is added
+            Players["Dealer"].HasBet= true;
+            PlayerOrder.NextTurn();
             //give promt to frontend to take bets
             state = "TakingBets";
+            // await _messenger.SendFrontendJson(GetAllConnStrsIncGameboard(), GetGameState());
             return true;
         }
         Console.WriteLine("Not all players have made bets yet");
         return false;
     }
 
-    public bool Restart(){
+    public bool Restart(){//may want to allow for an override here tor restart early.
         if (state == "Restart") {
-            // state = "NotStarted";
             foreach(KeyValuePair<string, BlackJackPlayer> player in Players) {
                 Players[player.Key].Hand.Clear();
+                Players[player.Key].CurrentScore = 0;
+                Players[player.Key].CurrentBet = 0;
+                Players[player.Key].HasBet = false;
+                Players[player.Key].NotPlaying = false;
                 Players[player.Key].Busted = false;
                 Players[player.Key].Winner = false;
                 Players[player.Key].StillPlaying = true;
+                Players[player.Key].Standing = false;
             }
+            BlackJackJsonState.Winners.Clear();
+            BlackJackJsonState.Losers.Clear();
+            BlackJackJsonState.Stalemates.Clear();
             PlayerOrder.BackToFirstPlayer();
             StartRound();
             return true;
@@ -150,6 +163,7 @@ public class BlackJackGame : IBaseGame<StandardCard>
             Console.WriteLine("In giving cards");
             state = "CheckingForQuickWinners";
             CheckForWinnersOrLosers();//may want a wait or something here for like 2 seconds.
+            // await _messenger.SendFrontendJson(GetAllConnStrsIncGameboard(), GetGameState());
             return true;//now the round either end or they draw cards. end round done, drwing cards not done.
         }
         Console.WriteLine("The state is not in \"GivingCards\"");
@@ -254,13 +268,15 @@ public class BlackJackGame : IBaseGame<StandardCard>
                 if (player.Key != "Dealer") {
                     if (player.Value.CurrentScore > Players["Dealer"].CurrentScore && player.Value.Busted == false || Players["Dealer"].Busted && player.Value.Busted == false) {
                         BlackJackJsonState.Winners.Add(player.Value.Name);
-                        player.Value.TotalMoney += player.Value.CurrentBet * 2;
+                        // player.Value.TotalMoney += player.Value.CurrentBet * 2;
+                        Players[player.Key].TotalMoney += player.Value.CurrentBet * 2;
                     }
                     else if (player.Value.CurrentScore < Players["Dealer"].CurrentScore || player.Value.Busted == true)
                         BlackJackJsonState.Losers.Add(player.Value.Name);
                     else {
                         BlackJackJsonState.Stalemates.Add(player.Value.Name);
-                        player.Value.TotalMoney += player.Value.CurrentBet;
+                        // player.Value.TotalMoney += player.Value.CurrentBet;
+                        Players[player.Key].TotalMoney += player.Value.CurrentBet;
                     }
                 } else
                     continue;

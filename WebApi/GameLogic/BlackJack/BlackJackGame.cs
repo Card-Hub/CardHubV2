@@ -242,6 +242,9 @@ public class BlackJackGame : IBaseGame<StandardCard>
                 break;
             }
         }
+        if (state == "DealersTurn"){
+            PlayerOrder.BackToFirstPlayer();
+        }
         return true;
     }
 

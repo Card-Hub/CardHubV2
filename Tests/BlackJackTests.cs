@@ -186,6 +186,7 @@ public class BlackJackTests {
     game.TakeBet("04", 45);
     game.DrawCard("01");
     game.Stand("01");
+    // game.DrawCard("01");
     game.DrawCard("02");
     game.Stand("02");
     game.DrawCard("03");

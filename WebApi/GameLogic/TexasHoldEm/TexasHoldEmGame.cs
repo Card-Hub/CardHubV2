@@ -25,10 +25,10 @@ public class TexasHoldEmGame
   public string ButtonPlayer {get; set;}
   private int ButtonIndex {get; set;}
   public int CurrentBet {get; set;}
+  public int MinIncrease {get; set;}
   public List<StandardCard> Board {get; set;}
   public int TotalPot {get; set;}
   public string LastPlayerWhoRaised {get; set;}
-  [JsonIgnore]
   public string GameboardConnStr {get; set;}
   [JsonIgnore]
   private iUnoMessenger Messenger {get;set;}
@@ -48,6 +48,7 @@ public class TexasHoldEmGame
     this.ButtonPlayer = "";
     this.ButtonIndex = -1; // set to -1 so that we can += 1 it to be 0 in RoundStart
     this.TotalPot = 0;
+    this.MinIncrease = LittleBlindAmt;
     this.Board = new();
     this.InitialPlayerPot = 100;
     this.LastPlayerWhoRaised = "";
@@ -64,20 +65,8 @@ public class TexasHoldEmGame
       return false;
   }
 
-  public bool DrawCard(string playerName)
-  {
-    throw new NotImplementedException();
-  }
+  
 
-  public void EndGame()
-  {
-    throw new NotImplementedException();
-  }
-
-  public List<StandardCard> GetPlayerHand(string playerName)
-  {
-    throw new NotImplementedException();
-  }
   public bool SetPlayerStatus(string connStr, LyssiePlayerStatus status) {
     switch (status) {
       case (LyssiePlayerStatus.Active):
@@ -121,6 +110,7 @@ public class TexasHoldEmGame
     if (this.State == "Not Started" && PlayerOrder.GetPlayers(LyssiePlayerStatus.Active).Count >= 2) {
       List<string> playerConnStrs = PlayerOrder.GetPlayers(LyssiePlayerStatus.Active);
       for (int i = 0; i < playerConnStrs.Count; i++) {
+        // give people their money
         Players[playerConnStrs[i]].AmountOfMoneyLeft = InitialPlayerPot;
         Players[playerConnStrs[i]].CurrentlyPlaying = true;
       }
@@ -139,29 +129,7 @@ public class TexasHoldEmGame
     return true;
   }
 
-  public bool ResetForNextRound()
-  {
-    List<string> playerNames = PlayerOrder.GetPlayers(LyssiePlayerStatus.Active);
-    for (int i = 0; i < playerNames.Count; i++) {
-      Players[playerNames[i]].CurrentBet = 0;
-      Players[playerNames[i]].Folded = false;
-      Players[playerNames[i]].CanFold = false;
-      Players[playerNames[i]].CanRaise = false;
-      Players[playerNames[i]].CanCheck = false;
-      Players[playerNames[i]].CanCall = false;
-    }
-    return true;
-  }
-  public string GetGameState() {
-    tehJsonState.Update(this);
-    return JsonConvert.SerializeObject(tehJsonState, Formatting.Indented);
-  }
-  
-  public bool Call(string playerName) {
-    throw new NotImplementedException();
-  }
-
-  public void RoundStart() {
+    public void RoundStart() {
     // reset, assign new button
     this.State = "Pre-Flop";
     do { // modify button until we find a player who is playing
@@ -209,6 +177,8 @@ public class TexasHoldEmGame
     Players[LittleBlindPlayer].AmountOfMoneyLeft -= LittleBlindAmt;
     Players[BigBlindPlayer].CurrentBet = BigBlindAmt;
     Players[BigBlindPlayer].AmountOfMoneyLeft -= BigBlindAmt;
+    // set game's currentbet
+    CurrentBet = BigBlindAmt;
     // assign the last player who raised to be the big blind
     LastPlayerWhoRaised = BigBlindPlayer;
     // IF WE WANT TO DO BIG BLIND'S CHOICE, CODE WOULD GO HERE.
@@ -216,10 +186,122 @@ public class TexasHoldEmGame
     Players[PlayerOrder.GetCurrentPlayer()].CanCall = true;
     Players[PlayerOrder.GetCurrentPlayer()].CanRaise = true;
     Players[PlayerOrder.GetCurrentPlayer()].CanFold = true;
-      Messenger.Log(ButtonPlayer);
-      Messenger.Log(LittleBlindPlayer);
-      Messenger.Log(BigBlindPlayer);
     Messenger.SendFrontendJson(GetAllConnStrsIncGameboard(), GetGameState());
+  }
+
+  public bool ResetForNextRound()
+  {
+    List<string> playerNames = PlayerOrder.GetPlayers(LyssiePlayerStatus.Active);
+    for (int i = 0; i < playerNames.Count; i++) {
+      Players[playerNames[i]].CurrentBet = 0;
+      Players[playerNames[i]].Folded = false;
+      Players[playerNames[i]].CanFold = false;
+      Players[playerNames[i]].CanRaise = false;
+      Players[playerNames[i]].CanCheck = false;
+      Players[playerNames[i]].CanCall = false;
+    }
+    return true;
+  }
+  
+  public string GetGameState() {
+    tehJsonState.Update(this);
+    return JsonConvert.SerializeObject(tehJsonState, Formatting.Indented);
+  }
+  
+  private void DeclareWantToPlay(string connStr, bool wantToPlay) {
+    if (State == "DeclaringWantToPlay") {
+      if (Players.ContainsKey(connStr)) {
+        Players[connStr].CurrentlyPlaying = wantToPlay;
+      }
+      // if all players have declared that they want to play
+      int totalActivePlayers = PlayerOrder.GetPlayers(LyssiePlayerStatus.Active).Count;
+      int totalDeclaredPlayers = 0;
+      foreach (string cs in PlayerOrder.GetPlayers(LyssiePlayerStatus.Active)) {
+        if (Players[cs].HasDeclaredWhetherPlaying) {
+          totalDeclaredPlayers ++;
+        }
+      }
+      if (totalDeclaredPlayers == totalActivePlayers) {
+        Messenger.SendFrontendError(new List<string>() {GameboardConnStr}, "Not enough players want to play this round.");
+        RoundStart();
+      }
+    }
+  }
+
+  public bool Call(string connStr) {
+    PokerPlayer player = Players[connStr];
+    int amtExtraToPutIn = CurrentBet - player.CurrentBet;
+    if (player.CanCall) {
+      if (player.AmountOfMoneyLeft >= amtExtraToPutIn) {
+        // player can afford to call
+        player.AmountOfMoneyLeft -= amtExtraToPutIn;
+        player.CurrentBet = CurrentBet;
+        TotalPot += amtExtraToPutIn;
+        return true;
+      }
+      else { // can't afford to call
+        Messenger.SendFrontendError(new List<string>() {connStr}, "Can't call, you can't afford the current bet!");
+        return false;
+      }
+    }
+    else {
+        Messenger.SendFrontendError(new List<string>() {connStr}, "Can't call right now!");
+        return false;
+    }
+  }
+  public bool Fold(string connStr) {
+    if (Players[connStr].CanFold) {
+      Players[connStr].Folded = true;
+    }
+    Players[connStr].CanFold = false;
+    Players[connStr].CanCall = false;
+    Players[connStr].CanCheck = false;
+    Players[connStr].CanRaise = false;
+
+    // either the player isn't the only player left, or there's
+    if (HowManyPlayersArePlayingAndHaventFolded() > 1) {
+      //
+      GoToNextNotFoldedPlayingPlayer();
+      if (PlayerOrder.GetCurrentPlayer() == LastPlayerWhoRaised) {
+        Messenger.Log("IN FOLD, RAN OUT OF PLAYERS...");
+        Messenger.Log("SHOULD GO TO THE NEXT STREET NOW");
+        NextStreet();
+      }
+      else {
+        // move onto new player
+        var prevCurrentPlayer = PlayerOrder.GetCurrentPlayer();
+        Messenger.Log("IN FOLD, NEXT PLAYER SHOULD GO");
+        GoToNextNotFoldedPlayingPlayer();
+        var newCurrentPlayer = PlayerOrder.GetCurrentPlayer();
+        // if new player was the last to raise, the street ends
+        if (newCurrentPlayer == LastPlayerWhoRaised) {
+          NextStreet();
+        }
+        else {
+          // set up the new current player
+          SetUpNewPlayer(Players[prevCurrentPlayer].CanCheck);
+        }
+      }
+    }
+    else { // not enough players
+
+    }
+    return true;
+  }
+
+  public bool Raise(string connStr, int amtToRaiseBy) {
+    // your turn, you can afford it, you aren't the last to raise
+    if (Players[connStr].CanRaise) {
+
+    }
+    // for some reason, you can't raise
+    else {
+      var playerCanAffordToRaise = currentPlayer.AmountOfMoneyLeft >= (MinIncrease + CurrentBet - currentPlayer.CurrentBet);
+      currentPlayer.CanRaise = currentPlayer.Name != LastPlayerWhoRaised && playerCanAffordToRaise;
+
+        Messenger.SendFrontendError(new List<string>() {connStr},"It's your turn but you can't raise right now");
+    }
+      Messenger.SendFrontendError(new List<string>() {connStr}, "Can't raise right now!");
   }
 
   private List<string> GetAllConnStrsIncGameboard() {
@@ -248,20 +330,76 @@ public class TexasHoldEmGame
     /// <param name="valToNormalize"></param>
     /// <param name="max"></param>
     /// <returns></returns>
-    public int NormalizeInt(int valToNormalize, int max) {
-      int val = valToNormalize % max; // handle too large
-      while (val < 0) { // handle too big
-        val += max;
-      }
-      return val;
+  public int NormalizeInt(int valToNormalize, int max) {
+    int val = valToNormalize % max; // handle too large
+    while (val < 0) { // handle too big
+      val += max;
     }
-    public int HowManyPlayersPlayingThisRound() {
-      int count = 0;
-      foreach (string connStr in PlayerOrder.GetPlayers(LyssiePlayerStatus.Active)) {
-        if (Players[connStr].CurrentlyPlaying == true) {
-          count += 1;
-        }
+    return val;
+  }
+  public int HowManyPlayersPlayingThisRound() {
+    int count = 0;
+    foreach (string connStr in PlayerOrder.GetPlayers(LyssiePlayerStatus.Active)) {
+      if (Players[connStr].CurrentlyPlaying == true) {
+        count += 1;
       }
-      return count;
     }
+    return count;
+  }
+  public int HowManyPlayersArePlayingAndHaventFolded() {
+    int count = 0;
+    foreach (string connStr in PlayerOrder.GetPlayers(LyssiePlayerStatus.Active)) {
+      if (Players[connStr].CurrentlyPlaying == true && Players[connStr].Folded == false) {
+        count += 1;
+      }
+    }
+    return count;
+  }
+
+  public void GoToNextNotFoldedPlayingPlayer() {
+    do {
+      PlayerOrder.NextTurn();
+    } while (
+        Players[PlayerOrder.GetCurrentPlayer()].Folded == false &&
+        Players[PlayerOrder.GetCurrentPlayer()].CurrentlyPlaying == true);
+  }
+  public void NextStreet() {
+    Messenger.Log("Next street!");
+    // river is the final state of the game before winnerscreen
+    if (State != "River") { // TODO: FIX THIS
+      // go to little blind player
+      // if little blind is out, go to the first not-folded player
+      PlayerOrder.SetNextPlayer(LittleBlindPlayer);
+      PlayerOrder.NextTurn(); // current player == little blind
+      if (Players[LittleBlindPlayer].Folded == true) {
+        GoToNextNotFoldedPlayingPlayer();
+      }
+    }
+    if (State == "Pre-Flop") {
+      State = "Flop";
+      // give the 3 community cards
+      Board.Add(Deck.Draw());
+      Board.Add(Deck.Draw());
+      Board.Add(Deck.Draw());
+      // set the next canCheck
+      Players[PlayerOrder.GetCurrentPlayer()].CanCheck = true;
+    }
+  }
+
+  private void SetUpNewPlayer(bool canCheck) {
+    PokerPlayer currentPlayer = Players[PlayerOrder.GetCurrentPlayer()];
+    currentPlayer.CanFold = true;
+    currentPlayer.CanCheck = canCheck;
+    // player can call whenever they can afford to
+    currentPlayer.CanCall = currentPlayer.AmountOfMoneyLeft >= (CurrentBet - currentPlayer.CurrentBet);
+    // player can raise if they can afford to
+    // but they also can't have raised last
+    var playerCanAffordToRaise = currentPlayer.AmountOfMoneyLeft >= (MinIncrease + CurrentBet - currentPlayer.CurrentBet);
+    currentPlayer.CanRaise = currentPlayer.Name != LastPlayerWhoRaised && playerCanAffordToRaise;
+  }
+
+  public void EndGame()
+  {
+    Messenger.Log("Game ended.");
+  }
 }

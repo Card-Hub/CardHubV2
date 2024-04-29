@@ -12,6 +12,7 @@ public class PokerPlayer : CardPlayerLyssie<StandardCard> {
   public bool CanRaise {get; set; } // they can raise. only true on their turn
   public bool CanCall {get; set; } // they can call. only true on their turn
   public bool CanCheck {get; set; } // they can check. only true on their turn
+  public bool HasDeclaredWhetherPlaying { get; set; } // between rounds, they declare whether or not they're playing the next round
   public PokerPlayer(string name, string connectionString) : base(name, connectionString) {
     AmountOfMoneyLeft = 0;
     CurrentBet = 0;

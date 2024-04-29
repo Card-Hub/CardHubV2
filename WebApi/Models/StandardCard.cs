@@ -16,4 +16,10 @@ public class StandardCard
     public int Id { get; set; }
     public string Suit { get; set; }
     public string Value { get; set; }
+
+    public bool Equals(StandardCard other)
+    {
+        // Would still want to check for null etc. first.
+        return (this.Suit == other.Suit && this.Value == other.Value);
+    }
 }

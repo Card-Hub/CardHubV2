@@ -192,7 +192,6 @@ public class BlackJackTests {
     game.Stand("03");
     game.DrawCard("04");
     game.Stand("04");
-    // Assert.Equal("Restart", game.state);
     output.WriteLine(game.GetGameState());
   }
 }

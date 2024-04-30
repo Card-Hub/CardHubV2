@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import {defineComponent, ref, onMounted} from "vue";
 import {storeToRefs} from "pinia";
-import {useWebSocketStore} from "~/stores/webSocketStore";
+// import {useWebSocketStore} from "~/stores/webSocketStore";
+import {useBlackJackStore} from "~/stores/blackJackStore";
 
-import UNEnoshadowCard from "~/components/noShadowCard/UNEnoshadowCard.vue";
+// import UNEnoshadowCard from "~/components/noShadowCard/UNEnoshadowCard.vue";
 
-const store = useWebSocketStore();
-const uneStore = useUneStore();
+const blackjackStore = useBlackJackStore();
 const newCards = ref<number[]>([]);
-const { currentColor, players, currentPlayer, discardPile  } = storeToRefs(uneStore);
+// const { currentColor, players, currentPlayer, discardPile  } = storeToRefs(uneStore);
 
-const cards = ref<UNOCard[]>(discardPile);
+// const cards = ref<UNOCard[]>(discardPile);
 
 const getCardStyle = (index: number) => {
   const randomX = Math.floor(Math.random() * 50) - 5; // Random offset for X-axis

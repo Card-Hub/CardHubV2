@@ -1,9 +1,11 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
-import {useWebSocketStore} from "~/stores/webSocketStore";
+import { useWebSocketStore } from "~/stores/webSocketStore";
 
 
-export const blackJackStore = defineStore("blackJack", () => {
+
+
+export const useBlackJackStore = defineStore("blackjack", () => {
   const store = useWebSocketStore();
   const { gameJson, user } = storeToRefs(store);
     const { $api } = useNuxtApp();

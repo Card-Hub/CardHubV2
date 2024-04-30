@@ -7,12 +7,13 @@ import {
     LogLevel
 } from "@microsoft/signalr";
 import { ref } from "vue";
-
 import {useUneStore} from "~/stores/uneStore";
+// import {useBlackJackStore} from "~/stores/blackJackStore";
 
 export const useWebSocketStore = defineStore("webSocket", () => {
   
   const store = useUneStore();
+
   const { gameType } = storeToRefs(store);
   const { parseJson } = store;
     const { $api } = useNuxtApp();

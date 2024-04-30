@@ -246,123 +246,123 @@ const handleExit = () => {
 
           <div class="explosions absolute flex flex-col justify-center items-center">
             <div id="app">
-<!--              <vue-particles id="tsparticles" @particles-loaded="particlesLoaded" url="http://foo.bar/particles.json"/>-->
+              <vue-particles id="tsparticles" @particles-loaded="particlesLoaded" url="http://foo.bar/particles.json"/>
 
-<!--              <vue-particles-->
-<!--                  id="tsparticles"-->
-<!--                  @particles-loaded="particlesLoaded"-->
-<!--                  :options="{-->
-<!--                    background: {-->
-<!--                        color: {-->
-<!--                            value: 'transparent'-->
-<!--                        }-->
-<!--                    },-->
-<!--                    particles: {-->
-<!--                        number: {-->
-<!--                            value: 0-->
-<!--                        },-->
-<!--                        color: {-->
-<!--                            value: ['#8338ec', '#ff006e', '#ffbe0b', '#3a86ff']-->
-<!--                        },-->
-<!--                        animation: {-->
-<!--                            enable: true,-->
-<!--                            speed: 2,-->
-<!--                            startValue: 'max',-->
-<!--                            destroy: 'min'-->
-<!--                        },-->
-<!--                        links: {-->
-<!--                            enable: false-->
-<!--                        },-->
-<!--                        life: {-->
-<!--                            count: 1,-->
-<!--                            duration: {-->
-<!--                              sync: true,-->
-<!--                                value: 5-->
-<!--                            }-->
-<!--                        },-->
-<!--                        move: {-->
-<!--                            enable: true,-->
-<!--                            gravity: {-->
-<!--                                enable: true,-->
-<!--                                acceleration: 10-->
-<!--                            },-->
-<!--                          speed: {-->
-<!--                              min: 10,-->
-<!--                              max: 20-->
-<!--                          },-->
-<!--                          decay: 0.1,-->
-<!--                          direction: 'none',-->
-<!--                          straight: false,-->
-<!--                          outModes: {-->
-<!--                              default: 'destroy',-->
-<!--                              top: 'none'-->
-<!--                          }-->
-<!--                        },-->
-<!--                        rotate: {-->
-<!--                            value: {min: 0, max: 360},-->
-<!--                            move: true,-->
-<!--                            direction: 'random',-->
-<!--                            animation: {-->
-<!--                                enable: true,-->
-<!--                                speed: 60-->
-<!--                            }-->
-<!--                        },-->
-<!--                        tilt: {-->
-<!--                            enable: true,-->
-<!--                            value: {min: 0, max: 360},-->
-<!--                            direction: 'random',-->
-<!--                            move: true,-->
-<!--                            animation: {-->
-<!--                                enable: true,-->
-<!--                                speed: 60-->
-<!--                            }-->
-<!--                        },-->
-<!--                        roll: {-->
-<!--                          darken: {-->
-<!--                            enable: true,-->
-<!--                            value: 25-->
-<!--                          },-->
-<!--                          enable: true,-->
-<!--                          speed: {-->
-<!--                            min: 15,-->
-<!--                            max: 25-->
-<!--                          }-->
-<!--                        },-->
-<!--                        wobble: {-->
-<!--                            distance: 30,-->
-<!--                            enable: true,-->
-<!--                            move: true,-->
-<!--                            speed: {-->
-<!--                                min: -15,-->
-<!--                                max: 15}-->
-<!--                        },-->
-<!--                        opacity: {-->
-<!--                            value: {min: 0, max: 2}-->
-<!--                        },-->
-<!--                        shape: {-->
-<!--                            type: ['circle', 'triangle', 'square'],-->
-<!--                        },-->
-<!--                        size: {-->
-<!--                            value: { min: 2, max: 4 }-->
-<!--                        }-->
-<!--                    },-->
-<!--                    emitters: {-->
-<!--                      life: {-->
-<!--                        count: 0,-->
-<!--                        duration: 0.1,-->
-<!--                        delay: 0.4-->
-<!--                      },-->
-<!--                      rate: {-->
-<!--                        delay: 0.5,-->
-<!--                        quantity: 150-->
-<!--                      },-->
-<!--                      size: {-->
-<!--                        width: 0,-->
-<!--                        height: 0-->
-<!--                      },-->
-<!--                    }-->
-<!--                }"-->
-<!--              />-->
+              <vue-particles
+                  id="tsparticles"
+                  @particles-loaded="particlesLoaded"
+                  :options="{
+                    background: {
+                        color: {
+                            value: 'transparent'
+                        }
+                    },
+                    particles: {
+                        number: {
+                            value: 0
+                        },
+                        color: {
+                            value: ['#8338ec', '#ff006e', '#ffbe0b', '#3a86ff']
+                        },
+                        animation: {
+                            enable: true,
+                            speed: 2,
+                            startValue: 'max',
+                            destroy: 'min'
+                        },
+                        links: {
+                            enable: false
+                        },
+                        life: {
+                            count: 1,
+                            duration: {
+                              sync: true,
+                                value: 5
+                            }
+                        },
+                        move: {
+                            enable: true,
+                            gravity: {
+                                enable: true,
+                                acceleration: 10
+                            },
+                          speed: {
+                              min: 10,
+                              max: 20
+                          },
+                          decay: 0.1,
+                          direction: 'none',
+                          straight: false,
+                          outModes: {
+                              default: 'destroy',
+                              top: 'none'
+                          }
+                        },
+                        rotate: {
+                            value: {min: 0, max: 360},
+                            move: true,
+                            direction: 'random',
+                            animation: {
+                                enable: true,
+                                speed: 60
+                            }
+                        },
+                        tilt: {
+                            enable: true,
+                            value: {min: 0, max: 360},
+                            direction: 'random',
+                            move: true,
+                            animation: {
+                                enable: true,
+                                speed: 60
+                            }
+                        },
+                        roll: {
+                          darken: {
+                            enable: true,
+                            value: 25
+                          },
+                          enable: true,
+                          speed: {
+                            min: 15,
+                            max: 25
+                          }
+                        },
+                        wobble: {
+                            distance: 30,
+                            enable: true,
+                            move: true,
+                            speed: {
+                                min: -15,
+                                max: 15}
+                        },
+                        opacity: {
+                            value: {min: 0, max: 2}
+                        },
+                        shape: {
+                            type: ['circle', 'triangle', 'square'],
+                        },
+                        size: {
+                            value: { min: 2, max: 4 }
+                        }
+                    },
+                    emitters: {
+                      life: {
+                        count: 0,
+                        duration: 0.1,
+                        delay: 0.4
+                      },
+                      rate: {
+                        delay: 0.5,
+                        quantity: 150
+                      },
+                      size: {
+                        width: 0,
+                        height: 0
+                      },
+                    }
+                }"
+              />
             </div>
           </div>
         </div>

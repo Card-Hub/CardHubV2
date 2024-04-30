@@ -30,9 +30,9 @@ const values = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "
 for (const suit of suits) {
   for (const value of values) {
     standardDeck.push({
-      id: standardDeck.length + 1,
-      suit,
-      value
+      Id: standardDeck.length + 1,
+      Suit: suit,
+      Value: value
     });
   }
 }
@@ -83,9 +83,6 @@ const items = ref([
         </NuxtLink>
       </div>
 
-      <!--      <div class="column">-->
-      <!--        <h1>UNO</h1>-->
-      <!--      </div>-->
     </div>
 
     <div class="menu-container">
@@ -98,7 +95,7 @@ const items = ref([
     
     <div v-if="active === 2" class="card-container">
         <StandardCardDisplay v-for="card in standardDeck"
-                             :key="card.id"
+                             :key="card.Id"
                              :card="card"
         />
     </div>

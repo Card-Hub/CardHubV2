@@ -15,28 +15,14 @@ const { tryCreateRoom, tryJoinRoom, sendGameType } = store;
 const connectGameboard = async (): Promise<void> => {
   const isRoomCreated = await tryCreateRoom();
   if (isRoomCreated) {
-    sendGameType('CAH');
+    sendGameType('AZN Flush');
     // await navigateTo('/playerview');
     await navigateTo("/lobby");
   }
 };
 
-// create standard deck of cards
-const standardDeck = [];
-const suits = ["hearts", "diamonds", "clubs", "spades"];
-const values = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King", "Ace"];
 
-for (const suit of suits) {
-  for (const value of values) {
-    standardDeck.push({
-      id: standardDeck.length + 1,
-      suit,
-      value
-    });
-  }
-}
-
-const playerHand = ref<StandardCard[]>(standardDeck);
+// const playerHand = ref<StandardCard[]>(standardDeck);
 
 const getCards = () => {
   return new URL(`../../assets/icons/aznflush/aznflush.png`, import.meta.url);
@@ -91,10 +77,7 @@ const items = ref([
     </div>
     
     <div v-if="active === 2" class="card-container">
-      <StandardCardDisplay v-for="card in standardDeck"
-                           :key="card.id"
-                           :card="card"
-      />
+      
     </div>
     
     <div class="rules-container" v-else-if="active === 0">

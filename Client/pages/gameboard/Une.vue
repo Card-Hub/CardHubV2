@@ -2,8 +2,6 @@
 import {defineComponent, ref, onMounted} from "vue";
 import {storeToRefs} from "pinia";
 import {useWebSocketStore} from "~/stores/webSocketStore";
-import {tsParticles} from "@tsparticles/engine";
-declare module "@tsparticles/vue3";
 
 import UNEnoshadowCard from "~/components/noShadowCard/UNEnoshadowCard.vue";
 
@@ -58,6 +56,9 @@ const discardedCardsToDisplay = computed(() => {
       Color: discardPile.value[i].Color,
       Value: discardPile.value[i].Value
     };
+    if (discardPile.value[i].Value === "Wild" || discardPile.value[i].Value === "Wild Draw Four") {
+      card.Color = currentColor.value;
+    }
     DC.push([card, 5 - i]);
   }
   return DC;
@@ -70,10 +71,10 @@ const getPlayerIconStyle = (index: number) => {
 
   if (totalPlayers === 2) {
     xpos = index === 0 ? 50 : -51;
-    ypos = index === 0 ? -300 : 300;
+    ypos = index === 0 ? -350 : 350;
   } else if (totalPlayers === 3) {
-    xpos = index === 0 ? 151 : index === 1 ? -251 : 251;
-    ypos = index === 0 ? -300 : index === 1 ? 300 : 300;
+    xpos = index === 0 ? 151 : index === 1 ? -276 : 251;
+    ypos = index === 0 ? -350 : index === 1 ? 350 : 350;
   } else if (totalPlayers === 4) {
     xpos = index === 0 ? 150 : index === 1 ? -456 : index === 2 ? -56 : 356;
     ypos = index === 0 ? -350 : index === 1 ? 0 : index === 2 ? 350 : 0;
@@ -130,23 +131,27 @@ const getArrow = () => {
 
 const getleftArrow = () => {
   let angle = 180;
-  if (direction.value.toLowerCase() != "clockwise") {
+  let scale = 1;
+  if (direction.value.toLowerCase() === "clockwise") {
     angle = 0;
+    scale = -1;
   }
 
   return {
-    transform: `rotate(${angle}deg)`,
+    transform: `rotate(${angle}deg) scaleX(${scale})`,
   };
 };
 
 const getRightArrow = () => {
   let angle = 0;
-  if (direction.value.toLowerCase() !== "clockwise") {
+  let scale = 1;
+  if (direction.value.toLowerCase() === "clockwise") {
     angle = 180;
+    scale = -1;
   }
 
   return {
-    transform: `rotate(${angle}deg)`,
+    transform: `rotate(${angle}deg) scaleX(${scale})`,
   };
 };
 
@@ -172,35 +177,36 @@ const handleExit = () => {
   <!--  <p> {{ discardedCardsToDisplay }}</p>-->
   <div class="gameboard-container">
     <div class="gameboard">
-      <div class="player-icons">
+      <div class="player-icons grid grid-cols-2 content-center">
         <div class="player-icon" v-for="(player, index) in players" :key="index"
              :style="{ ...getPlayerIconStyle(index), ...isCurrentPlayer(player.Name) }">
           <img :src="getPlayerIcon(player.Avatar)" alt="Player Icon" class="player-icon-img"/>
-          <p class="player-name"> {{ player.Name }} </p>
-
-          <div class="num-cards-container">
-            <div class="uno-small-card">
-              <div class="small-deck-card flex justify-center items-center bg-zinc-800 rounded-md shadow-md mb-2">
-                <img :src="getUNE()" alt="game icon" class="une-logo"/>
-              </div>
-              <p>{{ getNumofCards(player) }}</p>
-            </div>
-            
-          </div>
-
+          
+<!--          <p> {{ player.value.Hand.length }}</p>-->
         </div>
       </div>
+<!--      <div class="" v-for="player in players" :key="player">-->
+<!--        <h1 class="player-name">{{ player.Name }} </h1>-->
+<!--      </div>-->
+<!--      <div class="num-cards-container">-->
+<!--        <div class="uno-small-card">-->
+<!--          <div class="small-deck-card flex justify-center items-center bg-zinc-800 rounded-md shadow-md mb-2">-->
+<!--            <img :src="getUNE()" alt="game icon" class="une-logo"/>-->
+<!--          </div>-->
+<!--          <p> xHello </p>-->
+<!--        </div>-->
+<!--      </div>-->
 
       <div class="game-table rounded-tr-full shadow-lg" v-bind:class="currentColor">
         <div v-if="winner === ''">
-          <div class="column-container columns-4xl">
+          <div class="h-auto w-[800px] grid grid-cols-4 content-center">
             
-            <div class="column leftmost-column">
+            <div class="">
               <img :src="getArrow()" alt="left arrow" class="arrow"
                    :style="getleftArrow()"/>
             </div>
             
-            <div class="column left-column">
+            <div class="">
               <div class="deck-view">
                 <!--            <div class="flex justify-center items-center w-52 h-80 bg-zinc-800 rounded-md shadow-md mb-2">-->
                 <div class="deck-card flex justify-center items-center bg-zinc-800 rounded-md shadow-md mb-2"
@@ -210,8 +216,8 @@ const handleExit = () => {
               </div>
             </div>
 
-            <div class="column right-column">
-              <div class="card-pile">
+            <div class="">
+              <div class="deck-view">
                 <UNEnoshadowCard class="singular-card" v-for="[card, index] in discardedCardsToDisplay"
                                  :key="card.Id"
                                  :card="card"
@@ -220,7 +226,7 @@ const handleExit = () => {
               </div>
             </div>
 
-            <div class="column rightmost-column">
+            <div class="">
               <img :src="getArrow()" alt="right arrow" class="arrow"
                    :style="getRightArrow()"/>
             </div>
@@ -240,124 +246,123 @@ const handleExit = () => {
 
           <div class="explosions absolute flex flex-col justify-center items-center">
             <div id="app">
-              <!--                  <tsparticles id="tsparticles" @particlesLoaded="particlesLoaded" :options="options" />                  -->
-              <vue-particles id="tsparticles" @particles-loaded="particlesLoaded" url="http://foo.bar/particles.json"/>
+<!--              <vue-particles id="tsparticles" @particles-loaded="particlesLoaded" url="http://foo.bar/particles.json"/>-->
 
-              <vue-particles
-                  id="tsparticles"
-                  @particles-loaded="particlesLoaded"
-                  :options="{
-                    background: {
-                        color: {
-                            value: 'transparent'
-                        }
-                    },
-                    particles: {
-                        number: {
-                            value: 0
-                        },
-                        color: {
-                            value: ['#8338ec', '#ff006e', '#ffbe0b', '#3a86ff']
-                        },
-                        animation: {
-                            enable: true,
-                            speed: 2,
-                            startValue: 'max',
-                            destroy: 'min'
-                        },
-                        links: {
-                            enable: false
-                        },
-                        life: {
-                            count: 1,
-                            duration: {
-                              sync: true,
-                                value: 5
-                            }
-                        },
-                        move: {
-                            enable: true,
-                            gravity: {
-                                enable: true,
-                                acceleration: 10
-                            },
-                          speed: {
-                              min: 10,
-                              max: 20
-                          },
-                          decay: 0.1,
-                          direction: 'none',
-                          straight: false,
-                          outModes: {
-                              default: 'destroy',
-                              top: 'none'
-                          }
-                        },
-                        rotate: {
-                            value: {min: 0, max: 360},
-                            move: true,
-                            direction: 'random',
-                            animation: {
-                                enable: true,
-                                speed: 60
-                            }
-                        },
-                        tilt: {
-                            enable: true,
-                            value: {min: 0, max: 360},
-                            direction: 'random',
-                            move: true,
-                            animation: {
-                                enable: true,
-                                speed: 60
-                            }
-                        },
-                        roll: {
-                          darken: {
-                            enable: true,
-                            value: 25
-                          },
-                          enable: true,
-                          speed: {
-                            min: 15,
-                            max: 25
-                          }
-                        },
-                        wobble: {
-                            distance: 30,
-                            enable: true,
-                            move: true,
-                            speed: {
-                                min: -15,
-                                max: 15}
-                        },
-                        opacity: {
-                            value: {min: 0, max: 2}
-                        },
-                        shape: {
-                            type: ['circle', 'triangle', 'square'],
-                        },
-                        size: {
-                            value: { min: 2, max: 4 }
-                        }
-                    },
-                    emitters: {
-                      life: {
-                        count: 0,
-                        duration: 0.1,
-                        delay: 0.4
-                      },
-                      rate: {
-                        delay: 0.5,
-                        quantity: 150
-                      },
-                      size: {
-                        width: 0,
-                        height: 0
-                      },
-                    }
-                }"
-              />
+<!--              <vue-particles-->
+<!--                  id="tsparticles"-->
+<!--                  @particles-loaded="particlesLoaded"-->
+<!--                  :options="{-->
+<!--                    background: {-->
+<!--                        color: {-->
+<!--                            value: 'transparent'-->
+<!--                        }-->
+<!--                    },-->
+<!--                    particles: {-->
+<!--                        number: {-->
+<!--                            value: 0-->
+<!--                        },-->
+<!--                        color: {-->
+<!--                            value: ['#8338ec', '#ff006e', '#ffbe0b', '#3a86ff']-->
+<!--                        },-->
+<!--                        animation: {-->
+<!--                            enable: true,-->
+<!--                            speed: 2,-->
+<!--                            startValue: 'max',-->
+<!--                            destroy: 'min'-->
+<!--                        },-->
+<!--                        links: {-->
+<!--                            enable: false-->
+<!--                        },-->
+<!--                        life: {-->
+<!--                            count: 1,-->
+<!--                            duration: {-->
+<!--                              sync: true,-->
+<!--                                value: 5-->
+<!--                            }-->
+<!--                        },-->
+<!--                        move: {-->
+<!--                            enable: true,-->
+<!--                            gravity: {-->
+<!--                                enable: true,-->
+<!--                                acceleration: 10-->
+<!--                            },-->
+<!--                          speed: {-->
+<!--                              min: 10,-->
+<!--                              max: 20-->
+<!--                          },-->
+<!--                          decay: 0.1,-->
+<!--                          direction: 'none',-->
+<!--                          straight: false,-->
+<!--                          outModes: {-->
+<!--                              default: 'destroy',-->
+<!--                              top: 'none'-->
+<!--                          }-->
+<!--                        },-->
+<!--                        rotate: {-->
+<!--                            value: {min: 0, max: 360},-->
+<!--                            move: true,-->
+<!--                            direction: 'random',-->
+<!--                            animation: {-->
+<!--                                enable: true,-->
+<!--                                speed: 60-->
+<!--                            }-->
+<!--                        },-->
+<!--                        tilt: {-->
+<!--                            enable: true,-->
+<!--                            value: {min: 0, max: 360},-->
+<!--                            direction: 'random',-->
+<!--                            move: true,-->
+<!--                            animation: {-->
+<!--                                enable: true,-->
+<!--                                speed: 60-->
+<!--                            }-->
+<!--                        },-->
+<!--                        roll: {-->
+<!--                          darken: {-->
+<!--                            enable: true,-->
+<!--                            value: 25-->
+<!--                          },-->
+<!--                          enable: true,-->
+<!--                          speed: {-->
+<!--                            min: 15,-->
+<!--                            max: 25-->
+<!--                          }-->
+<!--                        },-->
+<!--                        wobble: {-->
+<!--                            distance: 30,-->
+<!--                            enable: true,-->
+<!--                            move: true,-->
+<!--                            speed: {-->
+<!--                                min: -15,-->
+<!--                                max: 15}-->
+<!--                        },-->
+<!--                        opacity: {-->
+<!--                            value: {min: 0, max: 2}-->
+<!--                        },-->
+<!--                        shape: {-->
+<!--                            type: ['circle', 'triangle', 'square'],-->
+<!--                        },-->
+<!--                        size: {-->
+<!--                            value: { min: 2, max: 4 }-->
+<!--                        }-->
+<!--                    },-->
+<!--                    emitters: {-->
+<!--                      life: {-->
+<!--                        count: 0,-->
+<!--                        duration: 0.1,-->
+<!--                        delay: 0.4-->
+<!--                      },-->
+<!--                      rate: {-->
+<!--                        delay: 0.5,-->
+<!--                        quantity: 150-->
+<!--                      },-->
+<!--                      size: {-->
+<!--                        width: 0,-->
+<!--                        height: 0-->
+<!--                      },-->
+<!--                    }-->
+<!--                }"-->
+<!--              />-->
             </div>
           </div>
         </div>
@@ -396,37 +401,12 @@ const handleExit = () => {
   text-shadow: 2px 2px 4px #000000;
 }
 
-.card-pile {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding-bottom: 10%;
-}
-
 .singular-card {
   justify-self: center;
   align-self: center;
   position: absolute;
 
   transition: transform 0.5s;
-}
-
-.column-container {
-  max-height: 800px;
-  max-width: 1000px;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  height: 75%;
-  width: 75%;
-}
-
-.left-column, .right-column, .leftmost-column, .rightmost-column {
-  flex: 1;
-  align-items: center;
-  justify-content: center;
-  display: flex;
 }
 
 .deck-view {
@@ -446,6 +426,7 @@ const handleExit = () => {
   height: 30vw;
   max-height: 300px;
   max-width: 200px;
+  margin-right: 100px;
 }
 
 .game-table {
@@ -608,6 +589,6 @@ const handleExit = () => {
   border-radius: 50%;
   overflow: hidden;
   margin-right: 10px;
-  background: rgba(255, 255, 255, 0.2);
+  background: black;
 }
 </style>

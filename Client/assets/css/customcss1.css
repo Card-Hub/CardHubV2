@@ -6,6 +6,7 @@
     --une-blue: #1166ac;
     --une-green: #7abb18;
     --une-yellow: #ffce30;
+    --une-black: #151515;
 }
 .p-button.p-component {
     background-color: var(--cardhub-red);

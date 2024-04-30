@@ -23,16 +23,27 @@ public class TexasGameSim {
     testPlayers.Add(new Tuple<string, string>("A", "111"));
     testPlayers.Add(new Tuple<string, string>("B", "222"));
     testPlayers.Add(new Tuple<string, string>("C", "333"));
+    testPlayers.Add(new Tuple<string, string>("D", "444"));
+    testPlayers.Add(new Tuple<string, string>("E", "555"));
+    testPlayers.Add(new Tuple<string, string>("F", "666"));
+    testPlayers.Add(new Tuple<string, string>("G", "777"));
+    testPlayers.Add(new Tuple<string, string>("H", "888"));
     //game.AddPlayer("D", "444");
     foreach (Tuple<string, string> playerTuple in testPlayers) {
       game.AddPlayer(playerTuple.Item1, playerTuple.Item2);
     }
     output.WriteLine("Game state upon adding A, B, C, D is: " + game.GetGameState());
     game.StartGame();
+    //game.Call(testPlayers[0].Item2);
+    //pre-flop
     foreach (Tuple<string, string> playerTuple in testPlayers) { // playerTuple is (name, connStr)
-      output.WriteLine($"Turn starting for {playerTuple.Item1}");
-      game.Call(playerTuple.Item2);
+      if (game.GetGameState() == "Pre-Flop") {
+        output.WriteLine($"Turn starting for {playerTuple.Item1}");
+        game.Call(playerTuple.Item2);
+      }
+      else { break; }
     }
+
     output.WriteLine("End Texas sim");
   }
 }

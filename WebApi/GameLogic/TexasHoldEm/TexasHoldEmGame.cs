@@ -237,6 +237,21 @@ public class TexasHoldEmGame
         player.AmountOfMoneyLeft -= amtExtraToPutIn;
         player.CurrentBet = CurrentBet;
         TotalPot += amtExtraToPutIn;
+
+        // move onto new player
+        var prevCurrentPlayer = PlayerOrder.GetCurrentPlayer();
+        Messenger.Log("IN FOLD, NEXT PLAYER SHOULD GO");
+        GoToNextNotFoldedPlayingPlayer();
+        var newCurrentPlayer = PlayerOrder.GetCurrentPlayer();
+        // if new player was the last to raise, the street ends
+        if (newCurrentPlayer == LastPlayerWhoRaised) {
+          NextStreet();
+        }
+        else {
+          // set up the new current player
+          SetUpNewPlayer(false); // next player can't check
+        }
+        Messenger.SendFrontendJson(new List<string>() {GameboardConnStr}, GetGameState());
         return true;
       }
       else { // can't afford to call
@@ -253,6 +268,8 @@ public class TexasHoldEmGame
     if (Players[connStr].CanFold) {
       Players[connStr].Folded = true;
     }
+    // store whether a player could check beforehand
+    bool foldedPlayerCouldCheck = Players[connStr].CanCheck;
     Players[connStr].CanFold = false;
     Players[connStr].CanCall = false;
     Players[connStr].CanCheck = false;
@@ -279,7 +296,7 @@ public class TexasHoldEmGame
         }
         else {
           // set up the new current player
-          SetUpNewPlayer(Players[prevCurrentPlayer].CanCheck);
+          SetUpNewPlayer(foldedPlayerCouldCheck);
         }
       }
     }
@@ -380,8 +397,8 @@ public class TexasHoldEmGame
     do {
       PlayerOrder.NextTurn();
     } while (
-        Players[PlayerOrder.GetCurrentPlayer()].Folded == false &&
-        Players[PlayerOrder.GetCurrentPlayer()].CurrentlyPlaying == true);
+        Players[PlayerOrder.GetCurrentPlayer()].Folded == true ||
+        Players[PlayerOrder.GetCurrentPlayer()].CurrentlyPlaying == false);
   }
   public void NextStreet() {
     Messenger.Log("Next street!");

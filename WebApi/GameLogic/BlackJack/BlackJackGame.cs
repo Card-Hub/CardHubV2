@@ -82,7 +82,6 @@ public class BlackJackGame : IBaseGame<StandardCard>
                 Players[player.Key].CurrentScore = 0;
                 Players[player.Key].CurrentBet = 0;
                 Players[player.Key].HasBet = false;
-                Players[player.Key].NotPlaying = false;
                 Players[player.Key].Busted = false;
                 Players[player.Key].Winner = false;
                 Players[player.Key].StillPlaying = true;
@@ -116,7 +115,6 @@ public class BlackJackGame : IBaseGame<StandardCard>
                     Players[player.Key].Standing = true;
                     if (PlayerOrder.GetCurrentPlayer() == player.Key && player.Key != "Dealer")
                         PlayerOrder.NextTurn();
-                    
                 } else
                     continue;
             } 
@@ -125,7 +123,7 @@ public class BlackJackGame : IBaseGame<StandardCard>
             }
             else if (state != "DealersTurn") {
                 foreach (KeyValuePair<string, BlackJackPlayer> player in Players) {//fix this later, its ugly
-                    if (Players[player.Key].Busted == true || Players[player.Key].Winner == true || Players[player.Key].StillPlaying == false || player.Value.Standing == true && state != "CheckingForQuickwinners" || player.Key == "Dealer"){
+                    if (Players[player.Key].NotPlaying == true || Players[player.Key].Busted == true || Players[player.Key].Winner == true || Players[player.Key].StillPlaying == false || player.Value.Standing == true && state != "CheckingForQuickwinners" || player.Key == "Dealer"){
                         Console.WriteLine("\n\nim here in the place you think it will be\n\n");
                         // state = "MakeListsAndPayPlayers";
                         state = "DealersTurn";
@@ -153,11 +151,11 @@ public class BlackJackGame : IBaseGame<StandardCard>
     public bool GivingCards(){
         if (state == "GivingCards"){
             foreach (KeyValuePair<string, BlackJackPlayer> player in Players)
-                if (player.Key != "Dealer")
+                if (player.Key != "Dealer" && player.Value.NotPlaying == false)
                     DrawCard(player.Key);
             DrawCard("Dealer");
             foreach (KeyValuePair<string, BlackJackPlayer> player in Players)
-                if (player.Key != "Dealer")
+                if (player.Key != "Dealer" && player.Value.NotPlaying == false)
                     DrawCard(player.Key);
             DrawCard("Dealer");
             Console.WriteLine("In giving cards");
@@ -190,10 +188,17 @@ public class BlackJackGame : IBaseGame<StandardCard>
     }
     public bool TakeBet(string connStr, int amt){
         if (state == "TakingBets") {
-            if (Players[connStr].TotalMoney >= amt){
+            if (Players[connStr].HasBet == false) {
+            // if (Players[connStr].TotalMoney >= amt){
                 Players[connStr].TotalMoney -= amt;
                 Players[connStr].CurrentBet = amt;
                 Players[connStr].HasBet = true;
+                if (Players[connStr].TotalMoney < 1) {
+                    Players[connStr].HasBet = true;
+                    Players[connStr].NotPlaying = true;
+                    PlayerOrder.SetPlayerStatus(connStr, LyssiePlayerStatus.Spectator);
+                }
+
                 // BlackJackJsonState.Update(this);
                 // Console.WriteLine("Player:", connStr, "has bet:", amt);//send frontedn stuffs
                 foreach (KeyValuePair<string, BlackJackPlayer> player in Players) {
@@ -207,8 +212,10 @@ public class BlackJackGame : IBaseGame<StandardCard>
                 if (state == "GivingCards")//may want to give promt for button here so its not instant.
                     GivingCards();
                 return true;
-            } else
-                Console.WriteLine("Not Enough money in players total!\n");
+            // } else
+            //     Console.WriteLine("Not Enough money in players total!\n");
+            } else 
+                Console.WriteLine("This player may not bet");
         }
         Console.WriteLine("we arnt in the TakingBets State");
         return false;
@@ -249,7 +256,7 @@ public class BlackJackGame : IBaseGame<StandardCard>
 
     public bool CheckAllPlayersStanding(){
         foreach (KeyValuePair<string, BlackJackPlayer> player in Players){
-            if (player.Value.Standing == true && player.Value.StillPlaying == false || player.Key == "Dealer") {
+            if (player.Value.Standing == true && player.Value.StillPlaying == false || player.Key == "Dealer" || player.Value.NotPlaying == true) {
                 state = "DealersTurn";
             } else{
                 state = "DrawingCards";
@@ -265,7 +272,7 @@ public class BlackJackGame : IBaseGame<StandardCard>
     public bool MakeListsAndPayPlayers(){
         if (state == "MakeListsAndPayPlayers"){
             foreach (KeyValuePair<string, BlackJackPlayer> player in Players) {
-                if (player.Key != "Dealer") {
+                if (player.Key != "Dealer" && player.Value.NotPlaying == false) {
                     if (player.Value.CurrentScore > Players["Dealer"].CurrentScore && player.Value.Busted == false || Players["Dealer"].Busted && player.Value.Busted == false) {
                         BlackJackJsonState.Winners.Add(player.Value.Name);
                         // player.Value.TotalMoney += player.Value.CurrentBet * 2;
@@ -346,7 +353,7 @@ public class BlackJackGame : IBaseGame<StandardCard>
             return true;
         } else if (state == "DrawingCards" || state == "DealersTurn"){//must be correct players turn.
             string currentPlayer = PlayerOrder.GetCurrentPlayer();
-            if (currentPlayer == connStr && Players[connStr].Busted == false && Players[connStr].Winner == false && Players[connStr].StillPlaying == true) {//eventually it will be dealers turn. and that will be a block.
+            if (currentPlayer == connStr && Players[connStr].Busted == false && Players[connStr].Winner == false && Players[connStr].StillPlaying == true && Players[connStr].NotPlaying == false) {//eventually it will be dealers turn. and that will be a block.
                 Players[connStr].TakeCard(Deck.Draw());
                 CheckForWinnersOrLosers();//checks all players which is weird when i just need to check single bust. may fix later
                 return true;

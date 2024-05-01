@@ -17,6 +17,34 @@ const getLogo = () => {
 const getPearl = () => {
   return new URL('../assets/icons/logos/pearl.svg', import.meta.url);
 };
+
+
+useSeoMeta({
+  title: 'CardHub',
+  description: 'Play card games with your friends with CardHub!',
+  ogTitle: 'CardHub',
+  ogDescription: 'Play card games with your friends with CardHub!',
+  ogImage: '/og-image.png',
+  ogUrl: 'playcardhub.com',
+  twitterTitle: 'CardHub',
+  twitterDescription: 'Play card games with your friends with CardHub!',
+  twitterImage: '/og-image',
+  twitterCard: 'summary'
+})
+
+useHead({
+  htmlAttrs: {
+    lang: 'en'
+  },
+  link: [
+    {
+      rel: 'icon',
+      type: 'image/png',
+      href: '/favicon.png'
+    }
+  ]
+})
+
 </script>
 
 <template>
@@ -44,6 +72,8 @@ const getPearl = () => {
     </div>
   </div>
 </template>
+
+
 
 <style scoped>
 #home-page {

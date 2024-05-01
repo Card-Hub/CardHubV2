@@ -248,7 +248,7 @@ const handleExit = () => {
           </div>
 
           <div class="end-btns">
-            <Button class="restart-btn end-btns" @click="restartGame()"> Play Again</Button>
+<!--            <Button class="restart-btn end-btns" @click="restartGame()"> Play Again</Button>-->
             <Button class="exit-btn end-btns" @click="handleExit()"> Exit</Button>
           </div>
 
@@ -563,7 +563,7 @@ const handleExit = () => {
   margin: 4px 2px;
   cursor: pointer;
   border-radius: 12px;
-  margin-left: 20px;
+  margin-left: 100px;
 }
 
 .fade-in {

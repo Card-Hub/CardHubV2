@@ -83,6 +83,11 @@ app.MapHub<CahHub>("/cahhub", options =>
     options.AllowStatefulReconnects = true;
 });
 
+app.MapHub<CahHub>("/unehub", options =>
+{
+    options.AllowStatefulReconnects = true;
+});
+
 app.Run();
 
 public partial class Program { }

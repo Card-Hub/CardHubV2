@@ -11,6 +11,11 @@ const { isFullscreen, enter, exit } = useFullscreen();
 const el = ref(null)
 const { toggle } = useFullscreen(el)
 
+const store = useBlackJackStore();
+
+const { drawBlackJackCard, standBlackJackPlayer, betBlackJackPlayer } = store;
+
+
 const getPrimeIcon = (name: string) => {
   return new URL(`../../assets/icons/primeIcons/${name}.svg`, import.meta.url);
 }
@@ -72,15 +77,15 @@ const closeBetPopup = () => {
 }
 
 const bet = (amtToBet) => {//invoke bet here
-
+  betBlackJackPlayer(amtToBet);
 }
 
 const hit = () => {//invoke drawcard function here
-
+  drawBlackJackCard();
 }
 
 const stand = () => {
-
+  standBlackJackPlayer();
 }
 
 const getUserIcon = () => {

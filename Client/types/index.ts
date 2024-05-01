@@ -30,6 +30,7 @@ declare global {
     interface unePlayer extends Player {
         PickingWildColor: boolean
         Hand: UNOCard[]
+        CanPressUne: boolean
     }
 
     interface LobbyUser {

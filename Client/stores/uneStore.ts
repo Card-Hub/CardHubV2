@@ -16,6 +16,7 @@ export const useUneStore = defineStore("une", () => {
     const playerWhoHasPrompt = ref<string>(""); // not implemented yet
     const winner = ref<string>("");
     const players = ref<unePlayer[]>([]);
+    const canPressUne = ref<boolean>(false);
     if (players.value != null) {
       console.log("loggig players");
       console.log(players.value);

@@ -14,7 +14,7 @@
 
   const store = useWebSocketStore(); 
   const {user, users, room, connection } = storeToRefs(store);
-  const { playCard, selectColor, drawCard } = store;
+  const { playCard, selectColor, drawCard, pressUne } = store;
   const uneStore = useUneStore();
   const { winner, currentPlayer, players, discardPile, someoneNeedsToSelectColor } = storeToRefs(uneStore);
  interface Player {
@@ -26,6 +26,7 @@
      interface unePlayer extends Player {
          PickingWildColor: boolean
          Hand: UNOCard[]
+         CanPressUne: boolean
      };
 
   const myCards = computed(() => {
@@ -77,6 +78,16 @@
     });
     return isValid;
   };
+
+  const canPressUne = () => {
+    let canPress = false;
+    players.value.forEach(player => {
+      if (player.Name === user.value && player.CanPressUne) {
+        canPress = true;
+      }
+    });
+    return canPress;
+  }
   
   const getWinnerIcon = (player: string) => {
     // iterate through players to find the winner's avatar
@@ -147,7 +158,7 @@
     </div>
     
     <Button v-if="winner===''" class="float-right font-bold drawButton shadow mb-4" @click="drawCard">Draw</Button>
-    <Button v-if="winner===''" class="float-left font-bold uneButton shadow mb-4" :disabled="validateUneCall" @click="callUne">UNE!</Button>
+    <Button v-if="winner===''" class="float-left font-bold uneButton shadow mb-4" :disabled="!canPressUne()" @click="pressUne">UNE!</Button>
     
     <div v-if="winner===''" class=" w-full flex flex-wrap justify-center">
       <UNOCardDisplay class="uneCard flex-wrap"

@@ -29,6 +29,7 @@ public class TexasHoldEmGame
   public List<StandardCard> Board {get; set;}
   public int TotalPot {get; set;}
   public string LastPlayerWhoRaised {get; set;}
+  public bool LastPlayerWhoRaisedCanStillGo = true;
   public string GameboardConnStr {get; set;}
   [JsonIgnore]
   private iUnoMessenger Messenger {get;set;}
@@ -241,11 +242,21 @@ public class TexasHoldEmGame
         // move onto new player
         SetUpOldPlayer(); // clears their bools
         Messenger.Log("IN CALL, NEXT PLAYER SHOULD GO");
+        Messenger.Log($"OLD PLAYER WAS: {Players[PlayerOrder.GetCurrentPlayer()].Name}");
         GoToNextNotFoldedPlayingPlayer();
+        Messenger.Log($"NEW PLAYER IS: {Players[PlayerOrder.GetCurrentPlayer()].Name}");
+
         var newCurrentPlayer = PlayerOrder.GetCurrentPlayer();
         // if new player was the last to raise, the street ends
         if (newCurrentPlayer == LastPlayerWhoRaised) {
-          NextStreet();
+          if (LastPlayerWhoRaisedCanStillGo) {
+            // set up the new current player
+            SetUpNewPlayer(true); // next player can't check
+            LastPlayerWhoRaisedCanStillGo = false;
+          }
+          else {
+            NextStreet();
+          }
         }
         else {
           // set up the new current player
@@ -280,19 +291,31 @@ public class TexasHoldEmGame
     if (HowManyPlayersArePlayingAndHaventFolded() > 1) {
       //
       GoToNextNotFoldedPlayingPlayer();
+      var newCurrentPlayer = PlayerOrder.GetCurrentPlayer();
       if (PlayerOrder.GetCurrentPlayer() == LastPlayerWhoRaised) {
-        Messenger.Log("IN FOLD, RAN OUT OF PLAYERS...");
-        Messenger.Log("SHOULD GO TO THE NEXT STREET NOW");
+        // if new player was the last to raise, the street ends
+        if (newCurrentPlayer == LastPlayerWhoRaised) {
+          if (LastPlayerWhoRaisedCanStillGo) {
+            // set up the new current player
+            SetUpNewPlayer(true); // next player can't check
+            LastPlayerWhoRaisedCanStillGo = false;
+          }
+          else {
+            Messenger.Log("IN FOLD, RAN OUT OF PLAYERS...");
+            Messenger.Log("SHOULD GO TO THE NEXT STREET NOW");
+            NextStreet();
+          }
         NextStreet();
+        }
       }
       else {
         // move onto new player
         var prevCurrentPlayer = PlayerOrder.GetCurrentPlayer();
         Messenger.Log("IN FOLD, NEXT PLAYER SHOULD GO");
         GoToNextNotFoldedPlayingPlayer();
-        var newCurrentPlayer = PlayerOrder.GetCurrentPlayer();
+        var newCurrentPlayer2 = PlayerOrder.GetCurrentPlayer();
         // if new player was the last to raise, the street ends
-        if (newCurrentPlayer == LastPlayerWhoRaised) {
+        if (newCurrentPlayer2 == LastPlayerWhoRaised) {
           NextStreet();
         }
         else {
@@ -384,6 +407,7 @@ public class TexasHoldEmGame
     }
     return count;
   }
+
   public int HowManyPlayersArePlayingAndHaventFolded() {
     int count = 0;
     foreach (string connStr in PlayerOrder.GetPlayers(LyssiePlayerStatus.Active)) {
@@ -401,8 +425,10 @@ public class TexasHoldEmGame
         Players[PlayerOrder.GetCurrentPlayer()].Folded == true ||
         Players[PlayerOrder.GetCurrentPlayer()].CurrentlyPlaying == false);
   }
+
   public void NextStreet() {
     Messenger.Log("Next street!");
+    LastPlayerWhoRaisedCanStillGo = true;
     // river is the final state of the game before winnerscreen
     if (State == "Pre-Flop" || State == "Flop" || State == "Turn") {
       // go to little blind player
@@ -412,6 +438,7 @@ public class TexasHoldEmGame
       if (Players[LittleBlindPlayer].Folded == true) {
         GoToNextNotFoldedPlayingPlayer();
       }
+      SetUpNewPlayer(true);
     }
     if (State == "Pre-Flop") {
       State = "Flop";

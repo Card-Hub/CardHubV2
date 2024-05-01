@@ -292,10 +292,15 @@ public async Task SelectWild(string connStr, UnoColorLyssie color) {
       return _players[connStr].GetHand();
     }
 
-    //public void RemovePlayer(string playerName)
-    //{
-  //    _playerOrder.Remove(playerName);
-    //}
+    public void RemovePlayer(string playerName)
+    {
+      _playerOrder.RemovePlayer(playerName);
+      _players.Remove(playerName);
+      if (SomeoneNeedsToSelectWildColor && PlayerOrder.GetCurrentPlayer() == playerName) {
+        SomeoneNeedsToSelectWildColor = false;
+      }
+      _messenger.SendFrontendJson(GetAllConnStrsIncGameboard(), GetGameState());
+    }
 
     public async Task InitiateTurn()
     {

@@ -144,6 +144,8 @@ export const useWebSocketStore = defineStore("webSocket", () => {
                 for (var lobbyUserIndex in jsonLobbyUsers) {
                     lobbyUsers.value.push(jsonLobbyUsers[lobbyUserIndex]);
                 }
+                
+                console.log(lobbyUsers.value);
             });
             
             joinConnection.on("Log", (string: string) => {
@@ -313,13 +315,21 @@ export const useWebSocketStore = defineStore("webSocket", () => {
     }
     };
 
-
+    const kickPlayer = async (player: string): Promise<void> => {
+        try {
+            if (connection.value !== null) {
+                await connection.value.invoke("KickPlayer", player);
+            }
+        } catch (e) {
+            console.log(e);
+        }
+    }
 
     // Must return all state properties
     // https://pinia.vuejs.org/core-concepts/
     return {
         connection, isConnected, isPlayer, cards, messages, users, user, room, cookieUser, cookieRoom, timer, lobbyUsers, gameJson, playerHasRedirected,
         tryCreateRoom, tryJoinRoom, sendCard, drawCard, startGame, sendMessage, closeConnection,
-        selectUno, sendAvatar, sendGameType, playCard, selectColor
+        selectUno, sendAvatar, sendGameType, playCard, selectColor, kickPlayer
     };
 });

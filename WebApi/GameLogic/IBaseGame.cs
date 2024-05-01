@@ -10,7 +10,6 @@ namespace WebApi.GameLogic {
     bool AddPlayer(string playerName, string connStr);
     bool RemovePlayer(string playerName);
     List<CardType> GetPlayerHand(string playerName);
-    List<string> GetPlayersInOrder();
 
     bool DrawCard(string playerName);
     bool ResetForNextRound();

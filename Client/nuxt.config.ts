@@ -11,7 +11,7 @@ export default defineNuxtConfig({
     css: ["primevue/resources/themes/aura-dark-noir/theme.css", "~/assets/css/cardhub.css"],
     devtools: { enabled: true },
     // spaLoadingTemplate: true,
-    modules: ["@pinia/nuxt", "@nuxt/test-utils/module", "@nuxtjs/tailwindcss", "nuxt-primevue", "nuxt-svgo"],
+    modules: ["@pinia/nuxt", "@vueuse/nuxt", "@nuxt/test-utils/module", "@nuxtjs/tailwindcss", "nuxt-primevue", "nuxt-svgo"],
     pinia: {
         storesDirs: ["./stores/**"]
     },

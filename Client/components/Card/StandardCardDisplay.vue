@@ -17,13 +17,16 @@ const handleClick = () => {
 };
 
 const getDisplayValue = (value: string) => {
-  if (value === 'Jack') {
+  //check if value is a number
+  if (!isNaN(parseInt(value))) {
+    return value;
+  } else if (value.toLowerCase() === 'jack') {
     return 'J';
-  } else if (value === 'Queen') {
+  } else if (value.toLowerCase() === 'queen') {
     return 'Q';
-  } else if (value === 'King') {
+  } else if (value.toLowerCase() === 'king') {
     return 'K';
-  } else if (value === 'Ace') {
+  } else if (value.toLowerCase() === 'ace') {
     return 'A';
   } else {
     return value;
@@ -37,7 +40,7 @@ const getSuitIcon = (suit: string) => {
 
 
 const getSuitColor = (suit: string) => {
-  return suit.toLowerCase() === 'hearts' || suit === 'diamonds' ? 'red' : 'black';
+  return suit.toLowerCase() === 'hearts' || suit.toLowerCase() === 'diamonds' ? 'red' : 'black';
 };
 </script>
 

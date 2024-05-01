@@ -6,6 +6,7 @@ import StandardCardDisplay from "~/components/Card/StandardCardDisplay.vue";
 
 import { storeToRefs } from "pinia";
 import { useWebSocketStore } from "~/stores/webSocketStore";
+import CahRules from "~/components/gameRules/CahRules.vue";
 
 const store = useWebSocketStore();
 const { connection, isConnected, messages, user, room } = storeToRefs(store);
@@ -37,19 +38,17 @@ for (const suit of suits) {
 
 const playerHand = ref<StandardCard[]>(standardDeck);
 
-
-const showCards = ref(false);
-const buttonText = ref('Show Cards');
-
-const showCardContainer = () => {
-  showCards.value = !showCards.value;
-  buttonText.value = showCards.value ? 'Hide Cards' : 'Show Cards';
-
-};
-
 const getCards = () => {
   return new URL(`../../assets/icons/cah/cah.svg`, import.meta.url);
 };
+
+const active = ref(0); // 0 = none, 1 = rules, 2 = cards
+//for the tab menu
+const items = ref([
+  { label: "None", icon: "pi pi-fw pi-eye-slash" },
+  { label: "Rules", icon: "pi pi-fw pi-info-circle" },
+  { label: "Cards", icon: "pi pi-fw pi-mobile" }
+]);
 </script>
 
 <template>
@@ -73,6 +72,10 @@ const getCards = () => {
         <h1 class="text-7xl">Cards Against Humanity</h1>
         <h3>Game Description: </h3>
         <p> The following game includes cards from the original Cards Against Humanity, so credit for them creating this popular game. "Cards Against Humanity" is a party game where players complete fill-in-the-blank statements using words or phrases on playing cards, typically with humor, satire, or absurdity. Each round, one player draws a prompt card and reads it aloud. Then, other players choose from their hand of answer cards to fill in the blanks, aiming to create the funniest or most outrageous combination. The player who initially drew the prompt card then selects their favorite answer, awarding that player a point. The game often involves dark humor, pop culture references, and unconventional combinations, making it a favorite for gatherings and parties. </p>
+        
+        <div>
+          <p>Copyright 2024 Cards Against Humanity LLC. Used within license terms.</p>
+        </div>
         <NuxtLink href="/lobby">
           <Button class="play" label="Secondary" severity="secondary" @click="connectGameboard"> Play CAH </Button>
         </NuxtLink>
@@ -82,15 +85,23 @@ const getCards = () => {
       <!--        <h1>UNO</h1>-->
       <!--      </div>-->
     </div>
-    <Button @click='showCardContainer()' class="show-cards">{{ buttonText }}</Button>
 
-    <div v-if="showCards" class="card-container">
-      <div v-if="showCards" class="card-container">
+    <div class="menu-container">
+      <TabMenu v-model:activeIndex="active" :model="items" activeItem="None" class="tab-menu"/>
+    </div>
+
+    <div class="rules-container" v-if="active === 1">
+      <CahRules />
+    </div>
+    
+    <div v-if="active === 2" class="card-container">
         <StandardCardDisplay v-for="card in standardDeck"
                              :key="card.id"
                              :card="card"
         />
-      </div>
+    </div>
+    
+    <div v-else-if="active === 0">
     </div>
   </div>
 </template>
@@ -185,5 +196,20 @@ const getCards = () => {
 
 .game-logo{
   background-color: #0a0a0a;
+}
+
+.rules-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.menu-container{
+  width: 90%;
+  align-self: center;
+  margin-top: 2.5%;
+  margin-bottom: 2%;
 }
 </style>

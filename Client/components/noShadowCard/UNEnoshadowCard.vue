@@ -8,16 +8,16 @@ export interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   card: () => ({
-    color: 'black',
-    value: '0',
-    id: 0
+    Color: 'black',
+    Value: '0',
+    Id: 0
   } as UNOCard),
 });
 
 // for action cards, they will be displayed a little differently
-const isActionCard = (props.card.value === 'Wild' || props.card.value === 'Skip' || props.card.value === 'Reverse' || props.card.value === 'Skip All') ? true : false;
-const isDrawCard = (props.card.value === 'Draw Two' || props.card.value === 'Wild Draw Four') ? true : false;
-const isNumberCard = (props.card.value === '0' || props.card.value === '1' || props.card.value === '2' || props.card.value === '3' || props.card.value === '4' || props.card.value === '5' || props.card.value === '6' || props.card.value === '7' || props.card.value === '8' || props.card.value === '9') ? true : false;
+const isActionCard = (props.card.Value === 'Wild' || props.card.Value === 'Skip' || props.card.Value === 'Reverse' || props.card.Value === 'Skip All');
+const isDrawCard = (props.card.Value === 'Draw Two' || props.card.Value === 'Wild Draw Four');
+const isNumberCard = (props.card.Value === '0' || props.card.Value === '1' || props.card.Value === '2' || props.card.Value === '3' || props.card.Value === '4' || props.card.Value === '5' || props.card.Value === '6' || props.card.Value === '7' || props.card.Value === '8' || props.card.Value === '9');
 
 const getDisplayValue = (value: string) => {
   if (value === 'Wild Draw Four') {
@@ -67,35 +67,35 @@ const cardColor = (color: string) => {
 <template>
   <div class="flex flex-wrap justify-center items-center">
     <div v-if="isNumberCard" class="card flex flex-col justify-center items-center m-2 rounded-md shadow-lg border-white border-4 p-2"
-         :style="cardColor(card.color)">
+         :style="cardColor(card.Color)">
       <div class="relative h-screen flex justify-center items-center">
         <div class="relative -top-3 right-12 text-6xl jost-font">
-          {{ getDisplayValue(card.value) }}
+          {{ getDisplayValue(card.Value) }}
         </div>
       </div>
       <div class="relative bottom-5 text-9xl jost-font">
-        {{ getDisplayValue(card.value) }}
+        {{ getDisplayValue(card.Value) }}
       </div>
     </div>
 
     <div v-else-if="isActionCard" class="card flex flex-col justify-center items-center m-2 rounded-md shadow-lg border-black border-4 p-2"
-         :style="cardColor(card.color)">
-      <img :src="getIcon(card.value)"
+         :style="cardColor(card.Color)">
+      <img :src="getIcon(card.Value)"
            alt="action card icon"
            id="small-icon"
            class="relative -top-4 -left-10"/>
-      <img :src="getIcon(card.value)"
+      <img :src="getIcon(card.Value)"
            alt="action card icon"
            id="draw-icon"
            class="relative bottom-13"/>
     </div>
 
     <div v-else-if="isDrawCard" class="card flex flex-col justify-center items-center m-2 rounded-md shadow-lg border-black border-4 p-2"
-         :style="cardColor(card.color)">
+         :style="cardColor(card.Color)">
       <div class="relative -top-6 -left-8 text-6xl font-bold jost-font">
-        {{ getDisplayValue(card.value) }}
+        {{ getDisplayValue(card.Value) }}
       </div>
-      <img :src="getIcon(card.value)"
+      <img :src="getIcon(card.Value)"
            alt="draw card icon"
            id="draw-icon"
            class="relative bottom-.5"/>

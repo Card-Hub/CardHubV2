@@ -15,6 +15,15 @@ const handleCardClick = (card: UNOCard) => {
   sendCard(card);
 };
 
+// convert cards into uno cards
+const unoCards = cards.value.map((card) => {
+  return {
+    Id: card.Id,
+    Color: card.Color,
+    Value: card.Value
+  };
+});
+
 // determine which type of card to display
 const getCardComponent = (card: Card) => {
   if (isStandardCard(card)) {
@@ -46,8 +55,8 @@ const isUNOCard = (card: Card): card is UNOCard => {
 <!--                 :isSelected="selectedCard === card"-->
 <!--                  @cardClicked="handleCardClick"-->
 <!--                  />-->
-    <UNOCardDisplay v-for="card in cards"
-               :key="card.id"
+    <UNOCardDisplay v-for="card in unoCards"
+               :key="card.Id"
                :card="card"
                :isSelected="selectedCard === card"
                @cardClicked="handleCardClick"

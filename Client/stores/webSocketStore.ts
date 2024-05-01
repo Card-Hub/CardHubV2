@@ -8,7 +8,13 @@ import {
 } from "@microsoft/signalr";
 import { ref } from "vue";
 
+import {useUneStore} from "~/stores/uneStore";
+
 export const useWebSocketStore = defineStore("webSocket", () => {
+  
+  const store = useUneStore();
+  const { gameType } = storeToRefs(store);
+  const { parseJson } = store;
     const { $api } = useNuxtApp();
 
     enum UserType {
@@ -19,27 +25,33 @@ export const useWebSocketStore = defineStore("webSocket", () => {
     const connection = ref<HubConnection | null>(null);
     const isConnected = computed(() => connection.value !== null && connection.value.state === HubConnectionState.Connected);
     const isPlayer = ref<boolean | null>(null);
-
+    
     const cards = ref<UNOCard[]>([]);
     const messages = ref<UserMessage[]>([]);
     const users = ref<string[]>([]);
-
+    
     const user = ref("");
     const room = ref("");
-
+    
+    const timer = ref<number>(0);
+    
     const runtimeConfig = useRuntimeConfig();
     const reconnectTimeout = runtimeConfig.public.reconnectTimeout;
+    
+    var playerHasRedirected = false;
+
+    const gameJson = ref<string>("");
+    const lobbyUsers = ref<Array<LobbyUser>>([]);
 
     // Users have 60 seconds to reconnect to the server
     // using client-side cookies
     const cookieUser = useCookie<string>("user", { maxAge: reconnectTimeout });
     const cookieRoom = useCookie<string>("room", { maxAge: reconnectTimeout });
 
-
     // Attempt to create a new room for the Gameboard device
     const tryCreateRoom = async (): Promise<boolean> => {
         try {
-            room.value = await $api<string>("game/createroom", { method: "POST" });
+            room.value = await $api<string>("Game/CreateRoom", { method: "POST" });
             console.log("Room created: ", room.value);
             await joinRoom(user.value, room.value, UserType.Gameboard);
             isPlayer.value = false;
@@ -93,13 +105,76 @@ export const useWebSocketStore = defineStore("webSocket", () => {
                 console.log(card);
             });
 
+            joinConnection.on("ReceiveCards", (gameCards: UNOCard[]) => {
+               cards.value.push(...gameCards);
+            });
+
             joinConnection.on("UsersInRoom", (groupUsers: string[]) => {
                 users.value = groupUsers;
             });
 
-            joinConnection.on("StartedGame", (gameCards: UNOCard[]) => {
-                cards.value = gameCards;
-                navigateTo("/playerview");
+            //joinConnection.on("StartedGame", (gameCards: UNOCard[]) => {
+            //    cards.value = gameCards;
+            //    navigateTo("/playerview");
+            //});
+
+            joinConnection.on("PopCard", (card: UNOCard) => {
+                console.log("Popped card:", card);
+                cards.value = cards.value.filter(c => c.id !== card.id);
+            });
+            // LYSSIETEST
+            joinConnection.on("ReceiveJson", (json: string) => {
+              console.log("Json Received: \n", json);
+              
+              gameJson.value = json;
+              parseJson(gameJson.value);
+              //console.log(gameType.value);
+
+              //if (isPlayer.value && !playerHasRedirected) {
+              //  navigateTo("/playerview/" + gameType.value);
+              //  playerHasRedirected = true;
+              //}
+            });
+
+            // json of LobbyUsers
+            joinConnection.on("ReceiveAvatars", (json: string) => {
+                var jsonLobbyUsers = JSON.parse(json);
+                lobbyUsers.value.length = 0; //clears array lmao
+                for (var lobbyUserIndex in jsonLobbyUsers) {
+                    lobbyUsers.value.push(jsonLobbyUsers[lobbyUserIndex]);
+                }
+                
+                console.log(lobbyUsers.value);
+            });
+            
+            joinConnection.on("Log", (string: string) => {
+              console.log("Backend logged:", string);
+              console.log(string);
+            });
+            // json of LobbyUsers
+            joinConnection.on("ReceiveAvatars", (json: string) => {
+              var jsonLobbyUsers = JSON.parse(json);
+              lobbyUsers.value.length = 0; //clears array lmao
+              for (var lobbyUserIndex in jsonLobbyUsers) {
+                lobbyUsers.value.push(jsonLobbyUsers[lobbyUserIndex]);
+              }
+            });
+
+            const timeout = ref<NodeJS.Timeout | null>(null);
+            joinConnection.on("StartTimer", async (time: number) => {
+                if (timeout.value)
+                    clearInterval(timeout.value);
+                console.log("Timer started:", timer);
+                timer.value = time;
+                if (time > 0) {
+                    timeout.value = setInterval(async () => {
+                        timer.value--;
+                        if (timer.value === 0) {
+                            if (timeout.value)
+                                clearInterval(timeout.value);
+                        }
+                    }, 1000);
+                }
             });
 
             joinConnection.onclose(async () => {
@@ -154,12 +229,49 @@ export const useWebSocketStore = defineStore("webSocket", () => {
             console.log(e);
         }
     };
+    const selectColor = async (color: string): Promise<void> => {
+        try {
+            if (connection.value !== null) {
+                await connection.value.invoke("SelectColor", color);
+            }
+        } catch (e) {
+            console.log(e);
+        }
+    };
+    const pressUne = async () : Promise<void> => {
+      try {
+        if (connection.value !== null) {
+          await connection.value.invoke("PressUne");
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    };
+    
+    const sendAvatar = async (avatar: string): Promise<void> => {
+        try {
+            if (connection.value !== null) {
+                await connection.value.invoke("SendAvatar", avatar);
+            }
+        } catch (e) {
+            console.log(e);
+        }
+    };
+    
+    const sendGameType = async (gameType: string): Promise<void> => {
+        try {
+            if (connection.value !== null) {
+                await connection.value.invoke("SendGameType", gameType);
+            }
+        } catch (e) {
+            console.log(e);
+        }
+    }
 
     const drawCard = async (): Promise<void> => {
         if (connection.value === null) {
             return;
         }
-        cards.value = [];
         await connection.value.invoke("DrawCard");
     }
 
@@ -169,6 +281,13 @@ export const useWebSocketStore = defineStore("webSocket", () => {
         }
 
         await connection.value.invoke("StartGame");
+    }
+    const playCard = async (card: UNOCard): Promise<void> => {
+        if (connection.value === null) {
+            return;
+        }
+        console.log("played a card");
+        await connection.value.invoke("PlayCard", card);
     }
 
     const sendMessage = async (message: string): Promise<void> => {
@@ -191,10 +310,33 @@ export const useWebSocketStore = defineStore("webSocket", () => {
         }
     };
 
+    const selectUno = async (): Promise<void> => {
+      try {
+        console.log("clicked to start uno");
+        if (connection.value !== null) {
+          await connection.value.invoke("SelectUno");
+        }
+        console.log("selected uno.");
+    } catch (e) {
+        console.log(e);
+    }
+    };
+
+    const kickPlayer = async (player: string): Promise<void> => {
+        try {
+            if (connection.value !== null) {
+                await connection.value.invoke("KickPlayer", player);
+            }
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
     // Must return all state properties
     // https://pinia.vuejs.org/core-concepts/
     return {
-        connection, isConnected, isPlayer, cards, messages, users, user, room, cookieUser, cookieRoom,
-        tryCreateRoom, tryJoinRoom, sendCard, drawCard, startGame, sendMessage, closeConnection
+        connection, isConnected, isPlayer, cards, messages, users, user, room, cookieUser, cookieRoom, timer, lobbyUsers, gameJson, playerHasRedirected,
+        tryCreateRoom, tryJoinRoom, sendCard, drawCard, startGame, sendMessage, closeConnection,
+        selectUno, sendAvatar, sendGameType, playCard, selectColor, pressUne, kickPlayer
     };
 });

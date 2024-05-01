@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineProps, defineEmits, ref } from 'vue';
+import { ref } from 'vue';
 import StandardCardDisplay from './Card/StandardCardDisplay.vue';
 import UNOCardDisplay from "~/components/Card/UNOCardDisplay.vue";
 import { useWebSocketStore } from "~/stores/webSocketStore";
@@ -8,22 +8,21 @@ const store = useWebSocketStore();
 const { connection, isConnected, cards, messages, users, user, room } = storeToRefs(store);
 const { tryJoinRoom, sendCard, drawCard } = store;
 
-// const selectedCard = ref<Card | null>(null);
-// const emit = defineEmits<{
-//   cardClick: [card: Card]
-// }>()
-
 const selectedCard = ref<UNOCard | null>(null);
-
-// const handleCardClick = (card: Card) => {
-//   selectedCard.value = card;
-//   emit('cardClick', card);
-// };
 
 const handleCardClick = (card: UNOCard) => {
   selectedCard.value = card;
   sendCard(card);
 };
+
+// convert cards into uno cards
+const unoCards = cards.value.map((card) => {
+  return {
+    Id: card.Id,
+    Color: card.Color,
+    Value: card.Value
+  };
+});
 
 // determine which type of card to display
 const getCardComponent = (card: Card) => {
@@ -49,15 +48,15 @@ const isUNOCard = (card: Card): card is UNOCard => {
 
 <template>
   <div class="player-hand">
-<!--    <component v-for="card in playerHand"-->
+<!--    <component v-for="card in cards"-->
 <!--                 :key="card.id"-->
 <!--                 :is="getCardComponent(card)"-->
 <!--                 :card="card"-->
 <!--                 :isSelected="selectedCard === card"-->
 <!--                  @cardClicked="handleCardClick"-->
 <!--                  />-->
-    <UNOCardDisplay v-for="card in cards"
-               :key="card.id"
+    <UNOCardDisplay v-for="card in unoCards"
+               :key="card.Id"
                :card="card"
                :isSelected="selectedCard === card"
                @cardClicked="handleCardClick"

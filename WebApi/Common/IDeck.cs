@@ -2,9 +2,10 @@
 
 public interface IDeck<TCard>
 {
+    void Add(TCard card);
     void Shuffle();
     TCard Draw();
     TCard Peek();
-    List<TCard> DrawUntil(int amount);
+    List<TCard> Draw(int amount);
     void ReclaimCards();
 }

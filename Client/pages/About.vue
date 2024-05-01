@@ -1,6 +1,6 @@
 <script setup lang="ts">
+import { ref } from 'vue';
 
-import Header from "~/components/Header.vue";
 const team = ref([
   { name: "Alejandro Mozqueda", image: new URL('../assets/icons/avatars/alex.png', import.meta.url) },
   { name: "Rubi Dionisio", image: new URL('../assets/icons/avatars/ruby.png', import.meta.url) },
@@ -66,18 +66,18 @@ const getPoster = () => {
         </div>
       </div>
     </div>
-    
+
     <div class="poster">
       <br><br>
       <h2> Some of Our Project Deliverables </h2>
       <br>
       <h3> Cardhub Poster </h3>
       <img alt="Cardhub poster" :src="getPoster()" class="project-poster"/>
-      
+
       <br>
-      
+
       <h3> Project Video </h3>
-      <p>COMING SOON</p>
+      <iframe width="560" height="315" src="https://www.youtube.com/embed/X1hQB4T-4z0?si=wK7j8fZsuhEmdrY2" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
     </div>
 
     <br> <br>
@@ -92,7 +92,8 @@ const getPoster = () => {
         <br> <a href="https://medium.com/made-with-creative-commons/card-against-humanity-8c0cc2c6c299"> Cards Against Humanity licensing information and context </a>
         <br> <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/"> Creative Commons Attribution-NonCommercial-ShareAlike 4.0 license </a>
         <br> <a href="https://learn.microsoft.com/en-us/dotnet/"> .net C# documentation </a>
-        <br> <a href="https://www.w3.org/WAI/WCAG22/quickref/"> WCAG Guidelines </a> </p>
+        <br> <a href="https://www.w3.org/WAI/WCAG22/quickref/"> WCAG Guidelines </a>
+        <br> <a href="https://github.com/tsparticles/vue3"> Particles License </a> </p>
     </div>
   </div>
   <Footer />
@@ -148,6 +149,7 @@ const getPoster = () => {
 
 .members{
   display: flex;
+  flex-wrap: wrap;
   flex-direction: row;
   justify-content: center;
   align-items: center;

@@ -1,7 +1,25 @@
 <script setup lang="ts">
 import PlayerHand from "~/components/PlayerHand.vue";
 import { ref, computed } from 'vue';
+import UNOCardDisplay from "~/components/Card/UNOCardDisplay.vue";
+import StandardCardDisplay from "~/components/Card/StandardCardDisplay.vue";
 
+import { storeToRefs } from "pinia";
+import { useWebSocketStore } from "~/stores/webSocketStore";
+import BlackjackRules from "~/components/gameRules/BlackjackRules.vue";
+
+const store = useWebSocketStore();
+const { connection, isConnected, messages, user, room } = storeToRefs(store);
+const { tryCreateRoom, tryJoinRoom, sendGameType } = store;
+
+const connectGameboard = async (): Promise<void> => {
+  const isRoomCreated = await tryCreateRoom();
+  if (isRoomCreated) {
+    sendGameType('Blackjack');
+    // await navigateTo('/playerview');
+    await navigateTo("/lobby");
+  }
+};
 
 // create standard deck of cards
 const standardDeck = [];
@@ -11,32 +29,30 @@ const values = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "
 for (const suit of suits) {
   for (const value of values) {
     standardDeck.push({
-      id: standardDeck.length + 1,
-      suit,
-      value
+      Id: standardDeck.length + 1,
+      Suit: suit,
+      Value: value
     });
   }
 }
 
 const playerHand = ref<StandardCard[]>(standardDeck);
 
-
-const showCards = ref(false);
-const buttonText = ref('Show Cards');
-
-const showCardContainer = () => {
-  showCards.value = !showCards.value;
-  buttonText.value = showCards.value ? 'Hide Cards' : 'Show Cards';
-
-};
-
 const getCards = () => {
   return new URL(`../../assets/icons/standardDeck/spades.svg`, import.meta.url);
 };
+
+const active = ref(0); // 0 = none, 1 = rules, 2 = cards
+//for the tab menu
+const items = ref([
+  { label: "None", icon: "pi pi-fw pi-eye-slash" },
+  { label: "Rules", icon: "pi pi-fw pi-info-circle" },
+  { label: "Cards", icon: "pi pi-fw pi-mobile" }
+]);
 </script>
 
 <template>
-  <div class="une">
+  <div class="blackjack">
     <NuxtLink href="/games" class="go-back-btn">
       <Button class="go-back">Go Back</Button>
     </NuxtLink>
@@ -57,7 +73,7 @@ const getCards = () => {
         <h3>Game Description: </h3>
         <p> In this classic card game, your goal is to beat the dealer's hand without going over 21. You'll be dealt two cards initially and have the option to 'hit' to receive another card or 'stand' to keep your current hand. The dealer will also be dealt cards, one face up and one face down. Be careful though - if your hand total exceeds 21, you'll 'bust' and lose the round. But if you manage to get closer to 21 than the dealer without busting, you win! Get ready to test your luck and skills in this exciting game of blackjack! </p>
         <NuxtLink href="/lobby">
-          <Button class="play"> Play Blackjack </Button>
+          <Button class="play" label="Secondary" severity="secondary" @click="connectGameboard"> Play Blackjack </Button>
         </NuxtLink>
       </div>
 
@@ -65,17 +81,29 @@ const getCards = () => {
       <!--        <h1>UNO</h1>-->
       <!--      </div>-->
     </div>
-    <Button @click='showCardContainer()' class="show-cards">{{ buttonText }}</Button>
 
-    <div v-if="showCards" class="card-container">
-      <PlayerHand :player-hand="playerHand"/>
+    <div class="menu-container">
+      <TabMenu v-model:activeIndex="active" :model="items" activeItem="None" class="tab-menu"/>
     </div>
 
+    <div class="rules-container" v-if="active === 1">
+      <BlackjackRules />
+    </div>
+    
+    <div v-if="active === 2" class="card-container">
+      <StandardCardDisplay v-for="card in standardDeck"
+                      :key="card.Id"
+                      :card="card"
+      />
+    </div>
+    
+    <div v-if="active === 0">
+    </div>
   </div>
 </template>
 
 <style scoped>
-.une {
+.blackjack {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -156,8 +184,24 @@ const getCards = () => {
   flex-direction: row;
   justify-content: center;
   align-self: center;
+  flex-wrap: wrap;
   align-items: center;
   height: 100%;
   width: 85%;
+}
+
+.rules-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.menu-container{
+  width: 90%;
+  align-self: center;
+  margin-top: 2.5%;
+  margin-bottom: 2%;
 }
 </style>

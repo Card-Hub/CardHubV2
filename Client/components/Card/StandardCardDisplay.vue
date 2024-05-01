@@ -5,11 +5,8 @@ import { defineProps, defineEmits } from 'vue';
 // this source apples to many of the components in this .vue file, playerhand.vue
 
 const props = defineProps<{
-  card: {
-    type: StandardCard,
-    required: true
-  };
-  isSelected: Boolean;
+  card?: StandardCard;
+  isSelected?: Boolean;
 }>();
 // console.log(props.card);
 
@@ -47,16 +44,16 @@ const getSuitColor = (suit: string) => {
 <template>
   <div class="flex flex-wrap justify-center items-center">
     <div class="relative w-20 h-32 m-2 bg-white rounded-md shadow-md p-2"
-         style="box-shadow: 6px -6px 3px rgba(200, 200, 200, 0.4);"
+         style="box-shadow: 4px -4px 6px rgba(256, 256, 256, 0.15);"
          @click="handleClick"
          :class="{ 'selected': isSelected }"
     >
-    <img :src="getSuitIcon(card.suit)"
+    <img :src="getSuitIcon(card.Suit)"
          alt="suit icon"
          class="absolute bottom-2 right-2 w-14 h-14" />
     <div class="absolute top-2 left-2 text-4xl font-bold"
-         :style="{ color: getSuitColor(card.suit) }">
-      {{ getDisplayValue(card.value) }}</div>
+         :style="{ color: getSuitColor(card.Suit) }">
+      {{ getDisplayValue(card.Value) }}</div>
       </div>
   </div>
 </template>

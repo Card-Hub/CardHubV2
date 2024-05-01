@@ -10,6 +10,17 @@ public class Deck<TCard> : IDeck<TCard>
         _cards = new List<TCard>();
         _drawnCards = new List<TCard>();
     }
+    
+    public Deck(IEnumerable<TCard> cards)
+    {
+        _cards = new List<TCard>(cards);
+        _drawnCards = new List<TCard>();
+    }
+    
+    public void Add(TCard card)
+    {
+        _cards.Add(card);
+    }
         
     public void Shuffle()
     {
@@ -37,13 +48,18 @@ public class Deck<TCard> : IDeck<TCard>
         return _cards.ElementAt(0);
     }
 
-    public List<TCard> DrawUntil(int amount)
+    public List<TCard> Draw(int amount)
     {
         if (_cards.Count < amount)
         {
             var errorMessage = $"Attempted to draw {amount} cards, but only {_cards.Count} cards are left in the deck.";
             throw new InvalidOperationException(errorMessage);
         }
+        if (amount < 1)
+        {
+            throw new InvalidOperationException("Attempted to draw less than 1 card from the deck.");
+        }
+        
         var drawnCards = _cards.Take(amount).ToList();
         _cards.RemoveRange(0, amount);
         _drawnCards.AddRange(drawnCards);

@@ -32,6 +32,9 @@ public class UnoMessenger : iUnoMessenger {
   public async Task SendFrontendError(List<string> connStrs, string error)
   {
     Console.WriteLine($"UnoMessenger told the frontend there's an error: {error}");
+    foreach (var connStr in connStrs) {
+      await Context.Clients.Client(connStr).SendAsync("ReceiveError", error);
+    }
   }
     public void Log(string message) {
       Console.WriteLine(message);

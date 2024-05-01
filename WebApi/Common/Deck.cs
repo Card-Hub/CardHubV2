@@ -1,4 +1,4 @@
-﻿namespace WebApi.Common;
+namespace WebApi.Common;
 
 public class Deck<TCard> : IDeck<TCard>
 {

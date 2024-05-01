@@ -17,7 +17,7 @@
     if (isRoomCreated) {
       await sendGameType("UNE");
       // await navigateTo('/playerview');
-      await navigateTo("/lobby");
+      await navigateTo("/lobby/une");
     }
   };
 

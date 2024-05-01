@@ -28,10 +28,10 @@ const playerStart = () => {
 
 const getIcon = (avatar: string) => {
   if (avatar == "" || avatar == null) {
-    return new URL(`../assets/icons/avatars/lyssie.png`, import.meta.url);
+    return new URL(`../../assets/icons/avatars/lyssie.png`, import.meta.url);
   }
   else {
-    return new URL(`../assets/icons/avatars/${avatar}.png`, import.meta.url);
+    return new URL(`../../assets/icons/avatars/${avatar}.png`, import.meta.url);
   }
 };
 

@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import {defineComponent, ref, onMounted} from "vue";
+
+import {useUneStore} from "~/stores/uneStore";
+
+
+import {type ConfigurableDocument, type MaybeElementRef, useFullscreen } from '@vueuse/core';
+import {defineComponent, ref, onMounted, type ComputedRef, type Ref, computed} from "vue";
 import {storeToRefs} from "pinia";
 import {useWebSocketStore} from "~/stores/webSocketStore";
 
@@ -21,6 +26,11 @@ const {currentColor, players, winner, currentPlayer, discardPile, direction} = s
 //const currentTurn = ref<string>(currentPlayer);
 const cards = ref<UNOCard[]>(discardPile);
 
+//fulscreen
+const { isFullscreen, enter, exit } = useFullscreen();
+const el = ref(null)
+const { toggle } = useFullscreen(el)
+
 const getCardStyle = (index: number) => {
   const randomX = Math.floor(Math.random() * 50) - 5; // Random offset for X-axis
   const randomY = Math.floor(Math.random() * 50) - 5; // Random offset for Y-axis
@@ -31,6 +41,10 @@ const getCardStyle = (index: number) => {
     zIndex: index,
   };
 };
+
+const getPrimeIcon = (name: string) => {
+  return new URL(`../../assets/icons/primeIcons/${name}.svg`, import.meta.url);
+}
 
 const cardStyle = (num: number) => {
   let randomX = num * 5;
@@ -175,14 +189,15 @@ const handleExit = () => {
   <!--  <p> {{ currentPlayer }}</p>-->
   <!--  <p> {{ discardPile }}</p>-->
   <!--  <p> {{ discardedCardsToDisplay }}</p>-->
-  <div class="gameboard-container">
+<!--  <UseFullscreen v-slot="{ toggle }">-->
+  <div class="gameboard-container" ref="el">
     <div class="gameboard">
       <div class="player-icons grid grid-cols-2 content-center">
         <div class="player-icon" v-for="(player, index) in players" :key="index"
              :style="{ ...getPlayerIconStyle(index), ...isCurrentPlayer(player.Name) }">
           <img :src="getPlayerIcon(player.Avatar)" alt="Player Icon" class="player-icon-img"/>
           
-<!--          <p> {{ player.value.Hand.length }}</p>-->
+<!--          <p> {{ players[index].Name.length }}</p>-->
         </div>
       </div>
 <!--      <div class="" v-for="player in players" :key="player">-->
@@ -199,12 +214,10 @@ const handleExit = () => {
 
       <div class="game-table rounded-tr-full shadow-lg" v-bind:class="currentColor">
         <div v-if="winner === ''">
-          <div class="h-auto w-[800px] grid grid-cols-4 content-center">
+          <div class="h-auto w-[900px] grid grid-cols-4 gap-4 place-items-center">
             
-            <div class="">
-              <img :src="getArrow()" alt="left arrow" class="arrow"
-                   :style="getleftArrow()"/>
-            </div>
+            <img :src="getArrow()" alt="left arrow" class="arrow"
+                 :style="getleftArrow()"/>
             
             <div class="">
               <div class="deck-view">
@@ -226,10 +239,8 @@ const handleExit = () => {
               </div>
             </div>
 
-            <div class="">
-              <img :src="getArrow()" alt="right arrow" class="arrow"
-                   :style="getRightArrow()"/>
-            </div>
+            <img :src="getArrow()" alt="right arrow" class="arrow"
+                 :style="getRightArrow()"/>
             
           </div>
         </div>
@@ -370,8 +381,9 @@ const handleExit = () => {
 
 
     </div>
+    <img :src="getPrimeIcon('expand')" class="absolute size-14" @click="toggle" />
   </div>
-
+  
 </template>
 
 <style scoped>
@@ -474,16 +486,8 @@ const handleExit = () => {
   background: rgba(255, 255, 255, 0.2); /* Adjust the background color of the player icon and opacity */
 }
 
-.left-arrow {
-  align-items: center;
-  justify-content: center;
-  transform: translate(-10%, 40%);
-}
-
-.right-arrow {
-  align-items: center;
-  justify-content: center;
-  transform: translate(110%, -40%);
+.arrow {
+  height: 30%;
 }
 
 .winner-icon {

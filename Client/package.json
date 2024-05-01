@@ -28,11 +28,13 @@
     "@microsoft/signalr": "^8.0.0",
     "@pinia/nuxt": "^0.5.1",
     "@tsparticles/vue3": "^3.*",
-    "tsparticles": "^3.*",
+    "@vueuse/components": "^10.9.0",
+    "@vueuse/core": "^10.9.0",
     "pinia": "^2.1.7",
     "primeflex": "^3.3.1",
     "primeicons": "^6.0.1",
-    "primevue": "^3.47.2"
+    "primevue": "^3.47.2",
+    "tsparticles": "^3.*"
   },
   "description": "Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.",
   "version": "1.0.0",

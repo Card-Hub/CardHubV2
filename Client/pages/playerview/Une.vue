@@ -1,7 +1,9 @@
 <script setup lang="ts">
-  import {defineComponent, ref, onMounted} from "vue";
+  import {defineComponent, ref } from "vue";
+  import { computed } from "vue";
   import {storeToRefs} from "pinia";
   import {useWebSocketStore} from "~/stores/webSocketStore";
+  import toast from "@/utils/toast";
   
   import UNOCardDisplay from "~/components/Card/UNOCardDisplay.vue";
   import UnoRules from "~/components/gameRules/UnoRules.vue";
@@ -10,13 +12,14 @@
   import Dialog from 'primevue/dialog';
   import Chat from "~/components/Chat.vue"; // for popup dialog
   const rulesVisible = ref(false); // for popup dialog
-  const chatVisible = ref(false); // for popup dialog
+  const chatVisible = ref(false); // for popup dialog https://primevue.org/avatar/ for chat notification
+  // const sideScroll= ref(false); // for scrolling view or all cards are viewable on screen by scrolling down
 
   const store = useWebSocketStore(); 
   const {user, users, room, connection } = storeToRefs(store);
   const { playCard, selectColor, drawCard } = store;
   const uneStore = useUneStore();
-  const { winner, currentPlayer, players, discardPile, someoneNeedsToSelectColor } = storeToRefs(uneStore);
+  const { winner, currentPlayer, players, discardPile, someoneNeedsToSelectColor, playerWhoHasPrompt } = storeToRefs(uneStore);
  interface Player {
          Name: string
          Avatar: string
@@ -62,20 +65,42 @@
 
   
   const callUne = () => {
-    // store.callUne();
+    // record who pressed button first
+    playerWhoHasPrompt.value = user.value;
+    
+    // disable une button for all players
+    document.getElementById("uneButton").setAttribute("disabled", "disabled");
+    
+    // check if current player was the first to press the button and give them a card if they were not
+    if (playerWhoHasPrompt.value !== currentPlayer.value) {
+      drawCard();
+      drawCard();
+    }
+    playerWhoHasPrompt.value = ""; // reset prompt
+    
   };
   
   // enable une button if player has one card left
   const validateUneCall = () => {
     let isValid = false;
     players.value.forEach(player => {
-      if (player.Name === currentPlayer.value) {
-        if (player.Hand.length < 3) {
+      if (player.Hand.length < 3) {
+        if (player.Name === currentPlayer.value) {
           isValid = true;
         }
       }
     });
     return isValid;
+  };
+  
+  const isUne = () => {
+    if (validateUneCall()) {
+      // enable une button
+      document.getElementById("uneButton").removeAttribute("disabled");
+      return "border: 2px solid white;";
+    } else {
+      return "background-color: var(--cardhub-red); opacity: 0.5; border: 2px solid transparent;";
+    }
   };
   
   const getWinnerIcon = (player: string) => {
@@ -102,12 +127,35 @@
     // redirect to join page
     await navigateTo("/join");
   };
+  
+  const updateScroll = () => {
+    if (sideScroll.value == false) 
+      sideScroll.value = true;
+    sideScroll.value = false;
+  };
+  
+  const isCurrentPlayer = () => {
+    if (user.value !== currentPlayer.value) {
+      toast.add({
+        severity: "error",
+        summary: "It's not your turn!",
+        detail: "Please wait for your turn to play!",
+        life: 5000
+      });
+    }
+    
+  };
+
+  const canBePlayed = (card: UNOCard) => {
+    return card.Color.toLowerCase() === discardPile.value[discardPile.value.length - 1].Color.toLowerCase() || card.Value === discardPile.value[discardPile.value.length - 1].Value || card.Color.toLowerCase() === 'black';
+  };
+
 </script>
 
 
 <template>
   <div class="playerview-une-container w-full p-6">
-    
+    <Toast/>
     <div class="flex flex-row-reverse">
       <div class="card flex justify-left">
         <i class="pi pi-fw pi-info-circle" style="font-size: 2.5rem" @click="rulesVisible = true"></i>
@@ -126,6 +174,7 @@
         </Dialog>
       </div>
       
+<!--      <i class="pi pi-fw pi-eye" @click="!sideScroll" style="font-size: 2.5rem"></i>-->
       <img :src="getUserIcon()" alt="user" class="user-avatar"/>
     </div>
     
@@ -146,18 +195,28 @@
       </h1>
     </div>
     
-    <Button v-if="winner===''" class="float-right font-bold drawButton shadow mb-4" @click="drawCard">Draw</Button>
-    <Button v-if="winner===''" class="float-left font-bold uneButton shadow mb-4" :disabled="validateUneCall" @click="callUne">UNE!</Button>
+    <Button v-if="winner===''" class="float-right font-bold drawButton shadow mb-4" @click="{...drawCard, ...isCurrentPlayer()}">Draw</Button>
+    <Button id="uneButton" v-if="winner ===''" class="uneButton float-left font-bold shadow mb-4" :disabled="!validateUneCall()" :style="isUne()" @click="callUne">UNE!</Button>
     
     <div v-if="winner===''" class=" w-full flex flex-wrap justify-center">
       <UNOCardDisplay class="uneCard flex-wrap"
                       v-for="card in myCards"
                       :key="card.Id"
                       :card="card"
-                      :isSelected="false"
-                      @click="playCard(JSON.stringify(card))"
+                      :isSelected="canBePlayed(card) && currentPlayer === user"
+                      @click="{...playCard(JSON.stringify(card)), ...isCurrentPlayer()}"
       />
     </div>
+
+<!--    <div v-if="winner==='' && updateScroll ===true" class=" w-full flex overflow-x-auto border-2 border-radius-4 justify-center">-->
+<!--      <UNOCardDisplay class="uneCard flex-wrap"-->
+<!--                      v-for="card in myCards"-->
+<!--                      :key="card.Id"-->
+<!--                      :card="card"-->
+<!--                      :isSelected="(card.Color.toLowerCase() === discardPile[discardPile.length - 1].Color.toLowerCase() || card.Value === discardPile[discardPile.length - 1].Value || card.Color.toLowerCase() === 'black') && currentPlayer === user"-->
+<!--                      @click="playCard(JSON.stringify(card))"-->
+<!--      />-->
+<!--    </div>-->
     
     <div v-if="currentPlayer === user && someoneNeedsToSelectColor">
     </div>

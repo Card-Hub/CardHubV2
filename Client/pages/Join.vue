@@ -1,12 +1,20 @@
 ﻿<script setup lang="ts">
-import { storeToRefs } from "pinia";
-import { useWebSocketStore } from "~/stores/webSocketStore";
 import toast from "@/utils/toast";
+import { useNuxtApp } from "nuxt/app";
+import { storeToRefs } from "pinia";
+import { computed } from "vue";
+import { useBaseStore } from "~/stores/baseStore";
+import { GameType } from "~/types";
+
+const { $gameToString } = useNuxtApp();
 
 
-const store = useWebSocketStore();
-const { connection, isConnected, messages, user, room } = storeToRefs(store);
-const { tryJoinRoom } = store;
+const store = useBaseStore();
+const { isBaseConnected, messages } = storeToRefs(store);
+const { tryConnectPlayer } = store;
+
+const user = ref("");
+const room = ref("");
 
 const isValidRoomCode = computed(() => {
   const digitRegex = /^\d+$/;
@@ -14,18 +22,18 @@ const isValidRoomCode = computed(() => {
 });
 
 const connectPlayer = async (): Promise<void> => {
-  const isCorrectRoomCode = await tryJoinRoom();
-  if (isCorrectRoomCode) {
-    // await navigateTo('/playerview');
-    await navigateTo("/lobby");
-  } else {
-    toast.add({
-      severity: "error",
-      summary: "That pin doesn't look right",
-      detail: "Please check and try again",
-      life: 5000
-    });
+  const gameType = await tryConnectPlayer(user.value, room.value);
+  if (gameType) {
+    await navigateTo(`/lobby/${ $gameToString(gameType) }`);
+    return;
   }
+
+  toast.add({
+    severity: "error",
+    summary: "That pin doesn't look right",
+    detail: "Please check and try again",
+    life: 5000
+  });
 };
 
 const navigateToLibrary = async (): Promise<void> => {
@@ -44,14 +52,13 @@ const navigateToHome = async (): Promise<void> => {
 //   }
 // };
 
-console.log("check here for connectivity", isConnected.value);
-console.log("check here for obj", connection.value);
+console.log("check here for connectivity", isBaseConnected.value);
 </script>
 
 <template>
   <div id="dimScreen">
     <Toast/>
-    <template v-if="connection === null">
+    <template v-if="isBaseConnected === false">
       <div class="flex flex-col justify-center h-screen items-center">
         <div class="flex flex-col justify-center gap-4">
           <svgo-logo-combination class="w-52 h-52" :fontControlled="false" filled @click="navigateToHome"/>
@@ -67,11 +74,10 @@ console.log("check here for obj", connection.value);
       </div>
     </template>
     <template v-else>
-      <p>In chat</p>
-      <div v-for="(m, index) in messages" :key="index">
-        <div class="bg-primary">{{ m.message }}</div>
-        <div>{{ m.user }}</div>
-      </div>
+      <h1>Connected to WS</h1>
+      <p>
+        TODO: Reroute to lobby
+      </p>
     </template>
   </div>
 </template>

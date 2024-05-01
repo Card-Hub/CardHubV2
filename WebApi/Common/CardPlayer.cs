@@ -40,6 +40,14 @@ public class CardPlayer<TCard> : ICardPlayer<TCard>
         return true;
     }
     
+    public bool RemoveCard(int index)
+    {
+        if (index < 0 || index >= _hand.Count) return false;
+        
+        _hand.RemoveAt(index);
+        return true;
+    }
+    
     public bool RemoveCards(IEnumerable<TCard> cards)
     {
         var success = true;
@@ -50,8 +58,22 @@ public class CardPlayer<TCard> : ICardPlayer<TCard>
         return success;
     }
     
+    public int HandCount()
+    {
+        return _hand.Count;
+    }
+    
     public void ClearHand()
     {
         _hand.Clear();
+    }
+    
+    public TCard PickRandomCard()
+    {
+        var random = new Random();
+        var index = random.Next(0, _hand.Count);
+        var card = _hand[index];
+        RemoveCard(index);
+        return card;
     }
 }

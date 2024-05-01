@@ -54,10 +54,39 @@ declare global {
         Winner: boolean
         StillPlaying: boolean
         Standing: boolean
+        PickingWildColor: boolean;
+        Hand: UNOCard[];
+    }
+
+    interface CahCard {
+        text: string;
+        type: CahType;
     }
 
     interface LobbyUser {
-      Name: string
-      Avatar: string
+        Name: string;
+        Avatar: string;
     }
+
+    interface ConnectionOptions {
+        room: string;
+        name?: string;
+    }
+
+    interface BasePlayer {
+        name: string;
+        avatar: string;
+    }
+}
+
+export const enum CahType {
+    White,
+    Black
+}
+
+export enum GameType {
+    BlackJack,
+    Cah,
+    Poker,
+    Une
 }

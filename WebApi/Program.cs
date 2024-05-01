@@ -1,8 +1,10 @@
+using System.Collections.Concurrent;
 using WebApi.Common;
 using WebApi.Controllers;
 using WebApi.GameLogic;
 using WebApi.Hubs;
 using WebApi.Models;
+using WebApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Logging.ClearProviders();
@@ -39,14 +41,20 @@ builder.Services.AddCors(options =>
             .AllowCredentials();
     });
 });
-builder.Services.AddSingleton<IDictionary<string, UserConnection>>(options => new Dictionary<string, UserConnection>());
-builder.Services.AddSingleton<HashSet<string>>(options => []);
+// builder.Services.AddSingleton<IDictionary<string, UserConnection>>(_ => new Dictionary<string, UserConnection>());
+builder.Services.AddSingleton<IDictionary<string, GameType>>(_ => new ConcurrentDictionary<string, GameType>());
+builder.Services.AddSingleton<IDictionary<string, BaseRoom>>(_ => new ConcurrentDictionary<string, BaseRoom>());
 builder.Services.AddSingleton<CardDbContext>();
 builder.Services.AddSingleton<UnoDeckBuilder>();
 builder.Services.AddSingleton<UnoGameMod>();
 builder.Services.AddSingleton<BlackJackGameStorage>();
 builder.Services.AddSingleton<UnoGameStorage>();
 builder.Services.AddSingleton<GameService>();
+
+builder.Services.AddTransient<CahGame>();
+builder.Services.AddSingleton<CahFactory>();
+builder.Services.AddSingleton<IDictionary<string, CahGame>>(_ => new ConcurrentDictionary<string, CahGame>());
+
 
 var app = builder.Build();
 
@@ -70,10 +78,12 @@ app.MapHub<BaseHub>("/basehub", options =>
     options.AllowStatefulReconnects = true;
 });
 
+app.MapHub<CahHub>("/cahhub", options =>
+{
+    options.AllowStatefulReconnects = true;
+});
+
 app.Run();
 
 public partial class Program { }
 
-//// For simulations
-//using WebApi.GameLogic.Simulations;
-//UnoGameSim.Simulate();

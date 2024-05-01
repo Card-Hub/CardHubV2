@@ -7,10 +7,21 @@ using Microsoft.AspNetCore.SignalR;
 using WebApi.Common;
 using WebApi.GameLogic.LyssieUno;
 
+public class UserConnection
+{
+  public string? ConnectionId { get; set; }
+  public required string User { get; set; }
+  public required string Room { get; set; }
+  public required UserType UserType { get; set; }
+    
+  public override string ToString() => $"{{ User: {User}, Room: {Room}, Type: {UserType}, ConnectionId: {ConnectionId} }}";
+}
 
-public partial class BaseHub : Hub
+
+public class UnoBaseHub : Hub
 {
   private Dictionary <string, UnoGameModLyssie> unoRoomToGames = new();
+  private Dictionary <string, UserConnection> _userConnections = new();
   private List<string> unoRoomCodes = new();
   
   public async Task SelectUno(UnoGameStorage unoGameStorage, string a1, string a2)

@@ -28,9 +28,9 @@ const getIconGivenName = (name: string) => {
   console.log(lobbyUsers.value.length);
   let url;
   lobbyUsers.value.forEach(function (lu: LobbyUser) {
-    console.log(lu.Name);
+    console.log(lu.name);
     console.log(lu.Avatar);
-    if (lu.Name == name) {
+    if (lu.name == name) {
     console.log("hfj");
       url = getIcon(lu.Avatar);
     }

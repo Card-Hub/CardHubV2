@@ -33,7 +33,7 @@ const getSuitIcon = (suit: string) => {
 
 
 const getSuitColor = (suit: string) => {
-  return suit.toLowerCase() === 'hearts' || suit === 'diamonds' ? 'red' : 'black';
+  return suit.toLowerCase() === 'hearts' || suit.toLowerCase() === 'diamonds' ? 'red' : 'black';
 };
 </script>
 
@@ -41,12 +41,12 @@ const getSuitColor = (suit: string) => {
   <div class="flex flex-wrap justify-center items-center">
     <div class="relative w-20 h-32 m-2 bg-white rounded-md shadow-md p-2"
     >
-      <img :src="getSuitIcon(card.suit)"
+      <img :src="getSuitIcon(card.Suit)"
            alt="suit icon"
            class="absolute bottom-2 right-2 w-14 h-14" />
       <div class="absolute top-2 left-2 text-4xl font-bold"
-           :style="{ color: getSuitColor(card.suit) }">
-        {{ getDisplayValue(card.value) }}</div>
+           :style="{ color: getSuitColor(card.Suit) }">
+        {{ getDisplayValue(card.Value) }}</div>
     </div>
   </div>
 </template>

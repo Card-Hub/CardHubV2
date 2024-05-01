@@ -1,17 +1,24 @@
 <script setup lang="ts">
 import {defineComponent, ref, onMounted} from "vue";
 import {storeToRefs} from "pinia";
-// import {useWebSocketStore} from "~/stores/webSocketStore";
-import {useBlackJackStore} from "~/stores/blackJackStore";
+import {useWebSocketStore} from "~/stores/webSocketStore";
 
-// import UNEnoshadowCard from "~/components/noShadowCard/UNEnoshadowCard.vue";
+import StandardCardDisplay from "~/components/Card/StandardCardDisplay.vue";
+import StandardnoshadowCard from "~/components/noShadowCard/StandardnoshadowCard.vue";
 
-const blackjackStore = useBlackJackStore();
+const store = useWebSocketStore();
+const uneStore = useUneStore();
+// uncomment these out later
+// const {  cards, users, room } = storeToRefs(store);
+// const { cards } = storeToRefs(store);
+
+const dealerCards = ref<StandardCard[]>([
+  {Id: 1, Suit: "hearts", Value: "Jack"},
+  {Id: 2, Suit: "hearts", Value: "Ace"}]);
+
 const newCards = ref<number[]>([]);
-// const { currentColor, players, currentPlayer, discardPile  } = storeToRefs(uneStore);
-
-// const cards = ref<UNOCard[]>(discardPile);
-
+//const currentColor = ref<string>("red");
+const { currentColor, players, currentPlayer, discardPile  } = storeToRefs(uneStore);
 const getCardStyle = (index: number) => {
   const randomX = Math.floor(Math.random() * 50) - 5; // Random offset for X-axis
   const randomY = Math.floor(Math.random() * 50) - 5; // Random offset for Y-axis
@@ -24,7 +31,7 @@ const getCardStyle = (index: number) => {
 };
 
 const cardStyle = (num: number) => {
-  let randomX = num * 5;
+  let randomX = num * 50;
   let randomY = num * 3;
   let randomRotation = 0;
 
@@ -38,43 +45,31 @@ const getPlayerIcon = (player: string) => {
   return new URL(`../../assets/icons/avatars/${player}.png`, import.meta.url);
 };
 
-const discardedCardsToDisplay = computed(() => {
-  var DC = [] as [UNOCard, number][];
-  // grab first 5 cards in discardedCards
-  for (let i = 0; i < discardPile.value.length && i < 5; i++) {
-    var card:UNOCard = {id: discardPile.value[i].Id, color: discardPile.value[i].Color, value:discardPile.value[i].Value};
-    DC.push([card, 5-i]);
-  }
-  return DC;
-});
 
 const getPlayerIconStyle = (index: number) => {
   const totalPlayers = players.value.length;
   let xpos = 0;
   let ypos = 0;
   
-  if (totalPlayers === 2) {
-    xpos = index === 0 ? 50 : -51;
-    ypos = index === 0 ? -300 : 300;
-  }else if(totalPlayers === 3){
+  if (totalPlayers === 2) {//good, might need order change
+    xpos = index === 0 ? 180 : -180;
+    ypos = index === 0 ? 315 : 315;
+  }else if(totalPlayers === 3){//good, might need order change
     xpos = index === 0 ? 151 : index === 1 ? -251 : 251;
-    ypos = index === 0 ? -300 : index === 1 ? 300 : 300;
-  } else if (totalPlayers === 4) {
-    xpos = index === 0 ? 150 : index === 1 ? -526 : index === 2 ? -56 : 426;
-    ypos = index === 0 ? -300 : index === 1 ? 0 : index === 2 ? 300 : 0;
-  } else if (totalPlayers === 5) {
-    xpos = index === 0 ? 225 : index === 1 ? -475 : index === 2 ? -251 : index === 3 ? 151 : 375;
-    ypos = index === 0 ? -300 : index === 1 ? 0 : index === 2 ? 300 : index === 3 ? 300 : 0;
-  } else if (totalPlayers === 6) {
-    xpos = index === 0 ? 500 : index === 1 ? -70 : index === 2 ? -525 : index === 3 ? -300 : index === 4 ? 60 : 325;
-    ypos = index === 0 ? -300 : index === 1 ? -300 : index === 2 ? 0 : index === 3 ? 300 : index === 4 ? 300 : 0;
-  } else if (totalPlayers === 7) {
-    xpos = index === 0 ? 550 : index === 1 ? -25 : index === 2 ? -425 : index === 3 ? -530 : index === 4 ? -350 : index === 5 ? 0 : 265;
-    ypos = index === 0 ? -300 : index === 1 ? -300 : index === 2 ? -150 : index === 3 ? 150 : index === 4 ? 300 : index === 5 ? 300 : 0;
-  } else if (totalPlayers === 8) {
-    xpos = index === 0 ? 600 : index === 1 ? 30 : index === 2 ? -375 : index === 3 ? -475 : index === 4 ? -300 : index === 5 ? 50 : index === 6 ? 265: 150;
-    ypos = index === 0 ? -300 : index === 1 ? -300 : index === 2 ? -150 : index === 3 ? 150 : index === 4 ? 300 : index === 5 ? 300 : index === 6 ? 150: -150;
-  }
+    ypos = index === 0 ? 300 : index === 1 ? 300 : 300;
+  } else if (totalPlayers === 4) {//good, might need order change
+    xpos = index === 0 ? 550 : index === 1 ? 180 : index === 2 ? -180 : -550;
+    ypos = index === 0 ? 280 : index === 1 ? 315 : index === 2 ? 315 : 280;
+  } else if (totalPlayers === 5) {//good, might need order change
+    xpos = index === 0 ? 225 : index === 1 ? -350 : index === 2 ? -251 : index === 3 ? 151 : 250;
+    ypos = index === 0 ? 330 : index === 1 ? 220 : index === 2 ? 300 : index === 3 ? 300 : 220;
+  } else if (totalPlayers === 6) {//good good
+    xpos = index === 0 ? 750 : index === 1 ? 490 : index === 2 ? 185 : index === 3 ? -185 : index === 4 ? -490 : -750;
+    ypos = index === 0 ? 200 : index === 1 ? 300 : index === 2 ? 300 : index === 3 ? 300 : index === 4 ? 300 : 200;
+  } else if (totalPlayers === 7) {//good good
+    xpos = index === 0 ? 750 : index === 1 ? 490 : index === 2 ? 245 : index === 3 ? 0 : index === 4 ? -245 : index === 5 ? -490 : -750;
+    ypos = index === 0 ? 200 : index === 1 ? 300 : index === 2 ? 300 : index === 3 ? 300 : index === 4 ? 300 : index === 5 ? 300 : 200;
+  } 
   return {
     transform: `translate(${xpos}%, ${ypos}%)`,
   };
@@ -91,20 +86,17 @@ const isCurrentPlayer = (player: string) => {
   }
 };
 
-const getUNE = () => {
-  return new URL(`../../assets/icons/unoDeck/UNE.svg`, import.meta.url);
+const getCARD = () => {
+  return new URL(`../../assets/icons/standardDeck/diamonds.svg`, import.meta.url);
 };
 
 const getCurrentColor = () => {
   const color = currentColor.value;
   return "background: ${currentColor.value}";
 };
-</script>
+  </script>
 
 <template>
-  <p> {{ currentPlayer }}</p>
-  <p> {{ discardPile }}</p>
-  <p> {{ discardedCardsToDisplay }}</p>
   <div class="gameboard-container">
     <div class="gameboard">
       <div class="player-icons">
@@ -114,31 +106,25 @@ const getCurrentColor = () => {
           <p class="player-name"> {{ player.Name }} </p>
         </div>
       </div>
-
-<!--      TODO: ARROWS -->
-     <div class="game-table rounded-tr-full shadow-lg" v-bind:class="currentColor">
-       <div class="arrow-container">
-         <div id="curvedarrow"></div>
-  </div>
-
-        <div class="column-container">
-          <div class="column left-column">
+      <div class="game-table rounded-tr-full shadow-lg" v-bind:class="currentColor">
+      <div class="column-container">
+        <div class="column left-column">
             <div class="deck-view">
-              <!--            <div class="flex justify-center items-center w-52 h-80 bg-zinc-800 rounded-md shadow-md mb-2">-->
-              <div class="deck-card flex justify-center items-center bg-zinc-800 rounded-md shadow-md mb-2"
-                   v-for="n in 5" :key="n" :style="cardStyle(n)">
-                <img :src="getUNE()" alt="game icon" class="une-logo"/>
+              <div class="deck-card flex justify-center items-center bg-zinc-800 rounded-md shadow-md mb-2">
+                <img :src="getCARD()" alt="game icon" class="une-logo"/>
               </div>
             </div>
           </div>
-
           <div class="column right-column">
             <div class="card-pile">
-              <UNEnoshadowCard class="singular-card" v-for="[card, index] in discardedCardsToDisplay"
-                               :key="card.Id"
+              <StandardnoshadowCard class="singular-card" v-for="(card, index) in dealerCards"
+                               :key="index"
                                :card="card"
                                :style="{ ...getCardStyle(index) }"
               />
+              <div class = "blank-card relative w-20 h-32 m-2 bg-white rounded-md shadow-md p-2" >
+                
+              </div>
             </div>
           </div>
 
@@ -179,25 +165,9 @@ const getCurrentColor = () => {
   height: 100%;
 }
 
-#curvedarrow {
-  position: relative;
-  width: 0;
-  height: 0;
-  border-top: 9px solid transparent;
-  border-right: 9px solid red;
-  transform: rotate(10deg);
-}
-#curvedarrow:after {
-  content: "";
-  position: absolute;
-  border: 0 solid transparent;
-  border-top: 3px solid red;
-  border-radius: 20px 0 0 0;
-  top: -12px;
-  left: -9px;
-  width: 12px;
-  height: 12px;
-  transform: rotate(45deg);
+.blank-card {
+  transform: translate(50px, 3px) rotate(0deg);
+  z-index: 1;
 }
 
 

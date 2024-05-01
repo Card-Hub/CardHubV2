@@ -30,6 +30,7 @@
     "@tsparticles/vue3": "^3.*",
     "@vueuse/components": "^10.9.0",
     "@vueuse/core": "^10.9.0",
+    "@vueuse/nuxt": "^10.9.0",
     "pinia": "^2.1.7",
     "primeflex": "^3.3.1",
     "primeicons": "^6.0.1",

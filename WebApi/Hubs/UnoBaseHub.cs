@@ -73,4 +73,10 @@ public partial class BaseHub : Hub
       }
       await game.SelectWild(userConnection.ConnectionId, colorEnum);
     }
+    public async Task PressUne(UnoGameStorage unoGameStorage) {
+      if (!_userConnections.TryGetValue(Context.ConnectionId, out var userConnection)) return;
+      string roomCode = userConnection.Room;
+      UnoGameModLyssie game = unoGameStorage.GetGame(roomCode);
+      await game.PressUne(userConnection.ConnectionId);
+    }
 }

@@ -16,7 +16,7 @@ public class UnoMessenger : iUnoMessenger {
 // potentially lots of people will need to know this
   public async Task SendFrontendJson(List<string> connStrs, string json)
   {
-    Console.WriteLine($"UnoMessenger sent to the frontend: \n {json}");
+    //Console.WriteLine($"UnoMessenger sent to the frontend: \n {json}");
     foreach (var connStr in connStrs) {
       Context.Clients.Client(connStr).SendAsync("ReceiveJson", json);
     }

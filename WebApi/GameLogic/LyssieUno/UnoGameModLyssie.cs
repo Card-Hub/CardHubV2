@@ -24,8 +24,11 @@ public class UnoGameModLyssie
 
   // Timer
   private TimeSpan _moveTimeLimit;
+  private TimeSpan _uneTimeLimit;
   private Timer _moveTimer;
+  private Timer _uneButtonTimer;
   private readonly object _lock = new();
+  private readonly object _uneButtonTimerLock = new();
 
   // Game state
   public bool GameStarted {get; private set;} 
@@ -37,6 +40,7 @@ public class UnoGameModLyssie
   private UnoSettingsLyssie Settings = new();
   private UnoJsonStateLyssie JsonState= new();
   private iUnoMessenger _messenger;
+  private string WhoHasUne {get; set;} = "";
 
     // constructor
   public UnoGameModLyssie(iUnoMessenger messenger, UnoDeckBuilderLyssie deckBuilder)
@@ -44,8 +48,11 @@ public class UnoGameModLyssie
       _deckBuilder = deckBuilder;
 
       _moveTimeLimit = TimeSpan.FromSeconds(5);
+      _uneTimeLimit = TimeSpan.FromSeconds(3);
       _moveTimer = new Timer(_moveTimeLimit);
+      _uneButtonTimer = new Timer(_uneTimeLimit);
       _messenger = messenger;
+      _uneButtonTimer.Elapsed += OnUneTimeElapsed;
       //_moveTimer.Elapsed += OnMoveTimeElapsed;
       //_hubContext = hubContext;
       
@@ -64,7 +71,7 @@ public class UnoGameModLyssie
 
     foreach (var player in _playerOrder.GetPlayers(LyssiePlayerStatus.Active))
     {
-        var drawnCards = _deck.Draw(7);
+        var drawnCards = _deck.Draw(3);
         _players[player].AddCards(drawnCards);
     }
 
@@ -115,6 +122,35 @@ public class UnoGameModLyssie
       _discardPile.Push(card);
       _CurrentColor = card.ColorEnum;
       
+      // Remove old une flags, stop timer
+      foreach (var player in GetActivePlayers()) {
+            player.CanPressUne = false;
+            CancelUneTimer();
+      }
+
+      // Check Une button
+      var currentPlayer = _players[_playerOrder.GetCurrentPlayer()];
+      // if player only has 1 card now and they didn't press une:
+      if (currentPlayer.GetHand().Count == 1 && currentPlayer.PressedUne == false) {
+        WhoHasUne = _playerOrder.GetCurrentPlayer();
+        _messenger.Log($"Play card WhoHasUne = {WhoHasUne}");
+        StartUneTimer();
+        // all other players can press une
+        foreach (string connStr2 in _playerOrder.GetPlayers(LyssiePlayerStatus.Active)) {
+          if (connStr2 != _playerOrder.GetCurrentPlayer()) {
+            _players[connStr2].CanPressUne = true;
+          }
+        }
+      }
+      
+      // if player only has 1 card now, or they did press une:
+      else {
+        foreach (string connStr2 in _playerOrder.GetPlayers(LyssiePlayerStatus.Active)) {
+          _players[connStr2].CanPressUne = false;
+          _players[connStr2].PressedUne = false;
+        }
+      }
+
       _messenger.Log($"{connStr} played a card: {JsonConvert.SerializeObject(card)}");
       await CancelTimer(card);
       // did someone win?
@@ -181,7 +217,7 @@ public async Task SelectWild(string connStr, UnoColorLyssie color) {
         await InitiateTurn();
         break;
       case UnoValueLyssie.SkipAll:
-        _playerOrder.SetNextPlayer((_playerOrder.GetCurrentPlayer()));
+        _playerOrder.SetNextPlayer(_playerOrder.GetCurrentPlayer());
         _messenger.Log("Skip All played.");
         await InitiateTurn();
         break;
@@ -193,12 +229,12 @@ public async Task SelectWild(string connStr, UnoColorLyssie color) {
       case UnoValueLyssie.Wild:
         _messenger.Log("Wild played.?");
         SomeoneNeedsToSelectWildColor = true;
-        _playerOrder.SetNextPlayer(2); // skips next person's turn
+        //_playerOrder.SetNextPlayer(2); // skips next person's turn
         break;
       case UnoValueLyssie.WildDrawFour:
         _messenger.Log("Wild Draw 4 played.");
-        List<UnoCardModLyssie> cards2twice = _deck.Draw(2);
-        _players[nextPersonConnStr].AddCards(cards2twice);
+        List<UnoCardModLyssie> cards4twice = _deck.Draw(4);
+        _players[nextPersonConnStr].AddCards(cards4twice);
         SomeoneNeedsToSelectWildColor = true;
         _playerOrder.SetNextPlayer(2);
         break;
@@ -238,6 +274,13 @@ public async Task SelectWild(string connStr, UnoColorLyssie color) {
       var card = _deck.Draw();
       _players[connStr].AddCard(card);
       _messenger.Log($"{connStr} drew a card: {card.Color.ToString()} {card.Value.ToString()}");
+      
+      // Check Une button
+      //var currentPlayer = _players[_playerOrder.GetCurrentPlayer()];
+        // all other players can press une
+        foreach (var player in GetActivePlayers()) {
+            player.CanPressUne = false;
+        }
       await InitiateTurn();
       await _messenger.SendFrontendJson(GetAllConnStrsIncGameboard(), GetGameState());
       return true;
@@ -261,13 +304,48 @@ public async Task SelectWild(string connStr, UnoColorLyssie color) {
             _moveTimer.Start();
         }
         _playerOrder.NextTurn();
-        var player = _playerOrder.GetCurrentPlayer();
+        var player = _players[_playerOrder.GetCurrentPlayer()];
+        if (player.Hand.Count == 2) {
+          player.CanPressUne = true;
+          WhoHasUne = _playerOrder.GetCurrentPlayer();
+        }
         await _messenger.SendFrontendTimerSet(5);
         //await _hubContext.Clients.Clients(player, Gameboard).SendAsync("StartTimer", _moveTimeLimit.Seconds);
 
         _messenger.Log("Timer started.");
     }
 
+    public void StartUneTimer() {
+      lock (_uneButtonTimerLock)
+        {
+            _uneButtonTimer.Start();
+            _messenger.Log("Une timer started.");
+        }
+    }
+
+    public void CancelUneTimer()
+    {
+        lock (_uneButtonTimerLock)
+        {
+            _uneButtonTimer.Stop();
+            _messenger.Log($"Une timer cancelled.");
+        }
+    }
+    public async void OnUneTimeElapsed(object? source, ElapsedEventArgs e) {
+      _uneButtonTimer.Stop();
+      _messenger.Log("Une timer ended.");
+      WhoHasUne = "";_messenger.Log($"On time elapsed WhoHasUne = {WhoHasUne}");
+      // only people with 2 cards whose turn it is, can press une
+      foreach (string connStr in _playerOrder.GetPlayers(LyssiePlayerStatus.Active)) {
+        _players[connStr].CanPressUne = false;
+        _players[connStr].PressedUne = false;
+      }
+      var currentPlayer = _players[PlayerOrder.GetCurrentPlayer()];
+      if (currentPlayer.Hand.Count == 2) {
+        currentPlayer.CanPressUne = true;
+      }
+      await _messenger.SendFrontendJson(GetAllConnStrsIncGameboard(), GetGameState());
+    }
     public async Task CancelTimer(UnoCardModLyssie card)
     {
         lock (_lock)
@@ -381,6 +459,52 @@ public async Task SelectWild(string connStr, UnoColorLyssie color) {
       var isValueMatch = card.ValueEnum == lastCard.ValueEnum;
       var isWildPlayable = new List<UnoValueLyssie> {UnoValueLyssie.Wild, UnoValueLyssie.WildDrawFour}.Contains(card.ValueEnum);
       return isColorMatch || isValueMatch || isWildPlayable;
+    }
+
+    public async Task PressUne(string connStr) {
+      var playerWhoPressedUne = _players[connStr];
+      _messenger.Log("SOMEONE pressed une!");
+      _messenger.Log($"Connstr: {connStr}");
+      _messenger.Log($"Who has Une: {WhoHasUne}");
+      if (playerWhoPressedUne.CanPressUne) {
+        CancelUneTimer();
+        // If they are the person who has une rn
+        if (WhoHasUne == connStr) {
+          _messenger.Log("The player who has une, pressed une");
+          WhoHasUne = "";
+          //_messenger.Log($"PressUne == WhoHasUne = {WhoHasUne}");
+          var currentPlayer = _players[PlayerOrder.GetCurrentPlayer()];
+          currentPlayer.PressedUne = true;
+          // only the person who
+          foreach (UnoPlayerLyssie player in GetActivePlayers()) {
+            player.CanPressUne = false;
+          }
+          //var currentPlayer = _players[PlayerOrder.GetCurrentPlayer()];
+          if (currentPlayer.Hand.Count == 2) {
+            currentPlayer.CanPressUne = true;
+          }
+          await _messenger.SendFrontendJson(GetAllConnStrsIncGameboard(), GetGameState());
+        }
+        else if (WhoHasUne != "") {
+          _messenger.Log("Someone other than the player who has une, pressed une");
+          _players[WhoHasUne].AddCard(_deck.Draw());
+          _players[WhoHasUne].AddCard(_deck.Draw());
+          WhoHasUne = "";
+          // only the person who
+
+          foreach (UnoPlayerLyssie player in GetActivePlayers()) {
+            player.CanPressUne = false;
+          }
+          var currentPlayer = _players[PlayerOrder.GetCurrentPlayer()];
+          if (currentPlayer.Hand.Count == 2) {
+            currentPlayer.CanPressUne = true;
+          }
+        await _messenger.SendFrontendJson(GetAllConnStrsIncGameboard(), GetGameState());
+        }
+      }
+      else {
+        await _messenger.SendFrontendError(new List<string>() {connStr}, "Can't press the Une button right now!");
+      }
     }
     
 }

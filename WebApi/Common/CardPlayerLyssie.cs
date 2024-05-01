@@ -18,7 +18,7 @@ public class CardPlayerLyssie<TCard> : ICardPlayer<TCard>
     public List<TCard> Hand { get { return _hand; } }
 
     // these attributes are private and won't be seen
-    private string ConnectionString;
+    protected string ConnectionString;
     private List<TCard> _hand;
     
     public CardPlayerLyssie(string name, string connectionString)

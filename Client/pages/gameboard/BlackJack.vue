@@ -43,6 +43,7 @@ const players = ref<BlackJackPlayer[]>([
 ]);
 
 const currentPlayer = ref<string>("lyssie");
+const dealersTurn = ref<boolean>(false);
 
 //const currentColor = ref<string>("red");
 // const { currentColor, players, currentPlayer, discardPile  } = storeToRefs(uneStore);
@@ -130,22 +131,23 @@ const getCARD = () => {
         </div>
       </div>
       <div class="game-table rounded-tr-full shadow-lg">
-      <div class="column-container">
-          <div class="column right-column">
             <div class="card-pile">
+              <div v-if="dealersTurn">
+                
+              </div>
+              <div class="!dealersTurn"></div>
               <StandardnoshadowCard :card="dealerCards[0]" class="standardCardDisplay"/>
               <StandardnoshadowCard :card="dealerCards[1]" class="standardCardDisplay"/>
               <div class="deck-card flex justify-center items-center bg-zinc-800 rounded-md shadow-md mb-2">
                 <img :src="getCARD()" alt="game icon" class="une-logo"/>
               </div>
             </div>
-            <div class = "blank-card relative w-20 h-32 m-2 bg-white rounded-md shadow-md p-2" >
+            <div class = "blank-card relative w-20 h-32 m-2 bg-zinc-800 rounded-md shadow-md p-2" >
+              <img :src="getCARD()" alt="game icon" class="une-logo"/>
             </div>
           </div>
 
 
-        </div>
-      </div>
     </div>
   </div>
 

@@ -102,17 +102,17 @@ public class BaseHub : Hub<IBaseClient>
                 Avatar = baseRoom.GetRandomAvailableAvatar()
             });
             
-            Context.Items[Name] = name;
-            await SendAvatar();
+            Context.Items.Add(Name, name);
         }
         else
         {
             _rooms.Add(roomId, new BaseRoom(ContextId));
         }
         
-        Context.Items[Room] = roomId;
+        Context.Items.Add(Room, roomId);
 
         await Groups.AddToGroupAsync(ContextId, roomId);
+        await SendAvatar();
     }
     
     public async Task SendMessage(string message)
@@ -131,6 +131,7 @@ public class BaseHub : Hub<IBaseClient>
         if (avatar != null && !baseRoom.SetAvatar(ContextId, avatar)) return;
         
         await Clients.Group(ContextRoomId).ReceiveAvatars(baseRoom.GetAvatars());
+        Console.WriteLine("Avatar sent");
     }
 
     
@@ -151,7 +152,7 @@ public class BaseHub : Hub<IBaseClient>
     private string ContextRoomId =>
         Context.Items.TryGetValueAs(Room, out string roomId)
             ? roomId
-            : throw new InvalidOperationException("Room id not found");
+            : throw new InvalidOperationException("Base Room id not found");
 
     #endregion
 }

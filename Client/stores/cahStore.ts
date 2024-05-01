@@ -4,16 +4,16 @@ import { defineStore } from "pinia";
 import {
     HubConnectionState
 } from "@microsoft/signalr";
-import { computed, } from "vue";
+import { computed } from "vue";
 
 
 export const useCahStore = defineStore("cah", () => {
     // Debugging purposes
     const LOG_PREFIX = "CahHub - ";
-    const log = function(...args: any[]){
+    const log = function (...args: any[]) {
         const modifiedArgs = args.map(arg => `${ LOG_PREFIX }${ arg }`);
         console.log.apply(console, modifiedArgs);
-    }
+    };
 
     // baseStore.ts
     const baseStore = useBaseStore();
@@ -21,16 +21,23 @@ export const useCahStore = defineStore("cah", () => {
 
     const isGameConnected = computed<boolean>(() => gameConnection.value !== null && gameConnection.value.state === HubConnectionState.Connected);
 
-    // watch(gameConnection, async (newValue, oldValue) => {
-    //     if (newValue === null || oldValue !== null || !isGameConnected.value) return;
-    // });
+    watch(gameConnection, async (newValue, oldValue) => {
+        if (newValue === null || !isGameConnected.value) return;
+
+        registerHandlers();
+    });
 
     const registerHandlers = (): void => {
-        gameConnection.value?.on("ReceiveCards", (cards: CahCard[]) => {
-            log("Received cards", cards)
+        if (gameConnection.value === null) return;
+
+        gameConnection.value.on("ReceiveCards", (cards: CahCard[]) => {
+            log("Received cards", cards);
         });
-        log("Registered handlers");
-    }
+
+        gameConnection.value.on("Pong", () => {
+            log("Received pong");
+        });
+    };
 
 
     const sendAvatar = async (avatar: string): Promise<void> => {
@@ -53,11 +60,16 @@ export const useCahStore = defineStore("cah", () => {
         await gameConnection.value?.invoke("KickPlayer", player);
     };
 
+    const ping = async (): Promise<void> => {
+        if (!isGameConnected) return;
+        await gameConnection.value?.invoke("Ping");
+    };
+
 
     // Must return all state properties
     // https://pinia.vuejs.org/core-concepts/
     return {
         isGameConnected,
-        closeConnection, sendAvatar, sendGameType, kickPlayer, registerHandlers
+        closeConnection, sendAvatar, sendGameType, kickPlayer, registerHandlers, ping
     };
 });

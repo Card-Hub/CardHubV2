@@ -46,6 +46,11 @@ declare global {
         room: string;
         name?: string;
     }
+
+    interface BasePlayer {
+        name: string;
+        avatar: string;
+    }
 }
 
 export const enum CahType {

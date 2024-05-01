@@ -2,43 +2,46 @@
 
 import { storeToRefs } from "pinia";
 import AvatarSelection from "~/components/AvatarSelection.vue";
-import Chat from "~/components/Chat.vue";
-
-const store = useWebSocketStore();
-const { isPlayer, messages, users, room, lobbyUsers } = storeToRefs(store);
-const { sendMessage, startGame } = store;
-const uneStore = useUneStore();
-const { gameType, gameStarted } = storeToRefs(uneStore);
-
-
-// will allow for a popup of the chat
 import dialog from 'primevue/dialog';
-import UnoRules from "~/components/gameRules/UnoRules.vue";
+import Chat from "~/components/Chat.vue";
+import { GameType } from "~/types";
+
+const { $gameToString } = useNuxtApp();
+
+const baseStore = useBaseStore();
+const { isPlayer, messages, users, room, currentAvatar } = storeToRefs(baseStore);
+const {  } = baseStore;
+
+const cahStore = useCahStore();
+const { ping } = cahStore;
+
+
 const visible = ref(false);
 
-const gameboardStart = () => {
-  startGame();
-  navigateTo("/gameboard/" + gameType.value.toLowerCase());
+const gameboardStart = async () => {
+  // startGame();
+  await navigateTo("/gameboard/" + $gameToString(GameType.Cah));
 }
 
 const playerStart = () => {
-  return navigateTo("/playerview/" + gameType.value.toLowerCase());
+  return navigateTo("/playerview/" + $gameToString(GameType.Cah));
 }
 
 const getIcon = (avatar: string) => {
-  if (avatar == "" || avatar == null) {
-    return new URL(`../assets/icons/avatars/lyssie.png`, import.meta.url);
+  if (!avatar) {
+    console.log("No avatar found: ", avatar);
+    return new URL(`../../assets/icons/avatars/lyssie.png`, import.meta.url);
   }
   else {
-    return new URL(`../assets/icons/avatars/${avatar}.png`, import.meta.url);
+    return new URL(`../../assets/icons/avatars/${avatar}.png`, import.meta.url);
   }
 };
 
 const getIconGivenName = (name: string) => {
-  lobbyUsers.value.forEach(function (user: LobbyUser) {
+  users.value.forEach(function (user: BasePlayer) {
     // console.log(value);
     if (user.name == name) {
-      return getIcon(user.Avatar);
+      return getIcon(user.avatar);
     } else {
       return getIcon("lyssie");
     }
@@ -47,11 +50,11 @@ const getIconGivenName = (name: string) => {
   return getIcon("lyssie");
 }
 
-const kickPlayer = (lobbyUser: LobbyUser) => {
-  console.log("Kicking player: " + lobbyUser.name);
+const kickPlayer = (user: BasePlayer) => {
+  console.log("Kicking player: " + user.name);
   // send message to server to kick player
   // BOOT PLAYER HERE
-  // kickPlayer(lobbyUser);
+  // kickPlayer(user);
 }
 
 </script>
@@ -61,8 +64,8 @@ const kickPlayer = (lobbyUser: LobbyUser) => {
     <div v-if="isPlayer" class="m-8">
 
       <div class="flex justify-between">
-        <h1 >
-          {{ gameType }}
+        <h1>
+          {{ $gameToString(GameType.Cah) }}
         </h1>
         <div class="justify-left">
           <i class="pi pi-fw pi-comment" style="font-size: 2rem" @click="visible = true"></i>
@@ -78,7 +81,7 @@ const kickPlayer = (lobbyUser: LobbyUser) => {
 
       <AvatarSelection class="align-center"/>
       <div class="">
-        <Button class="mt-5" @click="playerStart" v-if="gameStarted">Join Game</Button>
+        <Button class="mt-5" @click="playerStart" v-if="true">Join Game</Button>
       </div>
     </div>
 
@@ -94,11 +97,11 @@ const kickPlayer = (lobbyUser: LobbyUser) => {
           <SvgoStandardDeckSpades class="suit w-80 h-80 absolute z-0 bottom-12 -left-24 rotate-[-20deg]" :fontControlled="false" filled/>
 
           <div class="m-8 flex justify-between gap-4">
-            <div v-for="lobbyUser in lobbyUsers as LobbyUser[]" class="rounded-full flex card items-center justify-content h-16 w-full">
+            <div v-for="user in users as BasePlayer[]" class="rounded-full flex card items-center justify-content h-16 w-full">
               <!--<i class="pi pi-user mx-4 text-neutral-300" style="font-size: 1.5rem"></i>-->
-              <img :src="getIcon(lobbyUser.Avatar)" alt="avatar Icon" class="lobby-player-icon-img">
-              <span class="text-2xl text-neutral-300">{{ lobbyUser.name }} </span>
-              <Button class="kick-btn" @click="kickPlayer(lobbyUser)"> Kick </Button>
+              <img :src="getIcon(currentAvatar)" alt="avatar Icon" class="lobby-player-icon-img">
+              <span class="text-2xl text-neutral-300">{{ user.name }} </span>
+              <Button class="kick-btn" @click="kickPlayer(user)"> Kick </Button>
             </div>
           </div>
         </div>
@@ -106,7 +109,7 @@ const kickPlayer = (lobbyUser: LobbyUser) => {
       <div class="flex justify-center w-1/3">
         <div class="flex flex-col items-center">
           <h1 class="text-6xl">
-            {{ gameType }}
+            {{ $gameToString(GameType.Cah) }}
           </h1>
           <p class="mt-24 text-xl">
             Room Code
@@ -128,6 +131,9 @@ const kickPlayer = (lobbyUser: LobbyUser) => {
       Error: No user type found
     </div>
   </div>
+  <button @click="ping">
+    Ping
+  </button>
 </template>
 
 <style scoped>

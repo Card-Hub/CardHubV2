@@ -1,28 +1,33 @@
 <script setup lang="ts">
-import { useWebSocketStore } from "~/stores/webSocketStore";
+import { computed } from "vue";
 
-const store = useWebSocketStore();
-const { tryJoinRoom, sendAvatar } = store;
+const store = useBaseStore();
+const { users, currentAvatar } = storeToRefs(store);
+const { sendAvatar } = store;
 
-const availableAvatars = ["lyssie", "ruby", "oli", "femaleJuno", "alex", "andy", "liam", "juno", "pocky", "star", "fairy", "dinoNugget1", "dinoNugget2", "dinoNugget3", "dinoNugget4", "amongusNugget"];
-const currentChoice = ref<string>("lyssie");
-// sendAvatar(currentChoice.value);
+const avatars = ["lyssie", "ruby", "oli", "femaleJuno", "alex", "andy", "liam", "juno", "pocky", "star", "fairy", "dinoNugget1", "dinoNugget2", "dinoNugget3", "dinoNugget4", "amongusNugget"];
+let takenAvatars = computed<string[]>(() => users.value.map((user) => user.avatar));
 
 const getIcon = (avatar: string) => {
   return new URL(`../assets/icons/avatars/${ avatar }.png`, import.meta.url);
 };
 
-const isCurrentChoice = (avatar: string) => {
-  return {
-    border: currentChoice.value === avatar ? "2px solid #f31919" : "none",
-    boxShadow: currentChoice.value === avatar ? "0px 0px 10px 5px rgba(243, 25, 25, 0.5)" : "none"
-  };
+const avatarStyle = (avatar: string) => {
+  if (currentAvatar.value === avatar) {
+    return {
+      border: currentAvatar.value === avatar ? "2px solid #f31919" : "none",
+      boxShadow: currentAvatar.value === avatar ? "0px 0px 10px 5px rgba(243, 25, 25, 0.5)" : "none"
+    };
+  } else if (takenAvatars.value.includes(avatar)) {
+    return {
+      opacity: "0.5"
+    };
+  }
 };
 
 const selectAvatar = (avatar: string) => {
-  currentChoice.value = avatar;
+  if (takenAvatars.value.includes(avatar)) return;
   sendAvatar(avatar);
-  isCurrentChoice(avatar);
 };
 
 </script>
@@ -31,8 +36,8 @@ const selectAvatar = (avatar: string) => {
   <div class="selection-container">
     <h1 class="text-2xl font-bold text-right">Select an Avatar</h1>
     <div class="player-icons">
-      <div class="player-icon" v-for="(avatar) in availableAvatars" :key="avatar"
-           :style="isCurrentChoice(avatar)">
+      <div class="player-icon" v-for="(avatar) in avatars" :key="avatar"
+           :style="avatarStyle(avatar)">
         <img :src="getIcon(avatar)" alt="avatar Icon" class="player-icon-img" @click="selectAvatar(avatar)"/>
       </div>
     </div>

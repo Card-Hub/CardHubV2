@@ -40,7 +40,7 @@ public class CahHub : Hub
             if (!game.AddPlayer(ContextId)) return;
         }
         
-        Context.Items[Room] = roomId;
+        Context.Items.Add(Room, roomId);
 
         await Groups.AddToGroupAsync(ContextId, roomId);
     }
@@ -107,6 +107,9 @@ public class CahHub : Hub
         await Clients.Group(GetRoomId()).SendAsync("ReceiveWinner", winner);
     }
 
+    public async Task Ping() => await Clients.Caller.SendAsync("Pong");
+    
+
   
     #region Helpers
     
@@ -120,7 +123,7 @@ public class CahHub : Hub
     {
         return Context.Items.TryGetValueAs(Room, out string roomName)
             ? roomName
-            : throw new InvalidOperationException("Room id not found");
+            : throw new InvalidOperationException("Cah Room id not found");
     }
     
     #endregion

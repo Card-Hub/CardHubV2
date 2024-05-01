@@ -34,9 +34,14 @@ export const useBaseStore = defineStore("base", () => {
     const gameConnection = ref<HubConnection | null>(null);
     const isPlayer = ref<boolean | null>(null);
     const isBaseConnected = computed<boolean>(() => baseConnection.value !== null && baseConnection.value.state === HubConnectionState.Connected);
+    const currentAvatar = computed<string | null>(() => {
+        if (!isPlayer.value) return null;
+        const currentPlayer = users.value.find(p => p.name === user.value);
+        return currentPlayer?.avatar ?? null;
+    });
 
     const messages = ref<PlayerMessage[]>([]);
-    const users = ref<Array<LobbyUser>>([]);
+    const users = ref<Array<BasePlayer>>([]);
 
     const user = ref("");
     const room = ref("");
@@ -53,8 +58,14 @@ export const useBaseStore = defineStore("base", () => {
             if (!response) return false;
 
             const options: ConnectionOptions = { room: response };
-            await joinRoom(options, gameType);
-            await joinRoom(options, gameType, callback);
+            const baseConnect = await joinRoom(options, gameType);
+            const gameConnect = await joinRoom(options, gameType, callback);
+
+            if (!baseConnect || !gameConnect) {
+                log("Failed to connect to server");
+                console.log("Base: ", baseConnect, "Game: ", gameConnect)
+                return false;
+            }
 
             isPlayer.value = false;
             room.value = response;
@@ -76,8 +87,14 @@ export const useBaseStore = defineStore("base", () => {
             }
 
             const options: ConnectionOptions = { name: user, room: room };
-            await joinRoom(options, gameType);
-            await joinRoom(options, gameType);
+            const baseConnect = await joinRoom(options, gameType);
+            const gameConnect = await joinRoom(options, gameType, function () {});
+
+            if (!baseConnect || !gameConnect) {
+                log("Failed to connect to server");
+                console.log("Base: ", baseConnect, "Game: ", gameConnect)
+                return null;
+            }
 
             isPlayer.value = true;
             return gameType;
@@ -90,7 +107,7 @@ export const useBaseStore = defineStore("base", () => {
     const joinRoom = async (options: ConnectionOptions, gameType: GameType, callback?: () => void): Promise<boolean> => {
         try {
             const isBase = callback === undefined || callback === null;
-            if (!isBase && !isBaseConnected.value) return false;
+            // if (!isBase && !isBaseConnected.value) return false; // shit breaks
 
             const hubPath = isBase ? runtimeConfig.public.baseHub : $gameToString(gameType) + "hub";
             const webSocketUrl = `${ runtimeConfig.public.baseURL }/${ hubPath }`;
@@ -101,10 +118,11 @@ export const useBaseStore = defineStore("base", () => {
                 .withUrl(webSocketUrl)
                 .withStatefulReconnect()
                 .withAutomaticReconnect()
-                .configureLogging(LogLevel.Information)
+                .configureLogging(LogLevel.Warning)
                 .build();
 
             if (isBase) {
+                baseConnection.value = joinConnection;
                 registerBaseHandlers();
             } else {
                 callback?.();
@@ -142,13 +160,14 @@ export const useBaseStore = defineStore("base", () => {
     };
 
     const registerBaseHandlers = (): void => {
-        baseConnection.value?.on("ReceiveMessage", (userMessage: PlayerMessage) => {
+        if (baseConnection.value === null) return;
+
+        baseConnection.value.on("ReceiveMessage", (userMessage: PlayerMessage) => {
             messages.value.push(userMessage);
             console.log(userMessage);
         });
 
-        baseConnection.value?.on("ReceiveAvatars", (usersList: Array<LobbyUser>) => {
-            console.log("in the avatars");
+        baseConnection.value.on("ReceiveAvatars", (usersList: Array<BasePlayer>) => {
             users.value = usersList;
             console.log(usersList);
         });
@@ -178,7 +197,7 @@ export const useBaseStore = defineStore("base", () => {
     // Must return all state properties
     // https://pinia.vuejs.org/core-concepts/
     return {
-        baseConnection, gameConnection, isBaseConnected, isPlayer, messages, users, user, room,
+        baseConnection, gameConnection, isBaseConnected, isPlayer, messages, users, user, room, currentAvatar,
         tryConnectGameboard, tryConnectPlayer, sendMessage, closeConnection, sendAvatar, kickPlayer
     };
 });

@@ -7,23 +7,125 @@ const isPlayer = ref<boolean>(true);
 </script>
 
 <template>
-  <div>
-    <div v-if="isPlayer" class="m-8">
-      <h1>
-        Une - New and Improved
-      </h1>
-      <p>
-        Waiting for the host to start the game. Sit back and relax for now. While you're waiting, select an avatar.
-      </p>
+  <div id="app">
+    <!--                  <tsparticles id="tsparticles" @particlesLoaded="particlesLoaded" :options="options" />                  -->
+    <vue-particles id="tsparticles" @particles-loaded="particlesLoaded" url="http://foo.bar/particles.json"/>
 
-      <AvatarSelection class="align-center"/>
-    </div>
-    <div v-else-if="!isPlayer" class="flex min-h-screen">
-
-    </div>
-    <div v-else>
-      Error: No user type found
-    </div>
+    <vue-particles
+        id="tsparticles"
+        @particles-loaded="particlesLoaded"
+        :options="{
+                    background: {
+                        color: {
+                            value: 'transparent'
+                        }
+                    },
+                    particles: {
+                        number: {
+                            value: 0
+                        },
+                        color: {
+                            value: ['#8338ec', '#ff006e', '#ffbe0b', '#3a86ff']
+                        },
+                        animation: {
+                            enable: true,
+                            speed: 2,
+                            startValue: 'max',
+                            destroy: 'min'
+                        },
+                        links: {
+                            enable: false
+                        },
+                        life: {
+                            count: 1,
+                            duration: {
+                              sync: true,
+                                value: 5
+                            }
+                        },
+                        move: {
+                            enable: true,
+                            gravity: {
+                                enable: true,
+                                acceleration: 10
+                            },
+                          speed: {
+                              min: 10,
+                              max: 20
+                          },
+                          decay: 0.1,
+                          direction: 'none',
+                          straight: false,
+                          outModes: {
+                              default: 'destroy',
+                              top: 'none'
+                          }
+                        },
+                        rotate: {
+                            value: {min: 0, max: 360},
+                            move: true,
+                            direction: 'random',
+                            animation: {
+                                enable: true,
+                                speed: 60
+                            }
+                        },
+                        tilt: {
+                            enable: true,
+                            value: {min: 0, max: 360},
+                            direction: 'random',
+                            move: true,
+                            animation: {
+                                enable: true,
+                                speed: 60
+                            }
+                        },
+                        roll: {
+                          darken: {
+                            enable: true,
+                            value: 25
+                          },
+                          enable: true,
+                          speed: {
+                            min: 15,
+                            max: 25
+                          }
+                        },
+                        wobble: {
+                            distance: 30,
+                            enable: true,
+                            move: true,
+                            speed: {
+                                min: -15,
+                                max: 15}
+                        },
+                        opacity: {
+                            value: {min: 0, max: 2}
+                        },
+                        shape: {
+                            type: ['circle', 'triangle', 'square'],
+                        },
+                        size: {
+                            value: { min: 2, max: 4 }
+                        }
+                    },
+                    emitters: {
+                      life: {
+                        count: 0,
+                        duration: 0.1,
+                        delay: 0.4
+                      },
+                      rate: {
+                        delay: 0.5,
+                        quantity: 150
+                      },
+                      size: {
+                        width: 0,
+                        height: 0
+                      },
+                    }
+                }"
+    />
   </div>
 </template>
 

@@ -118,7 +118,28 @@ const cardColor = (color: string) => {
 }
 
 .selected {
-  border: 2px solid red;
+  border: 2px dashed transparent; /* Transparent border to start with */
+  height: 9rem;
+  width: 6rem;
+  opacity: 0; /* Start with 0 opacity */
+
+  /* Define the animation */
+  animation: fadeInBorder .5s ease-in forwards; /* Run the fadeInBorder animation */
+
+  /* Define the transition for the border */
+  transition: border-color .5s ease-in-out; /* Transition the border-color property */
+
+  /* Animation keyframes for fading in the border */
+  @keyframes fadeInBorder {
+    from {
+      border-color: transparent; /* Start with transparent border color */
+      opacity: 0; /* Start with 0 opacity */
+    }
+    to {
+      border-color: white; /* End with white border color */
+      opacity: 1; /* End with full opacity */
+    }
+  }
 }
 
 </style>

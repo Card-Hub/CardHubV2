@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useWebSocketStore } from '~/stores/webSocketStore';
+import { useBaseStore } from '~/stores/baseStore';
 import { storeToRefs } from "pinia";
 
-const store = useWebSocketStore();
-const { isPlayer, messages, user} = useWebSocketStore();
-const { lobbyUsers } = storeToRefs(store);
+const store = useBaseStore();
+const { isPlayer, messages, user, users } = storeToRefs(store);
 const { sendMessage } = store;
 // ref
 const newMessage1 = ref('');//find a way to get rid fo this
@@ -25,14 +24,14 @@ const getIcon = (avatar: string) => {
 };
 
 const getIconGivenName = (name: string) => {
-  console.log(lobbyUsers.value.length);
+  console.log(users.value.length);
   let url;
-  lobbyUsers.value.forEach(function (lu: LobbyUser) {
+  users.value.forEach(function (lu: BasePlayer) {
     console.log(lu.name);
-    console.log(lu.Avatar);
+    console.log(lu.avatar);
     if (lu.name == name) {
     console.log("hfj");
-      url = getIcon(lu.Avatar);
+      url = getIcon(lu.avatar);
     }
   });
   if (url != null) {
@@ -52,22 +51,22 @@ const getIconGivenName = (name: string) => {
       <div class="all-messages">
         <div v-for="(m, index) in messages" :key="index">
           <div class="each-message-container">
-            <div class="system-message" v-if="m.user == 'System'">
+            <div class="system-message" v-if="m.name == 'System'">
               {{m.message}}
             </div>
-            <div v-else-if="m.user != user" class="others-message-container">
-              <img :src="getIconGivenName(m.user)" alt="avatar Icon" class="lobby-player-icon-img-chat">
+            <div v-else-if="m.name != user" class="others-message-container">
+              <img :src="getIconGivenName(m.name)" alt="avatar Icon" class="lobby-player-icon-img-chat">
               <div class="message-and-name">
-                <span class="text-2xl text-neutral-300 username">{{ m.user }} </span>
+                <span class="text-2xl text-neutral-300 username">{{ m.name }} </span>
                 <div class="message-container"> {{ m.message }}</div>
               </div>
             </div>
             <div v-else class="my-message-container">
               <div class="message-and-name">
-                <span class="text-2xl text-neutral-300 username">{{ m.user }} </span>
+                <span class="text-2xl text-neutral-300 username">{{ m.name }} </span>
                 <div class="message-container"> {{ m.message }}</div>
               </div>
-              <img :src="getIconGivenName(m.user)" alt="avatar Icon" class="lobby-player-icon-img-chat">
+              <img :src="getIconGivenName(m.name)" alt="avatar Icon" class="lobby-player-icon-img-chat">
             </div>
             <!--<i class="pi pi-user mx-4 text-neutral-300" style="font-size: 1.5rem"></i>-->
           </div>
@@ -86,22 +85,22 @@ const getIconGivenName = (name: string) => {
       <div class="all-messages">
         <div v-for="(m, index) in messages" :key="index">
           <div class="each-message-container">
-            <div class="system-message" v-if="m.user == 'System'">
+            <div class="system-message" v-if="m.name == 'System'">
               {{m.message}}
             </div>
-            <div v-else-if="m.user != user" class="others-message-container">
-              <img :src="getIconGivenName(m.user)" alt="avatar Icon" class="lobby-player-icon-img-chat">
+            <div v-else-if="m.name != user" class="others-message-container">
+              <img :src="getIconGivenName(m.name)" alt="avatar Icon" class="lobby-player-icon-img-chat">
               <div class="message-and-name">
-                <span class="text-2xl text-neutral-300 username">{{ m.user }} </span>
+                <span class="text-2xl text-neutral-300 username">{{ m.name }} </span>
                 <div class="message-container"> {{ m.message }}</div>
               </div>
             </div>
             <div v-else class="my-message-container">
               <div class="message-and-name">
-                <span class="text-2xl text-neutral-300 username">{{ m.user }} </span>
+                <span class="text-2xl text-neutral-300 username">{{ m.name }} </span>
                 <div class="message-container"> {{ m.message }}</div>
               </div>
-              <img :src="getIconGivenName(m.user)" alt="avatar Icon" class="lobby-player-icon-img-chat">
+              <img :src="getIconGivenName(m.name)" alt="avatar Icon" class="lobby-player-icon-img-chat">
             </div>
           </div>
         </div>

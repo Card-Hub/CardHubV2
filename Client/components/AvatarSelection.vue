@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
+import {useBaseStore} from "~/stores/baseStore";
 
 const store = useBaseStore();
 const { users, currentAvatar } = storeToRefs(store);

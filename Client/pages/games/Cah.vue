@@ -3,6 +3,8 @@
 import { ref, computed } from 'vue';
 import CahRules from "~/components/gameRules/CahRules.vue";
 import { GameType } from "~/types";
+import {useBaseStore} from "~/stores/baseStore";
+import {useCahStore} from "~/stores/cahStore";
 
 
 const baseStore = useBaseStore();

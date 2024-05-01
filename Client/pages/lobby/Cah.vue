@@ -5,9 +5,13 @@ import AvatarSelection from "~/components/AvatarSelection.vue";
 import dialog from 'primevue/dialog';
 import Chat from "~/components/Chat.vue";
 import { GameType } from "~/types";
+import {useBaseStore} from "~/stores/baseStore";
+import {useCahStore} from "~/stores/cahStore";
 
 const { $gameToString } = useNuxtApp();
 
+import { ref, computed } from "vue";
+import CahDisplay from "~/components/Card/CahDisplay.vue";
 const baseStore = useBaseStore();
 const { isPlayer, messages, users, room, currentAvatar } = storeToRefs(baseStore);
 const {  } = baseStore;
@@ -28,7 +32,7 @@ const playerStart = () => {
 }
 
 const getIcon = (avatar: string) => {
-  if (!avatar) {
+  if (avatar === "" || avatar == null) {
     console.log("No avatar found: ", avatar);
     return new URL(`../../assets/icons/avatars/lyssie.png`, import.meta.url);
   }
@@ -40,7 +44,7 @@ const getIcon = (avatar: string) => {
 const getIconGivenName = (name: string) => {
   users.value.forEach(function (user: BasePlayer) {
     // console.log(value);
-    if (user.name == name) {
+    if (user.name === name) {
       return getIcon(user.avatar);
     } else {
       return getIcon("lyssie");
@@ -54,7 +58,27 @@ const kickPlayer = (user: BasePlayer) => {
   console.log("Kicking player: " + user.name);
   // send message to server to kick player
   // BOOT PLAYER HERE
-  // kickPlayer(user);
+  kickPlayer(user);
+}
+
+// turn each player into a cah player
+const cahPlayers = computed(() => users.value.map((user) => {
+  return {
+    Name: user.name,
+    Avatar: user.avatar,
+    Score: 0,
+    Hand: [],
+    IsCzar: false,
+    isWinner: false
+  }
+}));
+
+// convert cah player to base player
+const convertBase = (player: CahPlayer) => {
+  return {
+    name: player.Name,
+    avatar: player.Avatar
+  }
 }
 
 </script>
@@ -96,12 +120,12 @@ const kickPlayer = (user: BasePlayer) => {
           <SvgoStandardDeckHearts class="suit w-80 h-80 absolute z-0 -bottom-40 -right-10" :fontControlled="false" filled/>
           <SvgoStandardDeckSpades class="suit w-80 h-80 absolute z-0 bottom-12 -left-24 rotate-[-20deg]" :fontControlled="false" filled/>
 
-          <div class="m-8 flex justify-between gap-4">
-            <div v-for="user in users as BasePlayer[]" class="rounded-full flex card items-center justify-content h-16 w-full">
+          <div class="m-8 flex flex-col justify-between gap-4">
+            <div v-for="user in cahPlayers" class="rounded-full flex card items-center justify-content h-16 w-full">
               <!--<i class="pi pi-user mx-4 text-neutral-300" style="font-size: 1.5rem"></i>-->
-              <img :src="getIcon(currentAvatar)" alt="avatar Icon" class="lobby-player-icon-img">
-              <span class="text-2xl text-neutral-300">{{ user.name }} </span>
-              <Button class="kick-btn" @click="kickPlayer(user)"> Kick </Button>
+              <img :src="getIcon(user.Avatar)" alt="avatar Icon" class="lobby-player-icon-img">
+              <span class="text-2xl text-neutral-300">{{ user.Name }} </span>
+              <Button class="kick-btn" @click="kickPlayer(convertBase(user))"> Kick </Button>
             </div>
           </div>
         </div>

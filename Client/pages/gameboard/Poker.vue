@@ -217,7 +217,7 @@ const handleExit = () => {
       </div>
 
       <div class="game-table rounded-tr-full flex flex-col justify-center items-center shadow-xl">
-        <h1 class="text-center"> CURRENT BET: {{ currentBoardBet }}</h1>
+        <h1 class="text-center bet-txt"> CURRENT BET: {{ currentBoardBet }}</h1>
           <div class="deck-view justify-center align-items-center">
             <div class="deck-card flex justify-center items-center rounded-md shadow-md mb-2"
                  v-for="n in 5-cardsDisplayed" :key="n" :style="cardStyle(n)">
@@ -233,7 +233,7 @@ const handleExit = () => {
             />
           </div>
         </div>
-        <h1 class="text-center"> TOTAL POT: {{ totalPot }}</h1>
+        <h1 class="text-center pot-txt"> TOTAL POT: {{ totalPot }}</h1>
       </div>
       
 <!--        <div v-if="winner !== ''">-->
@@ -595,5 +595,19 @@ const handleExit = () => {
   bottom: 10px;
   right: 10px;
   cursor: pointer;
+}
+
+.bet-txt {
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-shadow: 2px 2px 4px #000000;
+  transform: translate(0%, -500%);
+}
+
+.pot-txt {
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-shadow: 2px 2px 4px #000000;
+  transform: translate(0%, 500%);
 }
 </style>

@@ -208,7 +208,7 @@
       </h1>
     </div>
     
-    <Button v-if="winner===''" class="float-right font-bold drawButton shadow mb-4" @click="{...drawCard, ...isCurrentPlayer}">Draw</Button>
+    <Button v-if="winner===''" class="float-right font-bold drawButton shadow mb-4" @click="drawCard">Draw</Button>
     <Button id="uneButton" v-if="winner ===''" class="uneButton float-left font-bold shadow mb-4" :disabled="!validateUneCall()" :style="isUne()" @click="callUne">UNE!</Button>
     
     <div v-if="winner===''" class=" w-full flex flex-wrap justify-center">

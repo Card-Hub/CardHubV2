@@ -1,8 +1,5 @@
 <script setup lang="ts">
-
 import {useUneStore} from "~/stores/uneStore";
-
-
 import {type ConfigurableDocument, type MaybeElementRef, useFullscreen } from '@vueuse/core';
 import {defineComponent, ref, onMounted, type ComputedRef, type Ref, computed} from "vue";
 import {storeToRefs} from "pinia";
@@ -381,7 +378,7 @@ const handleExit = () => {
 
 
     </div>
-    <img :src="getPrimeIcon('expand')" class="absolute size-14" @click="toggle" />
+    <img :src="getPrimeIcon('expand')" class="expand-icon size-14" @click="toggle" />
   </div>
   
 </template>
@@ -594,5 +591,12 @@ const handleExit = () => {
   overflow: hidden;
   margin-right: 10px;
   background: black;
+}
+
+.expand-icon {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  cursor: pointer;
 }
 </style>

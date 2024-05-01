@@ -1,10 +1,20 @@
 <script setup lang="ts">
-  import {defineComponent, ref } from "vue";
-  import { computed } from "vue";
+  import {defineComponent, ref, onMounted, type ComputedRef, type Ref, computed} from "vue";
   import {storeToRefs} from "pinia";
   import {useWebSocketStore} from "~/stores/webSocketStore";
   import toast from "@/utils/toast";
+
+  import { type ConfigurableDocument, type MaybeElementRef, useFullscreen } from '@vueuse/core';
   
+  // fullscreen
+  const { isFullscreen, enter, exit } = useFullscreen();
+  const el = ref(null)
+  const { toggle } = useFullscreen(el)
+
+  const getPrimeIcon = (name: string) => {
+    return new URL(`../../assets/icons/primeIcons/${name}.svg`, import.meta.url);
+  }
+
   import UNOCardDisplay from "~/components/Card/UNOCardDisplay.vue";
   import UnoRules from "~/components/gameRules/UnoRules.vue";
   
@@ -19,7 +29,7 @@
   const {user, users, room, connection } = storeToRefs(store);
   const { playCard, selectColor, drawCard } = store;
   const uneStore = useUneStore();
-  const { winner, currentPlayer, players, discardPile, someoneNeedsToSelectColor, playerWhoHasPrompt } = storeToRefs(uneStore);
+  const { winner, currentPlayer, players, discardPile, someoneNeedsToSelectColor, playerWhoHasPrompt, currentColor } = storeToRefs(uneStore);
  interface Player {
          Name: string
          Avatar: string
@@ -128,12 +138,6 @@
     await navigateTo("/join");
   };
   
-  const updateScroll = () => {
-    if (sideScroll.value == false) 
-      sideScroll.value = true;
-    sideScroll.value = false;
-  };
-  
   const isCurrentPlayer = () => {
     if (user.value !== currentPlayer.value) {
       toast.add({
@@ -147,7 +151,7 @@
   };
 
   const canBePlayed = (card: UNOCard) => {
-    return card.Color.toLowerCase() === discardPile.value[discardPile.value.length - 1].Color.toLowerCase() || card.Value === discardPile.value[discardPile.value.length - 1].Value || card.Color.toLowerCase() === 'black';
+    return card.Color.toLowerCase() === currentColor.value.toLowerCase() || card.Value.toLowerCase() === discardPile.value[discardPile.value.length - 1].Value.toLowerCase() || card.Color.toLowerCase() === 'black';
   };
 
 </script>
@@ -156,26 +160,35 @@
 <template>
   <div class="playerview-une-container w-full p-6">
     <Toast/>
-    <div class="flex flex-row-reverse">
-      <div class="card flex justify-left">
-        <i class="pi pi-fw pi-info-circle" style="font-size: 2.5rem" @click="rulesVisible = true"></i>
-        <Dialog v-model="rulesVisible" header="Rules" :visible="rulesVisible" @update:visible="rulesVisible = $event">
-          <UnoRules/>
-          <div class="flex justify-content-end gap-2">
-            <Button type="button" label="Exit" @click="rulesVisible = false"></Button>
-          </div>
-        </Dialog>
+    
+    <div class="flex flex-row justify-between">
+      <div class="user-info flex place-items-center gap-3 bg-gray-600">
+          <img :src="getUserIcon()" alt="user" class="user-avatar"/>
+          <p class="text-white"> {{ user }}</p>
       </div>
       
-      <div class="justify-left">
-        <i class="pi pi-fw pi-comment" style="font-size: 2.5rem" @click="chatVisible = true"></i>
-        <Dialog v-model="chatVisible" class="chat-container" header="Chat" :visible="chatVisible" @update:visible="chatVisible = $event">
-          <Chat/>
-        </Dialog>
+      <div class="left-div flex flex-row-reverse place-items-center gap-2">
+        <img :src="getPrimeIcon('expand')" class="size-10" @click="toggle" />
+
+        <div class="card">
+          <i class="pi pi-fw pi-info-circle" style="font-size: 2rem" @click="rulesVisible = true"></i>
+          <Dialog v-model="rulesVisible" header="Rules" class="w-[900px] h-[900px]" :visible="rulesVisible" @update:visible="rulesVisible = $event">
+            <UnoRules/>
+            <div class="flex justify-content-end gap-2">
+              <!--            <Button type="button" label="Exit" @click="rulesVisible = false"></Button>-->
+            </div>
+          </Dialog>
+        </div>
+
+        <div class="">
+          <i class="pi pi-fw pi-comment" style="font-size: 2rem" @click="chatVisible = true"></i>
+          <Dialog v-model="chatVisible" class="w-[900px] h-[900px]" header="Chat" :visible="chatVisible" @update:visible="chatVisible = $event">
+            <Chat/>
+          </Dialog>
+        </div>
+
+        <!--      <i class="pi pi-fw pi-eye" @click="!sideScroll" style="font-size: 2.5rem"></i>-->
       </div>
-      
-<!--      <i class="pi pi-fw pi-eye" @click="!sideScroll" style="font-size: 2.5rem"></i>-->
-      <img :src="getUserIcon()" alt="user" class="user-avatar"/>
     </div>
     
     
@@ -195,7 +208,7 @@
       </h1>
     </div>
     
-    <Button v-if="winner===''" class="float-right font-bold drawButton shadow mb-4" @click="{...drawCard, ...isCurrentPlayer()}">Draw</Button>
+    <Button v-if="winner===''" class="float-right font-bold drawButton shadow mb-4" @click="{...drawCard, ...isCurrentPlayer}">Draw</Button>
     <Button id="uneButton" v-if="winner ===''" class="uneButton float-left font-bold shadow mb-4" :disabled="!validateUneCall()" :style="isUne()" @click="callUne">UNE!</Button>
     
     <div v-if="winner===''" class=" w-full flex flex-wrap justify-center">
@@ -248,8 +261,6 @@
       </div>
     </div>
   </div>
-  
-  
 </template>
 
 <style scoped>
@@ -390,12 +401,10 @@
 }
 
 .user-avatar {
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 3rem;
+  height: 3rem;
   border-radius: 50%;
-  margin-right: 10px;
   background: rgba(255, 255, 255, 0.2);
-  margin-bottom: 10px;
 }
 
 .exit-btn {
@@ -410,5 +419,12 @@
   position: absolute;
   top: 70%;
   left: 50%;
+}
+
+.user-info {
+  color: white;
+  padding-left: 2px;
+  padding-right: 10px;
+  border-radius: 25%/50%;
 }
 </style>

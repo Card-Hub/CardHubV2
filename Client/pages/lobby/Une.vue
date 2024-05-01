@@ -66,7 +66,7 @@ const kickPlayer = (lobbyUser: LobbyUser) => {
         </h1>
         <div class="justify-left">
           <i class="pi pi-fw pi-comment" style="font-size: 2rem" @click="visible = true"></i>
-          <Dialog v-model="visible" class="chat-container" header="Chat" :visible="visible" @update:visible="visible = $event">
+          <Dialog v-model="visible" class="w-[900px] h-[900px]" header="Chat" :visible="visible" @update:visible="visible = $event">
             <Chat/>
           </Dialog>
         </div>

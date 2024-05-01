@@ -36,12 +36,12 @@ public class TexasGameSim {
     game.StartGame();
     //game.Call(testPlayers[0].Item2);
     //pre-flop
-    foreach (Tuple<string, string> playerTuple in testPlayers) { // playerTuple is (name, connStr)
-      if (game.GetGameState() == "Pre-Flop") {
-        output.WriteLine($"Turn starting for {playerTuple.Item1}");
-        game.Call(playerTuple.Item2);
-      }
-      else { break; }
+    int turnNum = 0;
+    int maxTurns = 100;
+    while (game.State != "RoundEnd" && turnNum < maxTurns) {
+      output.WriteLine($"Turn {turnNum} starting for {game.Players[game.PlayerOrder.GetCurrentPlayer()].Name}");
+      game.Call(game.PlayerOrder.GetCurrentPlayer());
+      turnNum++;
     }
 
     output.WriteLine("End Texas sim");

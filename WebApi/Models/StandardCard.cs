@@ -20,6 +20,6 @@ public class StandardCard
     public bool Equals(StandardCard other)
     {
         // Would still want to check for null etc. first.
-        return (this.Suit == other.Suit && this.Value == other.Value);
+        return (Suit == other.Suit) && (Value == other.Value);
     }
 }

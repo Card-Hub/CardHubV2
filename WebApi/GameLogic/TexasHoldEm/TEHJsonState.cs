@@ -22,7 +22,7 @@ public class TEHJsonState {
   public void Update(TexasHoldEmGame game) {
     //GameType = "Texas Hold Em";
     State = game.State.ToString();
-    if (State == "Not Started") {
+    if (State == "Not Started" || State == "RoundEnd") {
       ButtonPlayer = "";
       LittleBlindPlayer = "";
       BigBlindPlayer = "";

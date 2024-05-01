@@ -3,6 +3,8 @@ using WebApi.GameLogic;
 using WebApi.Models;
 using Xunit.Abstractions;
 
+using Newtonsoft.Json;
+using System.ComponentModel;
 namespace Tests.RandomTests;
 
 
@@ -1053,6 +1055,104 @@ public class PokerHandEvaluatorTests {
 		Assert.Equal(expectedValue, Evaluator.GetHandScore5(hand));
 	}
 
-  //[Theory]
-  //[MemberData(nameof(GetBestHand7Tests))]
+  [Fact]
+  public void TestGetAll5ItemCombosOf7() {
+    List<string> strings7 = new List<string> { "A", "B", "C", "D", "E", "F", "G"};
+    List<List<string>> expectedListOf5s = new List<List<string>> {
+      new List<string>() {"C", "D", "E", "F", "G"}, // 1 2 
+      new List<string>() {"B", "D", "E", "F", "G"}, // 1 3
+      new List<string>() {"B", "C", "E", "F", "G"}, // 1 4
+      new List<string>() {"B", "C", "D", "F", "G"}, // 1 5
+      new List<string>() {"B", "C", "D", "E", "G"}, // 1 6
+      new List<string>() {"B", "C", "D", "E", "F"}, // 1 7
+      new List<string>() {"A", "D", "E", "F", "G"}, // 2 3
+      new List<string>() {"A", "C", "E", "F", "G"}, // 2 4
+      new List<string>() {"A", "C", "D", "F", "G"}, // 2 5
+      new List<string>() {"A", "C", "D", "E", "G"}, // 2 6
+      new List<string>() {"A", "C", "D", "E", "F"}, // 2 7
+      new List<string>() {"A", "B", "E", "F", "G"}, // 3 4
+      new List<string>() {"A", "B", "D", "F", "G"}, // 3 5
+      new List<string>() {"A", "B", "D", "E", "G"}, // 3 6
+      new List<string>() {"A", "B", "D", "E", "F"}, // 3 7
+      new List<string>() {"A", "B", "C", "F", "G"}, // 4 5
+      new List<string>() {"A", "B", "C", "E", "G"}, // 4 6
+      new List<string>() {"A", "B", "C", "E", "F"}, // 4 7
+      new List<string>() {"A", "B", "C", "D", "G"}, // 5 6
+      new List<string>() {"A", "B", "C", "D", "F"}, // 5 7
+      new List<string>() {"A", "B", "C", "D", "E"} // 6 7
+    };
+    List<List<string>> allCombosOf5 = Evaluator.GetAll5ItemCombinationsOf7Items(strings7);
+    // 7c5 = 21
+    Assert.Equal(21, allCombosOf5.Count); 
+    Assert.Equal(21, expectedListOf5s.Count);
+    for (int i = 0; i < 21; i++) {
+      Assert.Equal(expectedListOf5s[i], allCombosOf5[i]);
+    }
+  }
+  public static IEnumerable<object[]> BestHandAndScoreTestCases
+	{
+		get
+		{
+			yield return new object[] // High card
+			{
+				new List<StandardCard>() {
+					new StandardCard(1, "Diamonds", "K"),
+					new StandardCard(2, "Diamonds", "2"),
+					new StandardCard(3, "Clubs", "4"),
+					new StandardCard(4, "Diamonds", "A"),
+					new StandardCard(5, "Diamonds", "Q"),
+          new StandardCard(6, "Hearts", "6"),
+          new StandardCard(7, "Hearts", "J")
+				},
+        new List<StandardCard>() {
+          new StandardCard(1, "Diamonds", "K"),
+          new StandardCard(4, "Diamonds", "A"),
+          new StandardCard(5, "Diamonds", "Q"),
+          new StandardCard(6, "Hearts", "6"),
+          new StandardCard(7, "Hearts", "J"),
+        },
+        0x1edcb6
+			};
+      yield return new object[] // one pair
+			{
+				new List<StandardCard>() {
+					new StandardCard(1, "Clubs", "K"),
+					new StandardCard(2, "Diamonds", "2"),
+					new StandardCard(3, "Clubs", "4"),
+					new StandardCard(4, "Diamonds", "A"),
+					new StandardCard(5, "Hearts", "6"),
+					new StandardCard(6, "Diamonds", "2"),
+					new StandardCard(7, "Hearts", "8"),
+				},
+				new List<StandardCard>() {
+					new StandardCard(1, "Clubs", "K"),
+					new StandardCard(2, "Diamonds", "2"),
+					new StandardCard(4, "Diamonds", "A"),
+					new StandardCard(6, "Diamonds", "2"),
+					new StandardCard(7, "Hearts", "8"),
+				},
+        0x22ed80
+			};
+		}
+	}
+  [Theory]
+  [MemberData(nameof(BestHandAndScoreTestCases))]
+  [Trait("testing", "rnrn")]
+  public void TestBestHand(List<StandardCard> cards7, List<StandardCard> bestHand, int expectedScore) {
+
+    List<StandardCard> actualBestHand = Evaluator.GetBestHand7(cards7).OrderByDescending(x=>Evaluator.ValToInt(x.Value)).ToList();
+    Output.WriteLine("Best hand:");
+
+    for (int i = 0; i < 5; i++) {
+      Output.WriteLine(JsonConvert.SerializeObject(bestHand[i]));
+    }
+    Output.WriteLine("Actual best hand:");
+    Output.WriteLine($"{actualBestHand.Count}");
+
+    for (int i = 0; i < 5; i++) {
+      Output.WriteLine(JsonConvert.SerializeObject(actualBestHand[i]));
+    }
+    Assert.Equivalent(bestHand.OrderByDescending(x=>Evaluator.ValToInt(x.Value)).ToList(), actualBestHand);
+    Assert.Equal(expectedScore, Evaluator.GetHandScore5(Evaluator.GetBestHand7(cards7)));  
+  }
 }

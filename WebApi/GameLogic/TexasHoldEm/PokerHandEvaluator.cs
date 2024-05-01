@@ -361,7 +361,7 @@ public class PokerHandEvaluator() {
       currentScore = GetHandScore5(hand);
       if(currentScore > bestScore) {
         bestScore = currentScore;
-        bestHand = hand;
+        bestHand = new List<StandardCard>(hand);
       }
     }
     return bestHand;
@@ -372,15 +372,15 @@ public class PokerHandEvaluator() {
     // simple way of getting each 5-card hand from the seven-card hand
     for (int exclude1 = 0; exclude1 < 7; exclude1++) {
       for (int exclude2 = 0; exclude2 < 7; exclude2++) {
-        if (exclude1 != exclude2) {
+        if (exclude1 < exclude2) {
           // get list excluding cards at index exclude1 and exclude2
           oneCombo.Clear();
           for (int i = 0; i < 7; i++) {
-            if (i != exclude1 && i != exclude2) {
+            if ((i != exclude1) && (i != exclude2)) {
               oneCombo.Add(sevenItems[i]);
             }
           }
-          allCombos.Add(oneCombo);
+          allCombos.Add(new List<T>(oneCombo)); // need to copy the list so that there's not just a reference to oneCombo, which results in 21 of the same list
         }
       }
     }

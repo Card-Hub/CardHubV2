@@ -239,8 +239,8 @@ public class TexasHoldEmGame
         TotalPot += amtExtraToPutIn;
 
         // move onto new player
-        var prevCurrentPlayer = PlayerOrder.GetCurrentPlayer();
-        Messenger.Log("IN FOLD, NEXT PLAYER SHOULD GO");
+        SetUpOldPlayer(); // clears their bools
+        Messenger.Log("IN CALL, NEXT PLAYER SHOULD GO");
         GoToNextNotFoldedPlayingPlayer();
         var newCurrentPlayer = PlayerOrder.GetCurrentPlayer();
         // if new player was the last to raise, the street ends
@@ -250,6 +250,7 @@ public class TexasHoldEmGame
         else {
           // set up the new current player
           SetUpNewPlayer(false); // next player can't check
+          
         }
         Messenger.SendFrontendJson(new List<string>() {GameboardConnStr}, GetGameState());
         return true;
@@ -403,7 +404,7 @@ public class TexasHoldEmGame
   public void NextStreet() {
     Messenger.Log("Next street!");
     // river is the final state of the game before winnerscreen
-    if (State != "River") { // TODO: FIX THIS
+    if (State == "Pre-Flop" || State == "Flop" || State == "Turn") {
       // go to little blind player
       // if little blind is out, go to the first not-folded player
       PlayerOrder.SetNextPlayer(LittleBlindPlayer);
@@ -421,6 +422,25 @@ public class TexasHoldEmGame
       // set the next canCheck
       Players[PlayerOrder.GetCurrentPlayer()].CanCheck = true;
     }
+    else if (State == "Flop") {
+      State = "Turn";
+      // give the turn cards
+      Board.Add(Deck.Draw());
+      // set the next canCheck
+      Players[PlayerOrder.GetCurrentPlayer()].CanCheck = true;
+    }
+    else if (State == "Turn") {
+      State = "River";
+      // give the turn cards
+      Board.Add(Deck.Draw());
+      // set the next canCheck
+      Players[PlayerOrder.GetCurrentPlayer()].CanCheck = true;
+    }
+    else if (State == "River") {
+      // end everything!
+      State = "RoundEnd";
+      Messenger.Log("Round has ended!");
+    }
   }
 
   private void SetUpNewPlayer(bool canCheck) {
@@ -433,6 +453,13 @@ public class TexasHoldEmGame
     // but they also can't have raised last
     var playerCanAffordToRaise = currentPlayer.AmountOfMoneyLeft >= (MinIncrease + CurrentBet - currentPlayer.CurrentBet);
     currentPlayer.CanRaise = currentPlayer.Name != LastPlayerWhoRaised && playerCanAffordToRaise;
+  }
+  private void SetUpOldPlayer() {
+    PokerPlayer currentPlayer = Players[PlayerOrder.GetCurrentPlayer()];
+    currentPlayer.CanFold = false;
+    currentPlayer.CanCheck = false;
+    currentPlayer.CanCall = false;
+    currentPlayer.CanCheck = false;
   }
 
   public void EndGame()

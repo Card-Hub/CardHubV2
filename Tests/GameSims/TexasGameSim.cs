@@ -40,7 +40,12 @@ public class TexasGameSim {
     int maxTurns = 100;
     while (game.State != "RoundEnd" && turnNum < maxTurns) {
       output.WriteLine($"Turn {turnNum} starting for {game.Players[game.PlayerOrder.GetCurrentPlayer()].Name}");
+      if (game.Players[game.PlayerOrder.GetCurrentPlayer()].CanCall) {
       game.Call(game.PlayerOrder.GetCurrentPlayer());
+      }
+      else {
+         game.Raise(game.PlayerOrder.GetCurrentPlayer(), 2);
+      }
       turnNum++;
     }
 

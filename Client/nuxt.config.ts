@@ -24,7 +24,7 @@ export default defineNuxtConfig({
     runtimeConfig: {
         public: {
             baseURL: process.env.BASE_URL,
-            hubPath: "basehub", // SignalR hub path, must be same as one in Program.cs
+            baseHub: "basehub", // SignalR hub path, must be same as one in Program.cs
             reconnectTimeout: 30 // Seconds
         }
     },

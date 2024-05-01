@@ -1,20 +1,21 @@
 <script setup lang="ts">
-import {useWebSocketStore} from "~/stores/webSocketStore";
+import { useWebSocketStore } from "~/stores/webSocketStore";
+
 const store = useWebSocketStore();
 const { tryJoinRoom, sendAvatar } = store;
 
-const availableAvatars = ['lyssie', 'ruby', 'oli', 'femaleJuno', 'alex', 'andy', 'liam', 'juno', 'pocky', 'star', 'fairy', 'dinoNugget1', 'dinoNugget2', 'dinoNugget3', 'dinoNugget4', 'amongusNugget'];
-const currentChoice = ref<string>('lyssie');
+const availableAvatars = ["lyssie", "ruby", "oli", "femaleJuno", "alex", "andy", "liam", "juno", "pocky", "star", "fairy", "dinoNugget1", "dinoNugget2", "dinoNugget3", "dinoNugget4", "amongusNugget"];
+const currentChoice = ref<string>("lyssie");
 // sendAvatar(currentChoice.value);
 
 const getIcon = (avatar: string) => {
-  return new URL(`../assets/icons/avatars/${avatar}.png`, import.meta.url);
+  return new URL(`../assets/icons/avatars/${ avatar }.png`, import.meta.url);
 };
 
 const isCurrentChoice = (avatar: string) => {
   return {
-    border: currentChoice.value === avatar ? '2px solid #f31919' : 'none',
-    boxShadow: currentChoice.value === avatar ? '0px 0px 10px 5px rgba(243, 25, 25, 0.5)' : 'none',
+    border: currentChoice.value === avatar ? "2px solid #f31919" : "none",
+    boxShadow: currentChoice.value === avatar ? "0px 0px 10px 5px rgba(243, 25, 25, 0.5)" : "none"
   };
 };
 
@@ -31,7 +32,7 @@ const selectAvatar = (avatar: string) => {
     <h1 class="text-2xl font-bold text-right">Select an Avatar</h1>
     <div class="player-icons">
       <div class="player-icon" v-for="(avatar) in availableAvatars" :key="avatar"
-             :style="isCurrentChoice(avatar)">
+           :style="isCurrentChoice(avatar)">
         <img :src="getIcon(avatar)" alt="avatar Icon" class="player-icon-img" @click="selectAvatar(avatar)"/>
       </div>
     </div>
@@ -70,7 +71,7 @@ const selectAvatar = (avatar: string) => {
   overflow: hidden; /* Ensure the player icon is circular */
   margin-right: 30px; /* Adjust the spacing between player icons */
   margin-bottom: 30px; /* Adjust the spacing between player icons */
-  
+
   border: 2px solid transparent;
   transition: border-color 0.3s ease;
 }

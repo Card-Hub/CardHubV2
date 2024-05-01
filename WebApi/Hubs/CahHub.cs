@@ -1,17 +1,10 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using WebApi.Common;
 using WebApi.GameLogic;
 using WebApi.Models;
 using WebApi.Services;
 
 namespace WebApi.Hubs;
-
-public record PlayerConnection
-{
-    public string Name { get; set; }
-    public string Room { get; set; }
-
-    public PlayerConnection() { }
-}
 
 public class CahHub : Hub
 {
@@ -30,14 +23,10 @@ public class CahHub : Hub
         _factory = factory;
     }
 
-    public async Task JoinRoom(PlayerConnection connection)
+    public async Task JoinRoom(BaseConnection connection)
     {
         var roomId = connection.Room;
-        if (TryGetGame(out var game, roomId))
-        {
-            if (!game.AddPlayer(ContextId)) return;
-        }
-        else
+        if (!TryGetGame(out var game, roomId))
         {
             var newGame = _factory.Build();
             newGame.Gameboard = ContextId;
@@ -45,8 +34,12 @@ public class CahHub : Hub
             newGame.PickingFinished += TimerTest;
             _games.Add(roomId, newGame);
         }
-
-        Context.Items[Name] = connection.Name;
+        else
+        {
+            if (connection.Name is null) return;
+            if (!game.AddPlayer(ContextId)) return;
+        }
+        
         Context.Items[Room] = roomId;
 
         await Groups.AddToGroupAsync(ContextId, roomId);
@@ -64,12 +57,12 @@ public class CahHub : Hub
         if (!TryGetGame(out var game)) return;
         
         var playerHands = game.StartGame();
+        
+        await Clients.Group(GetRoomId()).SendAsync("GameStarted");
         foreach (var (player, cards) in playerHands)
         {
             await Clients.Client(player).SendAsync("ReceiveCards", cards);
         }
-        
-        await Clients.Group(GetRoomId()).SendAsync("GameStarted");
     }
     
     // await _hubContext.Clients.Group(Room).SendAsync("ReceiveBlackCard", _currentBlackCard);
@@ -131,20 +124,4 @@ public class CahHub : Hub
     }
     
     #endregion
-}
-
-public static class DictionaryExtensions
-{
-    public static bool TryGetValueAs<TKey, TValue, TValueAs>(this IDictionary<TKey, TValue> dictionary, TKey key,
-        out TValueAs valueAs) where TValueAs : TValue
-    {
-        if (dictionary.TryGetValue(key, out var value) && value is TValueAs valueAsCast)
-        {
-            valueAs = valueAsCast;
-            return true;
-        }
-
-        valueAs = default!;
-        return false;
-    }
 }

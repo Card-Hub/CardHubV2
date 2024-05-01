@@ -6,8 +6,8 @@ import { useBaseStore } from "~/stores/baseStore";
 
 
 const store = useBaseStore();
-const { connection, isConnected, messages } = storeToRefs(store);
-const { tryJoinRoom } = store;
+const { isConnected, messages } = storeToRefs(store);
+const { tryConnectPlayer } = store;
 
 const user = ref("");
 const room = ref("");
@@ -18,17 +18,18 @@ const isValidRoomCode = computed(() => {
 });
 
 const connectPlayer = async (): Promise<void> => {
-  const isCorrectRoomCode = await tryJoinRoom(user.value, room.value);
-  if (isCorrectRoomCode) {
-    await navigateTo("/lobby");
-  } else {
-    toast.add({
-      severity: "error",
-      summary: "That pin doesn't look right",
-      detail: "Please check and try again",
-      life: 5000
-    });
+  const gameType = await tryConnectPlayer(user.value, room.value);
+  if (gameType) {
+    await navigateTo(`/lobby/${ gameType }`);
+    return;
   }
+
+  toast.add({
+    severity: "error",
+    summary: "That pin doesn't look right",
+    detail: "Please check and try again",
+    life: 5000
+  });
 };
 
 const navigateToLibrary = async (): Promise<void> => {
@@ -48,13 +49,12 @@ const navigateToHome = async (): Promise<void> => {
 // };
 
 console.log("check here for connectivity", isConnected.value);
-console.log("check here for obj", connection.value);
 </script>
 
 <template>
   <div id="dimScreen">
     <Toast/>
-    <template v-if="connection === null">
+    <template v-if="isConnected === false">
       <div class="flex flex-col justify-center h-screen items-center">
         <div class="flex flex-col justify-center gap-4">
           <svgo-logo-combination class="w-52 h-52" :fontControlled="false" filled @click="navigateToHome"/>
@@ -70,11 +70,10 @@ console.log("check here for obj", connection.value);
       </div>
     </template>
     <template v-else>
-      <p>In chat</p>
-      <div v-for="(m, index) in messages" :key="index">
-        <div class="bg-primary">{{ m.message }}</div>
-        <div>{{ m.user }}</div>
-      </div>
+      <h1>Connected to WS</h1>
+      <p>
+        TODO: Reroute to lobby
+      </p>
     </template>
   </div>
 </template>

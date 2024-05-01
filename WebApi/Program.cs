@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using WebApi.Common;
 using WebApi.Controllers;
 using WebApi.GameLogic;
@@ -40,8 +41,9 @@ builder.Services.AddCors(options =>
             .AllowCredentials();
     });
 });
-builder.Services.AddSingleton<IDictionary<string, UserConnection>>(_ => new Dictionary<string, UserConnection>());
-builder.Services.AddSingleton<IDictionary<string, GameType>>(_ => new Dictionary<string, GameType>());
+// builder.Services.AddSingleton<IDictionary<string, UserConnection>>(_ => new Dictionary<string, UserConnection>());
+builder.Services.AddSingleton<IDictionary<string, GameType>>(_ => new ConcurrentDictionary<string, GameType>());
+builder.Services.AddSingleton<IDictionary<string, BaseRoom>>(_ => new ConcurrentDictionary<string, BaseRoom>());
 builder.Services.AddSingleton<CardDbContext>();
 builder.Services.AddSingleton<UnoDeckBuilder>();
 builder.Services.AddSingleton<UnoGameMod>();
@@ -51,7 +53,7 @@ builder.Services.AddSingleton<GameService>();
 
 builder.Services.AddTransient<CahGame>();
 builder.Services.AddSingleton<CahFactory>();
-builder.Services.AddSingleton<IDictionary<string, CahGame>>();
+builder.Services.AddSingleton<IDictionary<string, CahGame>>(_ => new ConcurrentDictionary<string, CahGame>());
 
 
 var app = builder.Build();

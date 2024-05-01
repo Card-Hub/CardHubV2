@@ -14,27 +14,31 @@ public class GameController : ControllerBase
         _roomCodes = roomCodes;
     }
     
+    
     [HttpPost("CreateRoom")]
     public ActionResult<string> CreateRoom([FromBody] GameType gameType)
     {
         const int maxAttempts = 100;
         for (var j = 0; j < maxAttempts; j++) {
-            var roomCode = "";
+            var roomId = "";
             for (var i = 0; i < 6; i++)
             {
-                roomCode += new Random().Next(0, 9).ToString();
+                roomId += new Random().Next(0, 9).ToString();
             }
-            if (!_roomCodes.TryAdd(roomCode, gameType)) continue;
+            if (!_roomCodes.TryAdd(roomId, gameType)) continue;
 
-            return Ok(roomCode);
+            return Ok(roomId);
         }
         
         return BadRequest("Failed to create room");
     }
     
-    [HttpGet("VerifyCode/{id}")]
-    public ActionResult<bool> VerifyCode(string id)
+    
+    [HttpGet("VerifyCode/{roomId}")]
+    public ActionResult<GameType> VerifyCode(string roomId)
     {
-        return Ok(_roomCodes.ContainsKey(id));
+        if (_roomCodes.TryGetValue(roomId, out var gameType)) return Ok(gameType);
+
+        return NotFound();
     }
 }

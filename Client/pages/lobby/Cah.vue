@@ -1,7 +1,6 @@
 <script setup lang="ts">
 
 import { storeToRefs } from "pinia";
-import Une from "~/pages/games/Une.vue";
 import AvatarSelection from "~/components/AvatarSelection.vue";
 import Chat from "~/components/Chat.vue";
 
@@ -40,7 +39,7 @@ const getIconGivenName = (name: string) => {
     // console.log(value);
     if (user.name == name) {
       return getIcon(user.Avatar);
-    }else{
+    } else {
       return getIcon("lyssie");
     }
   });
@@ -60,7 +59,7 @@ const kickPlayer = (lobbyUser: LobbyUser) => {
 <template>
   <div>
     <div v-if="isPlayer" class="m-8">
-      
+
       <div class="flex justify-between">
         <h1 >
           {{ gameType }}
@@ -72,17 +71,17 @@ const kickPlayer = (lobbyUser: LobbyUser) => {
           </Dialog>
         </div>
       </div>
-      
+
       <p>
         Waiting for the host to start the game. Sit back and relax for now.
       </p>
-      
+
       <AvatarSelection class="align-center"/>
       <div class="">
         <Button class="mt-5" @click="playerStart" v-if="gameStarted">Join Game</Button>
       </div>
     </div>
-    
+
     <div v-else-if="!isPlayer" class="flex min-h-screen">
       <div class="flex flex-col w-1/3 bg-neutral-950 shadow-inner">
         <div class="flex-none">
@@ -93,13 +92,13 @@ const kickPlayer = (lobbyUser: LobbyUser) => {
           <SvgoStandardDeckClubs class="suit w-80 h-80 absolute z-0 top-20 -right-20 rotate-[240deg]" :fontControlled="false" filled/>
           <SvgoStandardDeckHearts class="suit w-80 h-80 absolute z-0 -bottom-40 -right-10" :fontControlled="false" filled/>
           <SvgoStandardDeckSpades class="suit w-80 h-80 absolute z-0 bottom-12 -left-24 rotate-[-20deg]" :fontControlled="false" filled/>
-          
+
           <div class="m-8 flex justify-between gap-4">
             <div v-for="lobbyUser in lobbyUsers as LobbyUser[]" class="rounded-full flex card items-center justify-content h-16 w-full">
               <!--<i class="pi pi-user mx-4 text-neutral-300" style="font-size: 1.5rem"></i>-->
-                <img :src="getIcon(lobbyUser.Avatar)" alt="avatar Icon" class="lobby-player-icon-img">
-                <span class="text-2xl text-neutral-300">{{ lobbyUser.name }} </span>
-                <Button class="kick-btn" @click="kickPlayer(lobbyUser)"> Kick </Button>
+              <img :src="getIcon(lobbyUser.Avatar)" alt="avatar Icon" class="lobby-player-icon-img">
+              <span class="text-2xl text-neutral-300">{{ lobbyUser.name }} </span>
+              <Button class="kick-btn" @click="kickPlayer(lobbyUser)"> Kick </Button>
             </div>
           </div>
         </div>
@@ -122,7 +121,7 @@ const kickPlayer = (lobbyUser: LobbyUser) => {
         <div class="chat-box">
           <Chat />
         </div>
-        
+
       </div>
     </div>
     <div v-else>
@@ -133,48 +132,47 @@ const kickPlayer = (lobbyUser: LobbyUser) => {
 
 <style scoped>
 
-  .card {
-    background: rgba( 255, 255, 255, 0.1 );
-    box-shadow: 0 8px 32px 0 rgba( 74, 1, 29, 0.15);
-    backdrop-filter: blur( 20px );
-    -webkit-backdrop-filter: blur( 20px );
-    border-radius: 28px;
-    border: 1px solid rgba( 255, 255, 255, 0.10 );
-  }
+.card {
+  background: rgba( 255, 255, 255, 0.1 );
+  box-shadow: 0 8px 32px 0 rgba( 74, 1, 29, 0.15);
+  backdrop-filter: blur( 20px );
+  -webkit-backdrop-filter: blur( 20px );
+  border-radius: 28px;
+  border: 1px solid rgba( 255, 255, 255, 0.10 );
+}
 
-  .suit {
-    opacity: 35%;
-  }
+.suit {
+  opacity: 35%;
+}
 
-  .lobby-player-icon-img {
-    width: 3em;
-    border-radius: 50%; /* Ensure the player icon is circular */
-    overflow: hidden;
-    margin-left: .5rem;
-    margin-right: 1rem;
-  }
+.lobby-player-icon-img {
+  width: 3em;
+  border-radius: 50%; /* Ensure the player icon is circular */
+  overflow: hidden;
+  margin-left: .5rem;
+  margin-right: 1rem;
+}
 
-  .chat-box {
-    height: 100%;
-    align-items: center;
-    padding-top: 30%;
-    width: 90%;
-  }
-  
-  .chat-container {
-    width: 80%;
-    height: 80%;
-    max-height: 400px;
-  }
-  
-  .kick-btn {
-    background-color: transparent;
-    color: white;
-    font-size: 1em;
-    border: 1px solid white;
-    padding: 0.5em;
-    margin-left: 1.5em;
-    
-  }
+.chat-box {
+  height: 100%;
+  align-items: center;
+  padding-top: 30%;
+  width: 90%;
+}
+
+.chat-container {
+  width: 80%;
+  height: 80%;
+  max-height: 400px;
+}
+
+.kick-btn {
+  background-color: transparent;
+  color: white;
+  font-size: 1em;
+  border: 1px solid white;
+  padding: 0.5em;
+  margin-left: 1.5em;
+
+}
 </style>
-

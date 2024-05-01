@@ -2,7 +2,6 @@
 
 import { defineStore } from "pinia";
 import {
-    // HttpTransportType,
     type HubConnection,
     HubConnectionBuilder,
     HubConnectionState,
@@ -11,9 +10,23 @@ import {
 import { computed, ref } from "vue";
 import { useRuntimeConfig } from "nuxt/app";
 import { useNuxtApp } from "nuxt/app";
+
 import { GameType } from "~/types";
 
+
+interface PlayerMessage {
+    name: string;
+    message: string;
+}
+
 export const useBaseStore = defineStore("base", () => {
+    // Debugging purposes
+    const LOG_PREFIX = "BaseHub - ";
+    const log = function(...args: any[]){
+        const modifiedArgs = args.map(arg => `${ LOG_PREFIX }${ arg }`);
+        console.log.apply(console, modifiedArgs);
+    }
+
     const { $api } = useNuxtApp();
 
     enum UserType {
@@ -21,65 +34,66 @@ export const useBaseStore = defineStore("base", () => {
         Player
     }
 
-    const connection = ref<HubConnection | null>(null);
-    const gameType = ref<GameType | null>(null);
+    const baseConnection = ref<HubConnection | null>(null);
+    const gameConnection = ref<HubConnection | null>(null);
     const isPlayer = ref<boolean | null>(null);
-    const isConnected = computed(() => connection.value !== null && connection.value.state === HubConnectionState.Connected);
+    const isConnected = computed(() => baseConnection.value !== null && baseConnection.value.state === HubConnectionState.Connected);
+    const gameType = ref<GameType | null>(null);
 
-    const messages = ref<UserMessage[]>([]);
-    const users = ref<string[]>([]);
+    const messages = ref<PlayerMessage[]>([]);
+    const users = ref<Array<LobbyUser>>([]);
 
     const user = ref("");
     const room = ref("");
 
     const runtimeConfig = useRuntimeConfig();
 
-    const lobbyUsers = ref<Array<LobbyUser>>([]);
-
-
     // Attempt to create a new room for the Gameboard device
-    const tryCreateRoom = async (gameType: GameType): Promise<boolean> => {
+    const tryConnectGameboard = async (gameType: GameType): Promise<string | null> => {
         try {
             const response = await $api<string>("Game/CreateRoom",
                 {
                     method: "POST",
-                    body: JSON.stringify(gameType)
+                    body: JSON.stringify(gameType) // TODO: Fix this
                 });
-            if (!response) return false;
+            if (!response) return null;
 
-            room.value = response;
-            await joinRoom(user.value, room.value);
+            const connection: BaseConnection = { room: response };
+            await joinRoom(connection);
             isPlayer.value = false;
-            console.log("Room created: ", room.value);
-            return true;
+            room.value = response;
+
+            log("Room created: ", room.value);
+            return room.value
         } catch (e) {
-            console.log("Failed to create room", e);
+            log("Failed to create room", e);
         }
-        return false;
+        return null;
     };
 
     // Attempt to join an existing room as a Player device
-    const tryJoinRoom = async (userName: string, roomId: string): Promise<boolean> => {
+    const tryConnectPlayer = async (user: string, room: string): Promise<GameType | null> => {
         try {
-            const roomCodeExists = await $api<boolean>(`game/verifycode/${ roomId }`, { method: "GET" });
-            if (!roomCodeExists) {
-                console.log("Invalid room code");
-                return false;
+            const gameType = await $api<GameType>(`game/verifycode/${ room }`, { method: "GET" });
+            if (!gameType) {
+                log("Invalid room code");
+                return null;
             }
 
-            await joinRoom(userName, roomId);
+            const connection: BaseConnection = { name: user, room: room };
+            await joinRoom(connection);
             isPlayer.value = true;
-            return true;
+            return gameType;
         } catch (e) {
-            console.log(e);
+            log(e);
+
         }
 
-        console.log("Failed to join room");
-        return false;
+        return null;
     };
 
-    const joinRoom = async (user: string, room: string): Promise<void> => {
-        const webSocketUrl = `${ runtimeConfig.public.baseURL }/${ gameType.value }`;
+    const joinRoom = async (connection: BaseConnection): Promise<void> => {
+        const webSocketUrl = `${ runtimeConfig.public.baseURL }/${ runtimeConfig.public.baseHub }`;
         try {
             // HubConnection configuration
             // https://learn.microsoft.com/en-us/aspnet/core/signalr/configuration?view=aspnetcore-8.0&tabs=dotnet#configure-client-options
@@ -87,114 +101,74 @@ export const useBaseStore = defineStore("base", () => {
                 .withUrl(webSocketUrl)
                 .withStatefulReconnect()
                 .withAutomaticReconnect()
-                .configureLogging(LogLevel.Debug)
+                .configureLogging(LogLevel.Information)
                 .build();
 
-            joinConnection.on("ReceiveMessage", (userMessage: UserMessage) => {
-                messages.value.push(userMessage);
-                console.log(userMessage);
+            joinConnection.on("ReceiveMessage", (playerMessage: PlayerMessage) => {
+                messages.value.push(playerMessage);
+                log(playerMessage);
             });
 
-            joinConnection.on("UsersInRoom", (groupUsers: string[]) => {
-                users.value = groupUsers;
-            });
-
-            joinConnection.on("ReceiveAvatars", (json: string) => {
-                let jsonLobbyUsers = JSON.parse(json);
-                lobbyUsers.value.length = 0;
-                for (let lobbyUserIndex in jsonLobbyUsers) {
-                    lobbyUsers.value.push(jsonLobbyUsers[lobbyUserIndex]);
-                }
-
-                console.log(lobbyUsers.value);
+            joinConnection.on("ReceiveAvatars", (avatars: Array<LobbyUser>) => {
+                users.value = avatars;
             });
 
             joinConnection.on("Log", (string: string) => {
-                console.log("Backend logged:", string);
-                console.log(string);
+                log("Backend logged:", string);
+                log(string);
             });
 
 
             joinConnection.onclose(async () => {
-                console.log("BaseHub - DISCONNECTED FROM SERVER");
+                log("DISCONNECTED FROM SERVER");
             });
 
             joinConnection.onreconnecting(() => {
-                console.log("BaseHub - RECONNECTING TO SERVER");
+                log("RECONNECTING TO SERVER");
             });
 
             joinConnection.onreconnected(() => {
-                console.log("BaseHub - RECONNECTED TO SERVER");
-                connection.value = joinConnection;
+                log("RECONNECTED TO SERVER");
+                baseConnection.value = joinConnection;
             });
 
 
             await joinConnection.start();
-            await joinConnection.invoke("JoinRoom", { user, room });
-            connection.value = joinConnection;
+            await joinConnection.invoke("JoinRoom", connection);
+            baseConnection.value = joinConnection;
 
             if (joinConnection.state === HubConnectionState.Connected) {
-                console.log("User connected");
+                log("User connected");
             }
         } catch (e) {
-            console.log("BaseHub - joinRoom error:\n", e);
+            log("joinRoom error:\n", e);
         }
     };
 
     const sendAvatar = async (avatar: string): Promise<void> => {
-        try {
-            if (connection.value !== null) {
-                await connection.value.invoke("SendAvatar", avatar);
-            }
-        } catch (e) {
-            console.log(e);
-        }
-    };
-
-    const sendGameType = async (gameType: string): Promise<void> => {
-        try {
-            if (connection.value !== null) {
-                await connection.value.invoke("SendGameType", gameType);
-            }
-        } catch (e) {
-            console.log(e);
-        }
+        if (baseConnection.value === null) return;
+        await baseConnection.value.invoke("SendAvatar", avatar);
     };
 
     const sendMessage = async (message: string): Promise<void> => {
-        try {
-            if (connection.value !== null) {
-                await connection.value.invoke("SendMessage", message);
-            }
-        } catch (e) {
-            console.log(e);
-        }
+        if (baseConnection.value === null) return;
+        await baseConnection.value.invoke("SendMessage", message);
     };
 
     const closeConnection = async (): Promise<void> => {
-        try {
-            if (connection.value !== null) {
-                await connection.value.stop();
-            }
-        } catch (e) {
-            console.log(e);
-        }
+        if (baseConnection.value === null) return;
+        await baseConnection.value.stop();
     };
 
     const kickPlayer = async (player: string): Promise<void> => {
-        try {
-            if (connection.value !== null) {
-                await connection.value.invoke("KickPlayer", player);
-            }
-        } catch (e) {
-            console.log(e);
-        }
+        if (baseConnection.value === null) return;
+        await baseConnection.value.invoke("KickPlayer", player);
     };
 
     // Must return all state properties
     // https://pinia.vuejs.org/core-concepts/
     return {
-        connection, isConnected, isPlayer, messages, users, user, room, lobbyUsers,
-        tryCreateRoom, tryJoinRoom, sendMessage, closeConnection, sendAvatar, sendGameType, kickPlayer
+        baseConnection, isConnected, isPlayer, messages, users, user, room,
+        tryConnectGameboard, tryConnectPlayer, sendMessage, closeConnection, sendAvatar, kickPlayer
     };
 });

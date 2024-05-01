@@ -1,42 +1,25 @@
 <script setup lang="ts">
-import PlayerHand from "~/components/PlayerHand.vue";
+
 import { ref, computed } from 'vue';
-import UNOCardDisplay from "~/components/Card/UNOCardDisplay.vue";
-import StandardCardDisplay from "~/components/Card/StandardCardDisplay.vue";
-
-import { storeToRefs } from "pinia";
-import { useWebSocketStore } from "~/stores/webSocketStore";
 import CahRules from "~/components/gameRules/CahRules.vue";
+import { GameType } from "~/types";
 
-const store = useWebSocketStore();
-const { connection, isConnected, messages, user, room } = storeToRefs(store);
-const { tryCreateRoom, tryJoinRoom, sendGameType } = store;
+
+const baseStore = useBaseStore();
+const { isConnected } = storeToRefs(baseStore);
+const { tryConnectGameboard, tryConnectPlayer } = baseStore;
+
+const cahStore = useCahStore();
+const { tryConnectCahGameboard, tryConnectCahPlayer } = cahStore;
+
 
 const connectGameboard = async (): Promise<void> => {
-  const isRoomCreated = await tryCreateRoom();
-  if (isRoomCreated) {
-    sendGameType('CAH');
-    // await navigateTo('/playerview');
-    await navigateTo("/lobby");
-  }
+  const room = await tryConnectGameboard(GameType.Cah);
+  if (!room) return;
+  if (!await tryConnectCahGameboard(room, GameType.Cah)) return;
+
+  await navigateTo("/lobby/cah");
 };
-
-// create standard deck of cards
-const standardDeck = [];
-const suits = ["hearts", "diamonds", "clubs", "spades"];
-const values = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King", "Ace"];
-
-for (const suit of suits) {
-  for (const value of values) {
-    standardDeck.push({
-      id: standardDeck.length + 1,
-      suit,
-      value
-    });
-  }
-}
-
-const playerHand = ref<StandardCard[]>(standardDeck);
 
 const getCards = () => {
   return new URL(`../../assets/icons/cah/cah.svg`, import.meta.url);
@@ -81,9 +64,6 @@ const items = ref([
         </NuxtLink>
       </div>
 
-      <!--      <div class="column">-->
-      <!--        <h1>UNO</h1>-->
-      <!--      </div>-->
     </div>
 
     <div class="menu-container">
@@ -95,10 +75,7 @@ const items = ref([
     </div>
     
     <div v-if="active === 2" class="card-container">
-        <StandardCardDisplay v-for="card in standardDeck"
-                             :key="card.id"
-                             :card="card"
-        />
+        <p>asdfuhksdhfkajf</p>
     </div>
     
     <div v-else-if="active === 0">

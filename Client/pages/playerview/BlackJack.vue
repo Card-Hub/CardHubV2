@@ -64,10 +64,7 @@ const stand = () => {
 
 }
 
-
-
 </script>
-
  
 <template>
   <div class="playerview-une-container w-full p-6">
@@ -94,7 +91,7 @@ const stand = () => {
 
       <div class="top-row-container">
         <div>
-          maybe what the state is
+          
         </div>
 
         <div class="cards-outer">
@@ -104,7 +101,7 @@ const stand = () => {
             </div>
         </div>
 
-        <div class="content-center">
+        <div class="content-center stat-box">
             <ul class="">
               <li>
                 Your current bet: {{CurrentBet}}
@@ -208,6 +205,19 @@ const stand = () => {
   color: black;
   font-size: 2.3em;
 }
+
+.stat-box {
+  margin-right: 150px;
+  margin-top: 120px;
+  border-radius: 20px;
+  background-color: var(--cardhub-red);
+  width: 90%;
+  height: 75%;
+  justify-content: center;
+  color: black;
+  font-size: 2.3em;
+}
+
 
 .raise-button {
   height: auto;

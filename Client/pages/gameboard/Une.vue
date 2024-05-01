@@ -7,48 +7,48 @@ import UNEnoshadowCard from "~/components/noShadowCard/UNEnoshadowCard.vue";
 
 const store = useWebSocketStore();
 const uneStore = useUneStore();
-uncomment these out later
-const {  cards, users, room } = storeToRefs(store);
-const { cards } = storeToRefs(store);
+// uncomment these out later
+// const {  cards, users, room } = storeToRefs(store);
+// const { cards } = storeToRefs(store);
 
 const newCards = ref<number[]>([]);
-const currentColor = ref<string>("red");
+//const currentColor = ref<string>("red");
 const { currentColor, players, currentPlayer, discardPile  } = storeToRefs(uneStore);
 
-const players = ref<Player[]>([
-  {name: "juno", avatar: "juno", cards: [1, 2, 3, 4, 5]},
-  {name: "fairy", avatar: "fairy", cards: [6, 7, 8, 9, 10]},
-  {name: "oli", avatar: "oli", cards: [11, 12, 13, 14, 15]},
-  { name: "femaleJuno", avatar: "femaleJuno", cards: [16, 17, 18, 19, 20] },
-  {name: "andy", avatar: "andy", cards: [12, 22, 19]},
-  {name: "lyssie", avatar: "lyssie", cards: [1, 2, 3, 4, 5]},
-  {name: "star", avatar: "star", cards: [6, 7, 8, 9, 10]},
-  {name: "rubi", avatar: "ruby", cards: [11, 12, 13, 14, 15]},
-]);
+// const players = ref<Player[]>([
+//   {name: "juno", avatar: "juno", cards: [1, 2, 3, 4, 5]},
+//   {name: "fairy", avatar: "fairy", cards: [6, 7, 8, 9, 10]},
+//   {name: "oli", avatar: "oli", cards: [11, 12, 13, 14, 15]},
+//   { name: "femaleJuno", avatar: "femaleJuno", cards: [16, 17, 18, 19, 20] },
+//   {name: "andy", avatar: "andy", cards: [12, 22, 19]},
+//   {name: "lyssie", avatar: "lyssie", cards: [1, 2, 3, 4, 5]},
+//   {name: "star", avatar: "star", cards: [6, 7, 8, 9, 10]},
+//   {name: "rubi", avatar: "ruby", cards: [11, 12, 13, 14, 15]},
+// ]);
 
-const currentTurn = ref<string>("fairy");
-const currentTurn = ref<string>(currentPlayer);
+// const currentTurn = ref<string>("fairy");
+//const currentTurn = ref<string>(currentPlayer);
 const cards = ref<UNOCard[]>(discardPile);
 
-placeholder bc i don't want to use websockets every time
-const cards = ref<UNOCard[]>([
-  {id: 1, color: "red", value: "0"},
-  {id: 2, color: "red", value: "1"},
-  {id: 3, color: "red", value: "2"},
-  {id: 4, color: "red", value: "3"},
-  {id: 15, color: "red", value: "Skip"},
-  {id: 16, color: "red", value: "Reverse"},
-  {id: 17, color: "red", value: "Draw Two"},
-  {id: 18, color: "red", value: "Skip All"},
-  {id: 19, color: "yellow", value: "0"},
-  {id: 20, color: "yellow", value: "1"},
-  {id: 21, color: "yellow", value: "2"},
-  {id: 22, color: "yellow", value: "3"},
-  {id: 23, color: "yellow", value: "4"},
-  {id: 24, color: "yellow", value: "5"},
-  {id: 25, color: "yellow", value: "6"},
-  {id: 26, color: "yellow", value: "7"},
-  {id: 27, color: "blue", value: "Wild Draw Four"}]);
+// placeholder bc i don't want to use websockets every time
+// const cards = ref<UNOCard[]>([
+//   {id: 1, color: "red", value: "0"},
+//   {id: 2, color: "red", value: "1"},
+//   {id: 3, color: "red", value: "2"},
+//   {id: 4, color: "red", value: "3"},
+//   {id: 15, color: "red", value: "Skip"},
+//   {id: 16, color: "red", value: "Reverse"},
+//   {id: 17, color: "red", value: "Draw Two"},
+//   {id: 18, color: "red", value: "Skip All"},
+//   {id: 19, color: "yellow", value: "0"},
+//   {id: 20, color: "yellow", value: "1"},
+//   {id: 21, color: "yellow", value: "2"},
+//   {id: 22, color: "yellow", value: "3"},
+//   {id: 23, color: "yellow", value: "4"},
+//   {id: 24, color: "yellow", value: "5"},
+//   {id: 25, color: "yellow", value: "6"},
+//   {id: 26, color: "yellow", value: "7"},
+//   {id: 27, color: "blue", value: "Wild Draw Four"}]);
 
 const getCardStyle = (index: number) => {
   const randomX = Math.floor(Math.random() * 50) - 5; // Random offset for X-axis
@@ -139,8 +139,6 @@ const getCurrentColor = () => {
 };
 </script>
 
-
-
 <template>
   <p> {{ currentPlayer }}</p>
   <p> {{ discardPile }}</p>
@@ -154,6 +152,8 @@ const getCurrentColor = () => {
           <p class="player-name"> {{ player.Name }} </p>
         </div>
       </div>
+
+<!--      TODO: ARROWS -->
      <div class="game-table rounded-tr-full shadow-lg" v-bind:class="currentColor">
        <div class="arrow-container">
          <div id="curvedarrow"></div>
@@ -162,6 +162,7 @@ const getCurrentColor = () => {
         <div class="column-container">
           <div class="column left-column">
             <div class="deck-view">
+              <!--            <div class="flex justify-center items-center w-52 h-80 bg-zinc-800 rounded-md shadow-md mb-2">-->
               <div class="deck-card flex justify-center items-center bg-zinc-800 rounded-md shadow-md mb-2"
                    v-for="n in 5" :key="n" :style="cardStyle(n)">
                 <img :src="getUNE()" alt="game icon" class="une-logo"/>

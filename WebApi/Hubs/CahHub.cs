@@ -23,9 +23,9 @@ public class CahHub : Hub
         _factory = factory;
     }
 
-    public async Task JoinRoom(BaseConnection connection)
+    public async Task JoinRoom(ConnectionOptions connectionOptions)
     {
-        var roomId = connection.Room;
+        var roomId = connectionOptions.Room;
         if (!TryGetGame(out var game, roomId))
         {
             var newGame = _factory.Build();
@@ -36,7 +36,7 @@ public class CahHub : Hub
         }
         else
         {
-            if (connection.Name is null) return;
+            if (connectionOptions.Name is null) return;
             if (!game.AddPlayer(ContextId)) return;
         }
         

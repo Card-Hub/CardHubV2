@@ -2,15 +2,9 @@
 
 import { defineStore } from "pinia";
 import {
-    type HubConnection,
-    HubConnectionBuilder,
-    HubConnectionState,
-    LogLevel
+    HubConnectionState
 } from "@microsoft/signalr";
-import { computed, ref } from "vue";
-import { useRuntimeConfig } from "nuxt/app";
-import { useNuxtApp } from "nuxt/app";
-import type { GameType } from "~/types";
+import { computed, } from "vue";
 
 
 export const useCahStore = defineStore("cah", () => {
@@ -21,114 +15,49 @@ export const useCahStore = defineStore("cah", () => {
         console.log.apply(console, modifiedArgs);
     }
 
-    const { $api } = useNuxtApp();
-    const { $gameToHubString } = useNuxtApp();
+    // baseStore.ts
+    const baseStore = useBaseStore();
+    const { gameConnection, isPlayer } = storeToRefs(baseStore);
 
-    const cahConnection = ref<HubConnection | null>(null);
-    const isConnected = computed(() => cahConnection.value !== null && cahConnection.value.state === HubConnectionState.Connected);
+    const isGameConnected = computed<boolean>(() => gameConnection.value !== null && gameConnection.value.state === HubConnectionState.Connected);
 
-    const runtimeConfig = useRuntimeConfig();
+    // watch(gameConnection, async (newValue, oldValue) => {
+    //     if (newValue === null || oldValue !== null || !isGameConnected.value) return;
+    // });
 
-
-    const tryConnectGameboard = async (roomId: string, gameType: GameType): Promise<boolean> => {
-        const connection: BaseConnection = { room: roomId };
-        if (!await joinRoom(connection, gameType)) {
-            log("Failed to connect gameboard");
-            return false;
-        }
-
-        log("Room created: ", roomId);
-        return true;
-    };
-
-    const tryConnectPlayer = async (name: string, roomId: string): Promise<boolean> => {
-        try {
-            const gameType = await $api<GameType>(`game/verifycode/${ roomId }`, { method: "GET" });
-            if (!gameType) {
-                log("Invalid room code");
-                return false;
-            }
-
-            const connection: BaseConnection = { name: name, room: roomId };
-            if (!await joinRoom(connection, gameType)) return false;
-
-            log("Joined room: ", roomId);
-            return true;
-        } catch (e) {
-            log("CahHub - ", e);
-            return false;
-        }
-    };
-
-    const joinRoom = async (connection: BaseConnection, gameType: GameType): Promise<boolean> => {
-        const webSocketUrl = `${ runtimeConfig.public.baseURL }/${ $gameToHubString(gameType) }`;
-        try {
-            const joinConnection = new HubConnectionBuilder()
-                .withUrl(webSocketUrl)
-                .withStatefulReconnect()
-                .withAutomaticReconnect()
-                .configureLogging(LogLevel.Information)
-                .build();
-
-            joinConnection.on("Log", (string: string) => {
-                log("[BACKEND LOG] ", string);
-            });
-
-
-            joinConnection.onclose(async () => {
-                log("DISCONNECTED FROM SERVER");
-            });
-
-            joinConnection.onreconnecting(() => {
-                log("RECONNECTING TO SERVER");
-            });
-
-            joinConnection.onreconnected(() => {
-                log("RECONNECTED TO SERVER");
-                cahConnection.value = joinConnection;
-            });
-
-            await joinConnection.start();
-            await joinConnection.invoke("JoinRoom", connection);
-            cahConnection.value = joinConnection;
-
-            if (joinConnection.state === HubConnectionState.Connected) {
-                log("User connected");
-            }
-            return true;
-
-        } catch (e) {
-            log("joinRoom error:\n", e);
-            return false;
-        }
-    };
+    const registerHandlers = (): void => {
+        gameConnection.value?.on("ReceiveCards", (cards: CahCard[]) => {
+            log("Received cards", cards)
+        });
+        log("Registered handlers");
+    }
 
 
     const sendAvatar = async (avatar: string): Promise<void> => {
-        if (cahConnection.value === null) return;
-        await cahConnection.value.invoke("SendAvatar", avatar);
+        if (!isGameConnected) return;
+        await gameConnection.value?.invoke("SendAvatar", avatar);
     };
 
     const sendGameType = async (gameType: string): Promise<void> => {
-        if (cahConnection.value === null) return;
-        await cahConnection.value.invoke("SendGameType", gameType);
+        if (!isGameConnected) return;
+        await gameConnection.value?.invoke("SendGameType", gameType);
     };
 
     const closeConnection = async (): Promise<void> => {
-        if (cahConnection.value === null) return;
-        await cahConnection.value.stop();
+        if (!isGameConnected) return;
+        await gameConnection.value?.stop();
     };
 
     const kickPlayer = async (player: string): Promise<void> => {
-        if (cahConnection.value === null) return;
-        await cahConnection.value.invoke("KickPlayer", player);
+        if (!isGameConnected) return;
+        await gameConnection.value?.invoke("KickPlayer", player);
     };
 
 
     // Must return all state properties
     // https://pinia.vuejs.org/core-concepts/
     return {
-        cahConnection, isConnected,
-        tryConnectCahGameboard: tryConnectGameboard, tryConnectCahPlayer: tryConnectPlayer, closeConnection, sendAvatar, sendGameType, kickPlayer
+        isGameConnected,
+        closeConnection, sendAvatar, sendGameType, kickPlayer, registerHandlers
     };
 });

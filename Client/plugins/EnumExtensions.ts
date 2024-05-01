@@ -4,13 +4,13 @@ export default defineNuxtPlugin(() => {
     const instance = (gameType: GameType): string => {
         switch (gameType) {
             case GameType.BlackJack:
-                return "blackjackhub";
+                return "blackjack";
             case GameType.Cah:
-                return "cahhub";
+                return "cah";
             case GameType.Poker:
-                return "pokerhub";
+                return "poker";
             case GameType.Une:
-                return "unehub";
+                return "une";
             default:
                 throw new Error("Invalid game type");
         }
@@ -18,7 +18,7 @@ export default defineNuxtPlugin(() => {
 
     return {
         provide: {
-            gameToHubString: instance
+            gameToString: instance
         }
     }
 })

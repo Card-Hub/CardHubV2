@@ -33,7 +33,6 @@ declare global {
     }
 
     interface CahCard {
-        id: number;
         text: string;
         type: CahType;
     }
@@ -43,7 +42,7 @@ declare global {
         Avatar: string;
     }
 
-    interface BaseConnection {
+    interface ConnectionOptions {
         room: string;
         name?: string;
     }
@@ -54,7 +53,7 @@ export const enum CahType {
     Black
 }
 
-export const enum GameType {
+export enum GameType {
     BlackJack,
     Cah,
     Poker,

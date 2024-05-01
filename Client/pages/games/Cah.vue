@@ -6,19 +6,17 @@ import { GameType } from "~/types";
 
 
 const baseStore = useBaseStore();
-const { isConnected } = storeToRefs(baseStore);
-const { tryConnectGameboard, tryConnectPlayer } = baseStore;
+const { tryConnectGameboard } = baseStore;
 
 const cahStore = useCahStore();
-const { tryConnectCahGameboard, tryConnectCahPlayer } = cahStore;
+const { registerHandlers } = cahStore;
 
 
 const connectGameboard = async (): Promise<void> => {
-  const room = await tryConnectGameboard(GameType.Cah);
-  if (!room) return;
-  if (!await tryConnectCahGameboard(room, GameType.Cah)) return;
+  const isConnected = await tryConnectGameboard(GameType.Cah, registerHandlers);
+  if (!isConnected) return;
 
-  await navigateTo("/lobby/cah");
+  await navigateTo({ path: "/lobby/cah" });
 };
 
 const getCards = () => {

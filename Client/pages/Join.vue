@@ -1,12 +1,16 @@
 ﻿<script setup lang="ts">
 import toast from "@/utils/toast";
+import { useNuxtApp } from "nuxt/app";
 import { storeToRefs } from "pinia";
 import { computed } from "vue";
 import { useBaseStore } from "~/stores/baseStore";
+import { GameType } from "~/types";
+
+const { $gameToString } = useNuxtApp();
 
 
 const store = useBaseStore();
-const { isConnected, messages } = storeToRefs(store);
+const { isBaseConnected, messages } = storeToRefs(store);
 const { tryConnectPlayer } = store;
 
 const user = ref("");
@@ -20,7 +24,7 @@ const isValidRoomCode = computed(() => {
 const connectPlayer = async (): Promise<void> => {
   const gameType = await tryConnectPlayer(user.value, room.value);
   if (gameType) {
-    await navigateTo(`/lobby/${ gameType }`);
+    await navigateTo(`/lobby/${ $gameToString(gameType) }`);
     return;
   }
 
@@ -48,13 +52,13 @@ const navigateToHome = async (): Promise<void> => {
 //   }
 // };
 
-console.log("check here for connectivity", isConnected.value);
+console.log("check here for connectivity", isBaseConnected.value);
 </script>
 
 <template>
   <div id="dimScreen">
     <Toast/>
-    <template v-if="isConnected === false">
+    <template v-if="isBaseConnected === false">
       <div class="flex flex-col justify-center h-screen items-center">
         <div class="flex flex-col justify-center gap-4">
           <svgo-logo-combination class="w-52 h-52" :fontControlled="false" filled @click="navigateToHome"/>

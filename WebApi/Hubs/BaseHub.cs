@@ -10,12 +10,12 @@ public record PlayerMessage
     public required string Message { get; set; }
 }
 
-public record BaseConnection
+public record ConnectionOptions
 {
     public required string Room { get; set; }
     public string? Name { get; set; }
 
-    public BaseConnection() { }
+    public ConnectionOptions() { }
 }
 
 public record BasePlayer
@@ -84,13 +84,12 @@ public class BaseHub : Hub<IBaseClient>
         _rooms = rooms;
     }
     
-    public async Task JoinRoom(BaseConnection connection)
+    public async Task JoinRoom(ConnectionOptions connectionOptions)
     {
         // Joinable by both gameboard and player
         // Both require a room id to join, only player requires a name
-        
-        var roomId = connection.Room;
-        var name = connection.Name;
+        var roomId = connectionOptions.Room;
+        var name = connectionOptions.Name;
         
         if (TryGetRoom(out var baseRoom, roomId))
         {
@@ -104,6 +103,7 @@ public class BaseHub : Hub<IBaseClient>
             });
             
             Context.Items[Name] = name;
+            await SendAvatar();
         }
         else
         {
@@ -113,7 +113,6 @@ public class BaseHub : Hub<IBaseClient>
         Context.Items[Room] = roomId;
 
         await Groups.AddToGroupAsync(ContextId, roomId);
-        await SendAvatar();
     }
     
     public async Task SendMessage(string message)

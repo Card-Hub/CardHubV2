@@ -8,8 +8,26 @@ import UNEnoshadowCard from "~/components/noShadowCard/UNEnoshadowCard.vue";
 import StandardCardDisplay from "~/components/Card/StandardCardDisplay.vue";
 import UNOCardDisplay from "~/components/Card/UNOCardDisplay.vue";
 
-
 import toast from "@/utils/toast";
+
+import { type ConfigurableDocument, type MaybeElementRef, useFullscreen } from '@vueuse/core';
+
+// fullscreen
+const { isFullscreen, enter, exit } = useFullscreen();
+const el = ref(null)
+const { toggle } = useFullscreen(el)
+
+const getPrimeIcon = (name: string) => {
+  return new URL(`../../assets/icons/primeIcons/${name}.svg`, import.meta.url);
+}
+
+// https://primevue.org/dialog
+import Dialog from 'primevue/dialog';
+import Chat from "~/components/Chat.vue";
+import UnoRules from "~/components/gameRules/UnoRules.vue";
+import PokerRules from "~/components/gameRules/PokerRules.vue"; // for popup dialog
+const rulesVisible = ref(false); // for popup dialog
+const chatVisible = ref(false); // for popup dialog https://primevue.org/avatar/ for chat notification
 
 //const store = useWebSocketStore();
 // const {user, users, room } = storeToRefs(store);
@@ -29,9 +47,10 @@ import toast from "@/utils/toast";
          CanCheck: boolean
          Hand: StandardCard[]
          BestHand: string
+         Folded: boolean
      };
 const bestHand = ref<string>("");
-const cards2 = ref<StandardCard[]>([ {Id: 3, suit: "Spades", value: "4"}, {Id: 3, suit: "Spades", value: "4"}]);
+const cards2 = ref<StandardCard[]>([ {Id: 3, Suit: "Spades", Value: "4"}, {Id: 3, Suit: "Spades", Value: "4"}]);
 const canCall = ref<boolean>(true);
 const canFold = ref<boolean>(true);
 const canRaise = ref<boolean>(true);
@@ -69,12 +88,60 @@ const fold = () => {
     });
   console.log("toasting");
 }
+
+const getUserIcon = () => {
+  // iterate through players to find the user's avatar
+  // let userIcon = "";
+  // players.value.forEach(p => { if (p.Name === user.value) { userIcon = p.Avatar; } });
+  //
+  // return new URL(`../../assets/icons/avatars/${userIcon}.png`, import.meta.url);
+  return new URL(`../../assets/icons/avatars/lyssie.png`, import.meta.url);
+};
+
+const handleExit = async () => {
+  // connection.value = null;
+  // room.value = '';
+
+  // redirect to join page
+  await navigateTo("/join");
+};
 </script>
 
 
 <template>
   <Toast/>
   <div class="playerview-une-container w-full p-6">
+    
+    <div class="flex flex-row justify-between">
+      <div class="user-info flex place-items-center gap-3 bg-gray-600">
+        <img :src="getUserIcon()" alt="user" class="user-avatar"/>
+        <p class="text-white"> {{ user }}</p>
+      </div>
+
+      <div class="left-div flex flex-row-reverse place-items-center gap-2">
+        <img :src="getPrimeIcon('expand')" class="size-10" @click="toggle" />
+
+        <div class="card">
+          <i class="pi pi-fw pi-info-circle" style="font-size: 2rem" @click="rulesVisible = true"></i>
+          <Dialog v-model="rulesVisible" header="Rules" class="w-[900px] h-[900px]" :visible="rulesVisible" @update:visible="rulesVisible = $event">
+            <PokerRules />
+            <div class="flex justify-content-end gap-2">
+              <!--            <Button type="button" label="Exit" @click="rulesVisible = false"></Button>-->
+            </div>
+          </Dialog>
+        </div>
+
+        <div class="">
+          <i class="pi pi-fw pi-comment" style="font-size: 2rem" @click="chatVisible = true"></i>
+          <Dialog v-model="chatVisible" class="w-[900px] h-[900px]" header="Chat" :visible="chatVisible" @update:visible="chatVisible = $event">
+            <Chat/>
+          </Dialog>
+        </div>
+
+        <!--      <i class="pi pi-fw pi-eye" @click="!sideScroll" style="font-size: 2.5rem"></i>-->
+      </div>
+    </div>
+    
     <div class="w-full margin-auto">
     <h1 class="text-center">
       <span v-if="currentPlayer === user && winner != user">
@@ -313,6 +380,34 @@ transform: translateY(-50%) translateX(-50%);
   font-size: 1.5em;
   text-align: center;
   justify-content: center;
+}
+
+.user-avatar {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.exit-btn {
+  background-color: transparent;
+  width: 15%;
+  height: 5%;
+  justify-content: center;
+  color: white;
+  font-size: 1.5em;
+  border: 2px solid white;
+  transform: translateY(-50%) translateX(-50%);
+  position: absolute;
+  top: 70%;
+  left: 50%;
+}
+
+.user-info {
+  color: white;
+  padding-left: 2px;
+  padding-right: 10px;
+  border-radius: 25%/50%;
 }
 
 </style>

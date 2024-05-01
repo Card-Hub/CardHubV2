@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import { storeToRefs } from "pinia";
 import Une from "~/pages/games/Une.vue";
 import AvatarSelection from "~/components/AvatarSelection.vue";
@@ -19,11 +18,11 @@ const visible = ref(false);
 
 const gameboardStart = () => {
   startGame();
-  navigateTo("/gameboard/" + gameType.value.toLowerCase());
+  navigateTo("/gameboard/poker");
 }
 
 const playerStart = () => {
-  return navigateTo("/playerview/" + gameType.value.toLowerCase());
+  return navigateTo("/playerview/poker");
 }
 
 const getIcon = (avatar: string) => {
@@ -62,7 +61,7 @@ const kickPlayer = (lobbyUser: LobbyUser) => {
 
       <div class="flex justify-between">
         <h1 >
-          {{ gameType }}
+          Poker
         </h1>
         <div class="justify-left">
           <i class="pi pi-fw pi-comment" style="font-size: 2rem" @click="visible = true"></i>
@@ -78,7 +77,7 @@ const kickPlayer = (lobbyUser: LobbyUser) => {
 
       <AvatarSelection class="align-center"/>
       <div v-if="gameStarted" >
-        <NuxtLink to="/gameboard/une" class="mt-5">
+        <NuxtLink to="/gameboard/poker" class="mt-5">
           <!--          <Button>Join Game</Button>-->
         </NuxtLink>
         <Button class="mt-5" @click="playerStart" v-if="gameStarted">Join Game</Button>

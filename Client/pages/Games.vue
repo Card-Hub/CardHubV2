@@ -61,6 +61,20 @@ const searchGame = () => {
   }
 };
 
+
+useSeoMeta({
+  title: 'CardHub',
+  description: 'Play card games with your friends with CardHub!',
+  ogTitle: 'CardHub',
+  ogDescription: 'Browse popular card games to play with your friends with CardHub!',
+  ogImage: '/og-image.png',
+  ogUrl: 'playcardhub.com/games',
+  twitterTitle: 'CardHub',
+  twitterDescription: 'Browse popular card games to play with your friends with CardHub!',
+  twitterImage: '/og-image',
+  twitterCard: 'summary'
+})
+
 </script>
 
 <template>

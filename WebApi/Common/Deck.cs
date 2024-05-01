@@ -1,16 +1,20 @@
-﻿namespace WebApi.Common;
+namespace WebApi.Common;
 
 public class Deck<TCard> : IDeck<TCard>
 {
-    private List<TCard> _cards;
-    private readonly List<TCard> _drawnCards;
+    protected List<TCard> _cards;
+    // private List<TCard> _cards;
+    // private readonly List<TCard> _drawnCards;
+    protected readonly List<TCard> _drawnCards;
 
     public Deck()
     {
         _cards = new List<TCard>();
         _drawnCards = new List<TCard>();
     }
-    
+    public List<TCard> GetCards(){
+        return _cards;
+    }
     public Deck(IEnumerable<TCard> cards)
     {
         _cards = new List<TCard>(cards);

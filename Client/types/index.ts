@@ -32,6 +32,29 @@ declare global {
         Hand: UNOCard[]
         CanPressUne: boolean
     }
+    
+    interface PokerPlayer extends Player {
+        CanFold: boolean
+        CanCall: boolean
+        CanRaise: boolean
+        CanCheck: boolean
+        Hand: StandardCard[]
+        BestHand: string
+        Folded: boolean
+    }
+    
+    interface BlackJackPlayer extends Player {
+        Hand: StandardCard[]
+        CurrentScore: number
+        TotalMoney: number
+        CurrentBet: number
+        HasBet: boolean
+        NotPlaying: boolean
+        Busted: boolean
+        Winner: boolean
+        StillPlaying: boolean
+        Standing: boolean
+    }
 
     interface LobbyUser {
       Name: string

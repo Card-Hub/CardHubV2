@@ -38,10 +38,10 @@ const popularGames = [
       link: '/games/cah'
     },
     {
-      title: 'Texas Hold Em',
+      title: 'Poker',
       image: new URL('../assets/icons/standardDeck/hearts.svg', import.meta.url),
       deckColor: 'white',
-      link: '/games/texasholdem'
+      link: '/games/poker'
     },
     {
     title: 'AZN Flush',

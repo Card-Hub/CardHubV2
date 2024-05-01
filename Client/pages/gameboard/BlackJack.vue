@@ -1,13 +1,26 @@
 <script setup lang="ts">
-import {defineComponent, ref, onMounted} from "vue";
+import {useUneStore} from "~/stores/uneStore";
+import {type ConfigurableDocument, type MaybeElementRef, useFullscreen } from '@vueuse/core';
+import {defineComponent, ref, onMounted, type ComputedRef, type Ref, computed} from "vue";
 import {storeToRefs} from "pinia";
 import {useWebSocketStore} from "~/stores/webSocketStore";
 
-import StandardCardDisplay from "~/components/Card/StandardCardDisplay.vue";
 import StandardnoshadowCard from "~/components/noShadowCard/StandardnoshadowCard.vue";
+import StandardCardDisplay from "~/components/Card/StandardCardDisplay.vue";
 
 const store = useWebSocketStore();
-const uneStore = useUneStore();
+const {user, users, room, connection} = storeToRefs(store);
+const {startGame} = store;
+
+//fulscreen
+const { isFullscreen, enter, exit } = useFullscreen();
+const el = ref(null)
+const { toggle } = useFullscreen(el)
+
+const getPrimeIcon = (name: string) => {
+  return new URL(`../../assets/icons/primeIcons/${name}.svg`, import.meta.url);
+}
+
 // uncomment these out later
 // const {  cards, users, room } = storeToRefs(store);
 // const { cards } = storeToRefs(store);
@@ -15,18 +28,31 @@ const uneStore = useUneStore();
 const dealerCards = ref<StandardCard[]>([
   {Id: 1, Suit: "hearts", Value: "Jack"},
   {Id: 2, Suit: "hearts", Value: "Ace"}]);
+//reverse dealer cards
+dealerCards.value.reverse();
 
-const newCards = ref<number[]>([]);
+const players = ref<BlackJackPlayer[]>([
+  {Name: "lyssie", Avatar: "lyssie", Afk: false, Hand: [{Id: 1, Suit: "hearts", Value: "Jack"}, {Id: 2, Suit: "hearts", Value: "Ace"}], CurrentScore: 21, TotalMoney: 100, CurrentBet: 10, HasBet: true, NotPlaying: false, Busted: false, Winner: false, StillPlaying: true, Standing: false},
+  {Name: "juno", Avatar: "juno", Afk: false,Hand: [{Id: 1, Suit: "hearts", Value: "Jack"}, {Id: 2, Suit: "hearts", Value: "Ace"}], CurrentScore: 21, TotalMoney: 100, CurrentBet: 10, HasBet: true, NotPlaying: false, Busted: false, Winner: false, StillPlaying: true, Standing: false},
+  {Name: "oli", Avatar: "oli", Afk: false,Hand: [{Id: 1, Suit: "hearts", Value: "Jack"}, {Id: 2, Suit: "hearts", Value: "Ace"}], CurrentScore: 21, TotalMoney: 100, CurrentBet: 10, HasBet: true, NotPlaying: false, Busted: false, Winner: false, StillPlaying: true, Standing: false},
+  {Name: "liam", Avatar: "liam", Afk: false,Hand: [{Id: 1, Suit: "hearts", Value: "Jack"}, {Id: 2, Suit: "hearts", Value: "Ace"}], CurrentScore: 21, TotalMoney: 100, CurrentBet: 10, HasBet: true, NotPlaying: false, Busted: false, Winner: false, StillPlaying: true, Standing: false},
+  {Name: "andy", Avatar: "andy", Afk: false,Hand: [{Id: 1, Suit: "hearts", Value: "Jack"}, {Id: 2, Suit: "hearts", Value: "Ace"}], CurrentScore: 21, TotalMoney: 100, CurrentBet: 10, HasBet: true, NotPlaying: false, Busted: false, Winner: false, StillPlaying: true, Standing: false},
+  {Name: "alex", Avatar: "alex", Afk: false,Hand: [{Id: 1, Suit: "hearts", Value: "Jack"}, {Id: 2, Suit: "hearts", Value: "Ace"}], CurrentScore: 21, TotalMoney: 100, CurrentBet: 10, HasBet: true, NotPlaying: false, Busted: false, Winner: false, StillPlaying: true, Standing: false},
+  {Name: "ruby", Avatar: "ruby",Afk: false, Hand: [{Id: 1, Suit: "hearts", Value: "Jack"}, {Id: 2, Suit: "hearts", Value: "Ace"}], CurrentScore: 21, TotalMoney: 100, CurrentBet: 10, HasBet: true, NotPlaying: false, Busted: false, Winner: false, StillPlaying: true, Standing: false},
+  {Name: "fairy", Avatar: "fairy", Afk: false,Hand: [{Id: 1, Suit: "hearts", Value: "Jack"}, {Id: 2, Suit: "hearts", Value: "Ace"}], CurrentScore: 21, TotalMoney: 100, CurrentBet: 10, HasBet: true, NotPlaying: false, Busted: false, Winner: false, StillPlaying: true, Standing: false},
+]);
+
+const currentPlayer = ref<string>("lyssie");
+const dealersTurn = ref<boolean>(false);
+
 //const currentColor = ref<string>("red");
-const { currentColor, players, currentPlayer, discardPile  } = storeToRefs(uneStore);
+// const { currentColor, players, currentPlayer, discardPile  } = storeToRefs(uneStore);
 const getCardStyle = (index: number) => {
-  const randomX = Math.floor(Math.random() * 50) - 5; // Random offset for X-axis
-  const randomY = Math.floor(Math.random() * 50) - 5; // Random offset for Y-axis
-  const randomRotation = Math.floor(Math.random() * 20) - 10; // Random rotation
+  let randomX = index * 50;
+  let randomY = index * 3;
 
   return {
-    transform: `translate(${randomX}px, ${randomY}px) rotate(${randomRotation}deg)`,
-    zIndex: index,
+    transform: `translate(${randomX}px, ${randomY}px)`,
   };
 };
 
@@ -50,26 +76,29 @@ const getPlayerIconStyle = (index: number) => {
   const totalPlayers = players.value.length;
   let xpos = 0;
   let ypos = 0;
-  
-  if (totalPlayers === 2) {//good, might need order change
-    xpos = index === 0 ? 180 : -180;
-    ypos = index === 0 ? 315 : 315;
-  }else if(totalPlayers === 3){//good, might need order change
-    xpos = index === 0 ? 151 : index === 1 ? -251 : 251;
-    ypos = index === 0 ? 300 : index === 1 ? 300 : 300;
-  } else if (totalPlayers === 4) {//good, might need order change
-    xpos = index === 0 ? 550 : index === 1 ? 180 : index === 2 ? -180 : -550;
-    ypos = index === 0 ? 280 : index === 1 ? 315 : index === 2 ? 315 : 280;
-  } else if (totalPlayers === 5) {//good, might need order change
-    xpos = index === 0 ? 225 : index === 1 ? -350 : index === 2 ? -251 : index === 3 ? 151 : 250;
-    ypos = index === 0 ? 330 : index === 1 ? 220 : index === 2 ? 300 : index === 3 ? 300 : 220;
-  } else if (totalPlayers === 6) {//good good
-    xpos = index === 0 ? 750 : index === 1 ? 490 : index === 2 ? 185 : index === 3 ? -185 : index === 4 ? -490 : -750;
-    ypos = index === 0 ? 200 : index === 1 ? 300 : index === 2 ? 300 : index === 3 ? 300 : index === 4 ? 300 : 200;
-  } else if (totalPlayers === 7) {//good good
-    xpos = index === 0 ? 750 : index === 1 ? 490 : index === 2 ? 245 : index === 3 ? 0 : index === 4 ? -245 : index === 5 ? -490 : -750;
-    ypos = index === 0 ? 200 : index === 1 ? 300 : index === 2 ? 300 : index === 3 ? 300 : index === 4 ? 300 : index === 5 ? 300 : 200;
-  } 
+
+  if (totalPlayers === 2) {
+    xpos = index === 0 ? 50 : -51;
+    ypos = index === 0 ? -350 : 350;
+  } else if (totalPlayers === 3) {
+    xpos = index === 0 ? 151 : index === 1 ? -276 : 251;
+    ypos = index === 0 ? -350 : index === 1 ? 350 : 350;
+  } else if (totalPlayers === 4) {
+    xpos = index === 0 ? 150 : index === 1 ? -456 : index === 2 ? -56 : 356;
+    ypos = index === 0 ? -350 : index === 1 ? 0 : index === 2 ? 350 : 0;
+  } else if (totalPlayers === 5) {
+    xpos = index === 0 ? 225 : index === 1 ? -475 : index === 2 ? -251 : index === 3 ? 151 : 375;
+    ypos = index === 0 ? -300 : index === 1 ? 0 : index === 2 ? 300 : index === 3 ? 300 : 0;
+  } else if (totalPlayers === 6) {
+    xpos = index === 0 ? 500 : index === 1 ? -70 : index === 2 ? -525 : index === 3 ? -300 : index === 4 ? 60 : 325;
+    ypos = index === 0 ? -300 : index === 1 ? -300 : index === 2 ? 0 : index === 3 ? 300 : index === 4 ? 300 : 0;
+  } else if (totalPlayers === 7) {
+    xpos = index === 0 ? 550 : index === 1 ? -25 : index === 2 ? -425 : index === 3 ? -530 : index === 4 ? -350 : index === 5 ? 0 : 265;
+    ypos = index === 0 ? -300 : index === 1 ? -300 : index === 2 ? -150 : index === 3 ? 150 : index === 4 ? 300 : index === 5 ? 300 : 0;
+  } else if (totalPlayers === 8) {
+    xpos = index === 0 ? 600 : index === 1 ? 30 : index === 2 ? -375 : index === 3 ? -475 : index === 4 ? -300 : index === 5 ? 50 : index === 6 ? 265 : 150;
+    ypos = index === 0 ? -300 : index === 1 ? -300 : index === 2 ? -150 : index === 3 ? 150 : index === 4 ? 300 : index === 5 ? 300 : index === 6 ? 150 : -150;
+  }
   return {
     transform: `translate(${xpos}%, ${ypos}%)`,
   };
@@ -89,11 +118,6 @@ const isCurrentPlayer = (player: string) => {
 const getCARD = () => {
   return new URL(`../../assets/icons/standardDeck/diamonds.svg`, import.meta.url);
 };
-
-const getCurrentColor = () => {
-  const color = currentColor.value;
-  return "background: ${currentColor.value}";
-};
   </script>
 
 <template>
@@ -106,31 +130,24 @@ const getCurrentColor = () => {
           <p class="player-name"> {{ player.Name }} </p>
         </div>
       </div>
-      <div class="game-table rounded-tr-full shadow-lg" v-bind:class="currentColor">
-      <div class="column-container">
-        <div class="column left-column">
-            <div class="deck-view">
+      <div class="game-table rounded-tr-full shadow-lg">
+            <div class="card-pile">
+              <div v-if="dealersTurn">
+                
+              </div>
+              <div class="!dealersTurn"></div>
+              <StandardnoshadowCard :card="dealerCards[0]" class="standardCardDisplay"/>
+              <StandardnoshadowCard :card="dealerCards[1]" class="standardCardDisplay"/>
               <div class="deck-card flex justify-center items-center bg-zinc-800 rounded-md shadow-md mb-2">
                 <img :src="getCARD()" alt="game icon" class="une-logo"/>
               </div>
             </div>
-          </div>
-          <div class="column right-column">
-            <div class="card-pile">
-              <StandardnoshadowCard class="singular-card" v-for="(card, index) in dealerCards"
-                               :key="index"
-                               :card="card"
-                               :style="{ ...getCardStyle(index) }"
-              />
-              <div class = "blank-card relative w-20 h-32 m-2 bg-white rounded-md shadow-md p-2" >
-                
-              </div>
+            <div class = "blank-card relative w-20 h-32 m-2 bg-zinc-800 rounded-md shadow-md p-2" >
+              <img :src="getCARD()" alt="game icon" class="une-logo"/>
             </div>
           </div>
 
 
-        </div>
-      </div>
     </div>
   </div>
 
@@ -222,10 +239,11 @@ const getCurrentColor = () => {
   position: absolute;
   border: grey 2px solid;
   transition: transform 0.5s;
-  width: 20vw;
-  height: 30vw;
-  max-height: 300px;
-  max-width: 200px;
+  width: 15vw;
+  height: 25vw;
+  max-height: 250px;
+  max-width: 150px;
+  transform: translate(-55%, 1.5%);
 }
 
 .game-table {
@@ -238,7 +256,7 @@ const getCurrentColor = () => {
   max-width: 1000px;
   /*background-color: #f3f4f6;*/
   border-radius: 50% / 100%;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
 }
 
 .une-logo {

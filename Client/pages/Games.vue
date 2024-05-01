@@ -42,12 +42,12 @@ const popularGames = [
       image: new URL('../assets/icons/standardDeck/hearts.svg', import.meta.url),
       deckColor: 'white',
       link: '/games/poker'
-    },
-    {
-    title: 'AZN Flush',
-    image: new URL('../assets/icons/aznflush/aznflush.png', import.meta.url),
-    deckColor: 'black',
-    link: '/games/aznflush'
+    // },
+    // {
+    // title: 'AZN Flush',
+    // image: new URL('../assets/icons/aznflush/aznflush.png', import.meta.url),
+    // deckColor: 'black',
+    // link: '/games/aznflush'
   }]; // add more as necessary
 
 const searchQuery = ref('');

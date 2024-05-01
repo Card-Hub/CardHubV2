@@ -7,12 +7,13 @@ import {
     LogLevel
 } from "@microsoft/signalr";
 import { ref } from "vue";
-
 import {useUneStore} from "~/stores/uneStore";
+// import {useBlackJackStore} from "~/stores/blackJackStore";
 
 export const useWebSocketStore = defineStore("webSocket", () => {
   
   const store = useUneStore();
+
   const { gameType } = storeToRefs(store);
   const { parseJson } = store;
     const { $api } = useNuxtApp();
@@ -205,8 +206,9 @@ export const useWebSocketStore = defineStore("webSocket", () => {
                     }
                 }
             });
-
+            console.log("\n\n\n111Im IN the ts joinroom before invoke\n\n\n");
             await joinConnection.start();
+            console.log("\n\n\nIm IN the ts joinroom before invoke\n\n\n");
             await joinConnection.invoke("JoinRoom", { user, room, userType });
             connection.value = joinConnection;
 

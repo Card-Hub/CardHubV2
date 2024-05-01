@@ -6,13 +6,32 @@ import {useWebSocketStore} from "~/stores/webSocketStore";
 import StandardCardDisplay from "~/components/Card/StandardCardDisplay.vue";
 import StandardnoshadowCard from "~/components/noShadowCard/StandardnoshadowCard.vue";
 
+// fullscreen
+const { isFullscreen, enter, exit } = useFullscreen();
+const el = ref(null)
+const { toggle } = useFullscreen(el)
+
+const getPrimeIcon = (name: string) => {
+  return new URL(`../../assets/icons/primeIcons/${name}.svg`, import.meta.url);
+}
+
+// https://primevue.org/dialog
+import Dialog from 'primevue/dialog';
+import Chat from "~/components/Chat.vue";
+import UnoRules from "~/components/gameRules/UnoRules.vue";
+import PokerRules from "~/components/gameRules/PokerRules.vue";
+import BlackjackRules from "~/components/gameRules/BlackjackRules.vue"; // for popup dialog
+const rulesVisible = ref(false); // for popup dialog
+const chatVisible = ref(false); // for popup dialog https://primevue.org/avatar/ for chat notification
+
+
 interface Player {
     Name: string
     Avatar: string
     Afk: boolean
 };
      
-interface PokerPlayer extends Player {
+interface BlackJack extends Player {
     Hand: StandardCard[]
     CurrentScore: number
     TotalMoney: number
@@ -64,10 +83,49 @@ const stand = () => {
 
 }
 
+const getUserIcon = () => {
+  // iterate through players to find the user's avatar
+  // let userIcon = "";
+  // players.value.forEach(p => { if (p.Name === user.value) { userIcon = p.Avatar; } });
+  //
+  // return new URL(`../../assets/icons/avatars/${userIcon}.png`, import.meta.url);
+  return new URL(`../../assets/icons/avatars/lyssie.png`, import.meta.url);
+};
+
 </script>
  
 <template>
   <div class="playerview-une-container w-full p-6">
+    <div class="flex flex-row justify-between">
+      <div class="user-info flex place-items-center gap-3 bg-gray-600">
+        <img :src="getUserIcon()" alt="user" class="user-avatar"/>
+        <p class="text-white"> {{ user }}</p>
+      </div>
+
+      <div class="left-div flex flex-row-reverse place-items-center gap-2">
+        <img :src="getPrimeIcon('expand')" class="size-10" @click="toggle" />
+
+        <div class="card">
+          <i class="pi pi-fw pi-info-circle" style="font-size: 2rem" @click="rulesVisible = true"></i>
+          <Dialog v-model="rulesVisible" header="Rules" class="w-[900px] h-[900px]" :visible="rulesVisible" @update:visible="rulesVisible = $event">
+            <BlackjackRules />
+            <div class="flex justify-content-end gap-2">
+              <!--            <Button type="button" label="Exit" @click="rulesVisible = false"></Button>-->
+            </div>
+          </Dialog>
+        </div>
+
+        <div class="">
+          <i class="pi pi-fw pi-comment" style="font-size: 2rem" @click="chatVisible = true"></i>
+          <Dialog v-model="chatVisible" class="w-[900px] h-[900px]" header="Chat" :visible="chatVisible" @update:visible="chatVisible = $event">
+            <Chat/>
+          </Dialog>
+        </div>
+
+        <!--      <i class="pi pi-fw pi-eye" @click="!sideScroll" style="font-size: 2.5rem"></i>-->
+      </div>
+    </div>
+    
     <div class="w-full margin-auto">
       <h1 class="text-center">
         <span v-if="currentPlayer === user && Winner == false && Busted == false && StillPlaying == true && Standing == false && NotPlaying == false && AllPlayersHaveBet == true">
@@ -121,8 +179,8 @@ const stand = () => {
         <Button class="font-bold button shadow" @click="hit" :disabled="currentPlayer != user || AllPlayersHaveBet == false || Standing || !HasBet">Hit</Button><!--will just invoke function-->
         <Button class="font-bold button shadow" @click="stand" :disabled="currentPlayer != user || AllPlayersHaveBet == false || Standing || !HasBet">Stand</Button><!--will just invoke function-->
       </div>
-      <div class="footer">
-      </div>
+<!--      <div class="footer">-->
+<!--      </div>-->
     </div>
 
   <div v-if="showingBetPopup" class="select-color">
@@ -175,6 +233,7 @@ const stand = () => {
   /*background-color: green;*/
   display: grid;
   grid-template-columns: 1fr 1fr;
+  padding-top: 20%;
 }
 .standardCardDisplay {
   /*background-color: pink;*/
@@ -316,6 +375,20 @@ transform: translateY(-50%) translateX(-50%);
   font-size: 1.5em;
   text-align: center;
   justify-content: center;
+}
+
+.user-info {
+  color: white;
+  padding-left: 2px;
+  padding-right: 10px;
+  border-radius: 25%/50%;
+}
+
+.user-avatar {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
 }
 
 </style>

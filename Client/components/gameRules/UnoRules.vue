@@ -42,6 +42,7 @@ const icons = {
       </div>
       <h2>Winning the Game</h2>
       <p>The first player to get rid of all the cards in their hand wins the game. If a player has one card left, they must click "UNE" to alert the other players. If they fail to do so and are caught by another player, they must draw two cards. If a player plays their next-to-last card and forgets to say "UNE," they are subject to the same penalty.</p>
+      <br><br>
     </div>
   </div>
 </template>

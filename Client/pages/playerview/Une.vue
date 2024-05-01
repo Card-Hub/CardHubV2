@@ -1,8 +1,20 @@
 <script setup lang="ts">
-  import {defineComponent, ref, onMounted} from "vue";
+  import {defineComponent, ref, onMounted, type ComputedRef, type Ref, computed} from "vue";
   import {storeToRefs} from "pinia";
   import {useWebSocketStore} from "~/stores/webSocketStore";
+  import toast from "@/utils/toast";
+
+  import { type ConfigurableDocument, type MaybeElementRef, useFullscreen } from '@vueuse/core';
   
+  // fullscreen
+  const { isFullscreen, enter, exit } = useFullscreen();
+  const el = ref(null)
+  const { toggle } = useFullscreen(el)
+
+  const getPrimeIcon = (name: string) => {
+    return new URL(`../../assets/icons/primeIcons/${name}.svg`, import.meta.url);
+  }
+
   import UNOCardDisplay from "~/components/Card/UNOCardDisplay.vue";
   import UnoRules from "~/components/gameRules/UnoRules.vue";
   
@@ -10,13 +22,14 @@
   import Dialog from 'primevue/dialog';
   import Chat from "~/components/Chat.vue"; // for popup dialog
   const rulesVisible = ref(false); // for popup dialog
-  const chatVisible = ref(false); // for popup dialog
+  const chatVisible = ref(false); // for popup dialog https://primevue.org/avatar/ for chat notification
+  // const sideScroll= ref(false); // for scrolling view or all cards are viewable on screen by scrolling down
 
   const store = useWebSocketStore(); 
   const {user, users, room, connection } = storeToRefs(store);
   const { playCard, selectColor, drawCard, pressUne } = store;
   const uneStore = useUneStore();
-  const { winner, currentPlayer, players, discardPile, someoneNeedsToSelectColor } = storeToRefs(uneStore);
+  const { winner, currentPlayer, players, discardPile, someoneNeedsToSelectColor, playerWhoHasPrompt, currentColor } = storeToRefs(uneStore);
  interface Player {
          Name: string
          Avatar: string
@@ -63,15 +76,27 @@
 
   
   const callUne = () => {
-    // store.callUne();
+    // record who pressed button first
+    playerWhoHasPrompt.value = user.value;
+    
+    // disable une button for all players
+    document.getElementById("uneButton").setAttribute("disabled", "disabled");
+    
+    // check if current player was the first to press the button and give them a card if they were not
+    if (playerWhoHasPrompt.value !== currentPlayer.value) {
+      drawCard();
+      drawCard();
+    }
+    playerWhoHasPrompt.value = ""; // reset prompt
+    
   };
   
   // enable une button if player has one card left
   const validateUneCall = () => {
     let isValid = false;
     players.value.forEach(player => {
-      if (player.Name === currentPlayer.value) {
-        if (player.Hand.length < 3) {
+      if (player.Hand.length < 3) {
+        if (player.Name === currentPlayer.value) {
           isValid = true;
         }
       }
@@ -113,31 +138,58 @@
     // redirect to join page
     await navigateTo("/join");
   };
+  
+  const isCurrentPlayer = () => {
+    if (user.value !== currentPlayer.value) {
+      toast.add({
+        severity: "error",
+        summary: "It's not your turn!",
+        detail: "Please wait for your turn to play!",
+        life: 5000
+      });
+    }
+    
+  };
+
+  const canBePlayed = (card: UNOCard) => {
+    return card.Color.toLowerCase() === currentColor.value.toLowerCase() || card.Value.toLowerCase() === discardPile.value[discardPile.value.length - 1].Value.toLowerCase() || card.Color.toLowerCase() === 'black';
+  };
+
 </script>
 
 
 <template>
   <div class="playerview-une-container w-full p-6">
+    <Toast/>
     
-    <div class="flex flex-row-reverse">
-      <div class="card flex justify-left">
-        <i class="pi pi-fw pi-info-circle" style="font-size: 2.5rem" @click="rulesVisible = true"></i>
-        <Dialog v-model="rulesVisible" header="Rules" :visible="rulesVisible" @update:visible="rulesVisible = $event">
-          <UnoRules/>
-          <div class="flex justify-content-end gap-2">
-            <Button type="button" label="Exit" @click="rulesVisible = false"></Button>
-          </div>
-        </Dialog>
+    <div class="flex flex-row justify-between">
+      <div class="user-info flex place-items-center gap-3 bg-gray-600">
+          <img :src="getUserIcon()" alt="user" class="user-avatar"/>
+          <p class="text-white"> {{ user }}</p>
       </div>
       
-      <div class="justify-left">
-        <i class="pi pi-fw pi-comment" style="font-size: 2.5rem" @click="chatVisible = true"></i>
-        <Dialog v-model="chatVisible" class="chat-container" header="Chat" :visible="chatVisible" @update:visible="chatVisible = $event">
-          <Chat/>
-        </Dialog>
+      <div class="left-div flex flex-row-reverse place-items-center gap-2">
+        <img :src="getPrimeIcon('expand')" class="size-10" @click="toggle" />
+
+        <div class="card">
+          <i class="pi pi-fw pi-info-circle" style="font-size: 2rem" @click="rulesVisible = true"></i>
+          <Dialog v-model="rulesVisible" header="Rules" class="w-[900px] h-[900px]" :visible="rulesVisible" @update:visible="rulesVisible = $event">
+            <UnoRules/>
+            <div class="flex justify-content-end gap-2">
+              <!--            <Button type="button" label="Exit" @click="rulesVisible = false"></Button>-->
+            </div>
+          </Dialog>
+        </div>
+
+        <div class="">
+          <i class="pi pi-fw pi-comment" style="font-size: 2rem" @click="chatVisible = true"></i>
+          <Dialog v-model="chatVisible" class="w-[900px] h-[900px]" header="Chat" :visible="chatVisible" @update:visible="chatVisible = $event">
+            <Chat/>
+          </Dialog>
+        </div>
+
+        <!--      <i class="pi pi-fw pi-eye" @click="!sideScroll" style="font-size: 2.5rem"></i>-->
       </div>
-      
-      <img :src="getUserIcon()" alt="user" class="user-avatar"/>
     </div>
     
     
@@ -165,10 +217,20 @@
                       v-for="card in myCards"
                       :key="card.Id"
                       :card="card"
-                      :isSelected="false"
-                      @click="playCard(JSON.stringify(card))"
+                      :isSelected="canBePlayed(card) && currentPlayer === user"
+                      @click="{...playCard(JSON.stringify(card)), ...isCurrentPlayer()}"
       />
     </div>
+
+<!--    <div v-if="winner==='' && updateScroll ===true" class=" w-full flex overflow-x-auto border-2 border-radius-4 justify-center">-->
+<!--      <UNOCardDisplay class="uneCard flex-wrap"-->
+<!--                      v-for="card in myCards"-->
+<!--                      :key="card.Id"-->
+<!--                      :card="card"-->
+<!--                      :isSelected="(card.Color.toLowerCase() === discardPile[discardPile.length - 1].Color.toLowerCase() || card.Value === discardPile[discardPile.length - 1].Value || card.Color.toLowerCase() === 'black') && currentPlayer === user"-->
+<!--                      @click="playCard(JSON.stringify(card))"-->
+<!--      />-->
+<!--    </div>-->
     
     <div v-if="currentPlayer === user && someoneNeedsToSelectColor">
     </div>
@@ -200,8 +262,6 @@
       </div>
     </div>
   </div>
-  
-  
 </template>
 
 <style scoped>
@@ -342,12 +402,10 @@
 }
 
 .user-avatar {
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 3rem;
+  height: 3rem;
   border-radius: 50%;
-  margin-right: 10px;
   background: rgba(255, 255, 255, 0.2);
-  margin-bottom: 10px;
 }
 
 .exit-btn {
@@ -362,5 +420,12 @@
   position: absolute;
   top: 70%;
   left: 50%;
+}
+
+.user-info {
+  color: white;
+  padding-left: 2px;
+  padding-right: 10px;
+  border-radius: 25%/50%;
 }
 </style>

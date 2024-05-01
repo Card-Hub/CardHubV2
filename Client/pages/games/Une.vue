@@ -102,7 +102,9 @@
     </div>
     
     <div class="rules-container" v-if="active === 1">
-      <UnoRules />
+      <div class="rules">
+        <UnoRules />
+      </div>
     </div>
     
     <div class="card-container" v-else-if="active === 2">
@@ -213,6 +215,15 @@
   justify-content: center;
   align-items: center;
   width: 100%;
+}
+
+.rules {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 90%;
+
 }
 
 .menu-container{

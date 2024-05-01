@@ -60,6 +60,10 @@ public class LyssiePlayerOrder : LyssieIPlayerOrder
     return inOrder;
   }
 
+
+  public void BackToFirstPlayer(){
+    CurrentPlayerIndex = 0;
+  }
   public void ShufflePlayers() {
     Random rng = new Random();
     ActivePlayers = ActivePlayers.OrderBy(_ => rng.Next()).ToList();

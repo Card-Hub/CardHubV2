@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import PlayerHand from "~/components/PlayerHand.vue";
 import { ref, computed } from 'vue';
-import UNOCardDisplay from "~/components/Card/UNOCardDisplay.vue";
+import TabMenu from 'primevue/tabmenu';
 import StandardCardDisplay from "~/components/Card/StandardCardDisplay.vue";
 
 import { storeToRefs } from "pinia";
 import { useWebSocketStore } from "~/stores/webSocketStore";
-import UnoRules from "~/components/gameRules/UnoRules.vue";
-import TexasholdemRules from "~/components/gameRules/TexasholdemRules.vue";
+import {navigateTo} from "nuxt/app";
+import PokerRules from "~/components/gameRules/PokerRules.vue";
 
 const store = useWebSocketStore();
 const { connection, isConnected, messages, user, room } = storeToRefs(store);
@@ -16,9 +15,9 @@ const { tryCreateRoom, tryJoinRoom, sendGameType } = store;
 const connectGameboard = async (): Promise<void> => {
   const isRoomCreated = await tryCreateRoom();
   if (isRoomCreated) {
-    sendGameType('Texas Hold \'Em');
+    sendGameType('Poker');
     // await navigateTo('/playerview');
-    await navigateTo("/lobby");
+    await navigateTo("/lobby/poker");
   }
 };
 
@@ -53,7 +52,7 @@ const items = ref([
 </script>
 
 <template>
-  <div class="blackjack">
+  <div class="poker">
     <NuxtLink href="/games" class="go-back-btn">
       <Button class="go-back">Go Back</Button>
     </NuxtLink>
@@ -70,16 +69,12 @@ const items = ref([
       </div>
 
       <div class="column right-column">
-        <h1 class="text-7xl">Texas Hold 'Em</h1>
+        <h1 class="text-7xl">Poker</h1>
         <h3>Game Description: </h3>
-        <p> Texas Hold'em is a popular variation of poker played in both casual settings and professional tournaments worldwide. In Texas Hold'em, each player is dealt two private cards (known as "hole cards") that belong to them alone, and five community cards are dealt face-up on the "board." Players use a combination of their hole cards and the community cards to make the best possible five-card poker hand.
-
-          The game proceeds through several rounds of betting, with players having the option to check, bet, raise, or fold depending on the strength of their hand and their confidence in winning the pot. The community cards are dealt in stages: three cards, known as the "flop," are dealt first, followed by another single card called the "turn" or "fourth street," and finally, a fifth card called the "river" or "fifth street."
-
-          The objective of Texas Hold'em is to win chips or money by either having the best hand at showdown or by getting all opponents to fold their hands before the showdown. It's a game of skill, strategy, and psychology, where players must carefully manage their resources and make calculated decisions based on their understanding of the game and their opponents.
+        <p> Poker is a widely popular card game that combines elements of skill, strategy, and chance. Players compete to win chips or money by betting on the strength of their hands, which are composed of a combination of private ("hole") cards and community cards. Variants like Texas Hold'em, the most famous form, involve players making decisions based on incomplete information, assessing the risk versus reward of their actions, and leveraging psychological tactics against opponents. The game unfolds through rounds of betting, with players aiming to either have the best hand at showdown or to bluff and persuade others to fold. Whether in casual home games or high-stakes tournaments, poker challenges players to analyze situations, manage resources, and outmaneuver opponents in pursuit of victory. .
         </p>
         <NuxtLink href="/lobby">
-          <Button class="play" label="Secondary" severity="secondary" @click="connectGameboard"> Play Texas Hold 'Em </Button>
+          <Button class="play" label="Secondary" severity="secondary" @click="connectGameboard"> Play Poker </Button>
         </NuxtLink>
       </div>
 
@@ -90,7 +85,9 @@ const items = ref([
     </div>
 
     <div class="rules-container" v-if="active === 1">
-      <TexasholdemRules />
+      <div class="rules-man">
+        <PokerRules />
+      </div>
     </div>
     
     <div v-if="active === 2" class="card-container">
@@ -106,7 +103,7 @@ const items = ref([
 </template>
 
 <style scoped>
-.blackjack {
+.poker {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -199,6 +196,11 @@ const items = ref([
   justify-content: center;
   align-items: center;
   width: 100%;
+}
+
+.rules-man {
+  width: 90%;
+  align-self: center;
 }
 
 .menu-container{

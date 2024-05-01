@@ -44,7 +44,7 @@ builder.Services.AddSingleton<HashSet<string>>(options => []);
 builder.Services.AddSingleton<CardDbContext>();
 builder.Services.AddSingleton<UnoDeckBuilder>();
 builder.Services.AddSingleton<UnoGameMod>();
-
+builder.Services.AddSingleton<BlackJackGameStorage>();
 builder.Services.AddSingleton<UnoGameStorage>();
 builder.Services.AddSingleton<GameService>();
 

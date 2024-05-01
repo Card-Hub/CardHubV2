@@ -17,7 +17,7 @@ const connectGameboard = async (): Promise<void> => {
   if (isRoomCreated) {
     sendGameType('BlackJack');
     // await navigateTo('/playerview');
-    await navigateTo("/lobby");
+    await navigateTo("/lobby/blackjack");
   }
 };
 

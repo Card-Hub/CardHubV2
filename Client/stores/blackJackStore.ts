@@ -1,56 +1,58 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
-import { useWebSocketStore } from "~/stores/webSocketStore";
-
-
-
+// import { useWebSocketStore } from "~/stores/webSocketStore";
+import { useBaseStore } from "~/stores/baseStore";
 
 export const useBlackJackStore = defineStore("blackjack", () => {
-  const store = useWebSocketStore();
-  const { gameJson, user } = storeToRefs(store);
+  const store = useBaseStore();
+  const gameJson = ref<string>("");
   const { $api } = useNuxtApp();
   const gameType = ref<string>("");
-  const gameStarted = ref<boolean>(false);
-  const playerWhoHasPrompt = ref<string>(""); // not implemented yet
-  const winner = ref<string>("");
-  const players = ref<unePlayer[]>([]);
+  const players = ref<BlackJackPlayer[]>([]);
   const winners = ref<string[]>([]);
   const losers = ref<string[]>([]);
   const stalemates = ref<string[]>([]);
+  const allPlayersHaveBet = ref<boolean | null>(null);
+
   if (players.value != null) {
     console.log("loggig players");
     console.log(players.value);
   }
   const currentPlayer = ref<string>("");
-  const discardPile = ref<UNOCard[]>([]);
-  const deckAmt = ref<number>(0);
 
-  const { connection, isConnected, messages, user, room } = storeToRefs(store);
+  const { gameConnection, messages, user, room } = storeToRefs(store);
 
   const drawBlackJackCard = async (): Promise<void> => {
-    if (connection.value === null) {
+    if (gameConnection.value === null) {
       return;
     }
     console.log("played a card");
-    await connection.value.invoke("DrawCardBlackJackHub");
+    await gameConnection.value.invoke("DrawCardBlackJackHub");
   }
-
-
+  
   const standBlackJackPlayer = async (): Promise<void> => {
-    if (connection.value === null) {
+    if (gameConnection.value === null) {
       return;
     }
     console.log("player has stood");
-    await connection.value.invoke("StandBlackJackHub");
+    await gameConnection.value.invoke("StandBlackJackHub");
   }
 
-
   const betBlackJackPlayer = async (bet: number): Promise<void> => {
-    if (connection.value === null) {
+    if (gameConnection.value === null) {
       return;
     }
     console.log("player has made bet");
-    await connection.value.invoke("betBlackJackHub", bet);
+    await gameConnection.value.invoke("betBlackJackHub", bet);
+  }
+
+
+  const registerHandlers = (): void => {
+    if (gameConnection.value === null) return;
+      gameConnection.value.on("ReceiveJSON", (blackJackJson: string) => {
+        gameJson.value = blackJackJson;
+        parseJson(gameJson.value);
+    });
   }
 
   const parseJson = async (json: string) => {
@@ -60,7 +62,8 @@ export const useBlackJackStore = defineStore("blackjack", () => {
       currentPlayer.value = parsed.CurrentPlayer;
       winners.value = parsed.Winners,
       losers.value = parsed.Losers,
-      stalemates.value = parsed.Stalemates 
+      stalemates.value = parsed.Stalemates,
+      allPlayersHaveBet.value = parsed.AllPlayersHaveBet
   }
 
   return {
@@ -73,6 +76,8 @@ export const useBlackJackStore = defineStore("blackjack", () => {
       currentPlayer,
       winners,
       losers,
-      stalemates
+      stalemates,
+      allPlayersHaveBet,
+      user
   };
 });

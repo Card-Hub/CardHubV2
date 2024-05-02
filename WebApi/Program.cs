@@ -50,10 +50,11 @@ builder.Services.AddSingleton<UnoGameMod>();
 builder.Services.AddSingleton<BlackJackGameStorage>();
 builder.Services.AddSingleton<UnoGameStorage>();
 builder.Services.AddSingleton<GameService>();
-
 builder.Services.AddTransient<CahGame>();
 builder.Services.AddSingleton<CahFactory>();
 builder.Services.AddSingleton<IDictionary<string, CahGame>>(_ => new ConcurrentDictionary<string, CahGame>());
+builder.Services.AddSingleton<IDictionary<string, BlackJackMessenger>>
+
 
 
 var app = builder.Build();

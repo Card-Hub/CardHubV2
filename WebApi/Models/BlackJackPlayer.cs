@@ -13,7 +13,7 @@ public class BlackJackPlayer : Player {
   public bool Winner {get; set;}
   public bool StillPlaying {get; set;}
   public bool Standing {get; set;}
-  // public string Name { get; set; }
+  public string Namee { get; set; }
   public BlackJackPlayer(string name) : base(name) {
     
     CurrentScore = 0;
@@ -24,7 +24,7 @@ public class BlackJackPlayer : Player {
     Busted = false;
     Winner = false;
     StillPlaying = true;
-
+    Namee = name;
   }
 
   public bool TakeCard(StandardCard card){

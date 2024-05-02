@@ -14,7 +14,8 @@ const { toggle } = useFullscreen(el)
 const store = useBlackJackStore();
 
 const { drawBlackJackCard, standBlackJackPlayer, betBlackJackPlayer } = store;
-
+const {players, currentPlayer, winners, losers, stalemates, user, allPlayersHaveBet} = storeToRefs(store);
+// const player = findPlayerByName(user);
 
 const getPrimeIcon = (name: string) => {
   return new URL(`../../assets/icons/primeIcons/${name}.svg`, import.meta.url);
@@ -28,46 +29,9 @@ import PokerRules from "~/components/gameRules/PokerRules.vue";
 import BlackjackRules from "~/components/gameRules/BlackjackRules.vue"; // for popup dialog
 const rulesVisible = ref(false); // for popup dialog
 const chatVisible = ref(false); // for popup dialog https://primevue.org/avatar/ for chat notification
+const showingBetPopup = ref< boolean>(false);
+const amtToBet = ref<number | null>(null);
 
-
-interface Player {
-    Name: string
-    Avatar: string
-    Afk: boolean
-};
-     
-interface BlackJack extends Player {
-    Hand: StandardCard[]
-    CurrentScore: number
-    TotalMoney: number
-    CurrentBet: number
-    HasBet: boolean
-    NotPlaying: boolean
-    Busted: boolean
-    Winner: boolean
-    StillPlaying: boolean
-    Standing: boolean
-};
-
-const cards2 = ref<StandardCard[]>([ {Id: 3, Suit: "Spades", Value: "4"}, {Id: 3, Suit: "Spades", Value: "4"}]);
-const HasBet = ref<boolean>(true);
-const NotPlaying = ref<boolean>(false);
-const Busted = ref<boolean>(false);
-const Winner = ref<boolean>(false);
-const StillPlaying = ref<boolean>(true);
-const Standing = ref<boolean>(false);
-const showingBetPopup = ref<boolean>(false);
-
-
-const CurrentScore = ref<number>(8);
-const CurrentBet = ref<number>(6);
-const TotalMoney = ref<number>(80);
-const amtToBet = ref<number>(0);
-const winners = ref<String[]>
-const losers = ref<String[]>
-const user = ref<string>("Me");
-const currentPlayer = ref<string>("Me");
-const AllPlayersHaveBet = ref<boolean>(false)
 
 const showBetPopup = () => {
   showingBetPopup.value = true;
@@ -76,8 +40,8 @@ const closeBetPopup = () => {
   showingBetPopup.value = false;
 }
 
-const bet = (amtToBet) => {//invoke bet here
-  betBlackJackPlayer(amtToBet);
+const bet = (amt: number) => {//invoke bet here
+  betBlackJackPlayer(amt);
 }
 
 const hit = () => {//invoke drawcard function here
@@ -95,6 +59,11 @@ const getUserIcon = () => {
   //
   // return new URL(`../../assets/icons/avatars/${userIcon}.png`, import.meta.url);
   return new URL(`../../assets/icons/avatars/lyssie.png`, import.meta.url);
+};
+
+const findPlayerByName = (userConn: string) {
+      // Find player object in Players array based on player's name
+      return players.value.find(player => player.Namee === user);
 };
 
 </script>
@@ -129,22 +98,23 @@ const getUserIcon = () => {
 
         <!--      <i class="pi pi-fw pi-eye" @click="!sideScroll" style="font-size: 2.5rem"></i>-->
       </div>
-    </div>
+    </div>all
     
     <div class="w-full margin-auto">
       <h1 class="text-center">
-        <span v-if="currentPlayer === user && Winner == false && Busted == false && StillPlaying == true && Standing == false && NotPlaying == false && AllPlayersHaveBet == true">
+        <!-- will need to change backend to also have currentplayerConn-->
+        <span v-if="currentPlayer === user && findPlayerByName(user)?.Winner == false && findPlayerByName(user)?.Busted == false && findPlayerByName(user)?.StillPlaying == true && findPlayerByName(user)?.Standing == false && findPlayerByName(user)?.NotPlaying == false && allPlayersHaveBet == true">
             Your Turn!
         </span>
-        <span v-if="Winner == true">
+        <span v-if="findPlayerByName(user)?.Winner == true">
             You Won!
         </span>
-        <span v-if="Busted == true">
+        <span v-if="findPlayerByName(user)?.Busted == true">
             You Lose!
         </span>
         <span v-if="currentPlayer !== user">{{ currentPlayer }} is playing...
         </span>
-        <span v-if="AllPlayersHaveBet == false">
+        <span v-if="allPlayersHaveBet == false">
             Everyone Take Bets!
         </span>
       </h1>
@@ -156,33 +126,33 @@ const getUserIcon = () => {
         <div>
           
         </div>
-
+    
         <div class="cards-outer">
             <div class="cards">
-              <StandardnoshadowCard :card="cards2[0]" class="standardCardDisplay"/>
-              <StandardnoshadowCard :card="cards2[1]" class="standardCardDisplay"/>  
+              <StandardnoshadowCard :card="findPlayerByName('Dealer')?.Hand[0]" class="standardCardDisplay"/>
+              <StandardnoshadowCard :card="findPlayerByName('Dealer')?.Hand[1]" class="standardCardDisplay"/>  
             </div>
         </div>
 
         <div class="content-center stat-box">
             <ul class="">
               <li>
-                Your current bet: {{CurrentBet}}
+                Your current bet: {{findPlayerByName(user)?.CurrentBet}}
               </li>
               <li>
-                Your remaining money: {{TotalMoney}}
+                Your remaining money: {{findPlayerByName(user)?.TotalMoney}}
               </li>
               <li>
-                Your Cards Value: {{CurrentScore}}
+                Your Cards Value: {{findPlayerByName(user)?.CurrentScore}}
               </li>
             </ul>
         </div>
       </div>
 
       <div class="buttons">
-        <Button class="font-bold button shadow" @click="showBetPopup" :disabled="HasBet">Bet</Button><!--will just invoke function-->
-        <Button class="font-bold button shadow" @click="hit" :disabled="currentPlayer != user || AllPlayersHaveBet == false || Standing || !HasBet">Hit</Button><!--will just invoke function-->
-        <Button class="font-bold button shadow" @click="stand" :disabled="currentPlayer != user || AllPlayersHaveBet == false || Standing || !HasBet">Stand</Button><!--will just invoke function-->
+        <Button class="font-bold button shadow" @click="showBetPopup" :disabled="findPlayerByName(user)?.HasBet">Bet</Button><!--will just invoke function-->
+        <Button class="font-bold button shadow" @click="hit" :disabled="currentPlayer != user || allPlayersHaveBet == false || findPlayerByName(user)?.Standing || !findPlayerByName(user)?.HasBet">Hit</Button><!--will just invoke function-->
+        <Button class="font-bold button shadow" @click="stand" :disabled="currentPlayer != user || allPlayersHaveBet == false || findPlayerByName(user)?.Standing || !findPlayerByName(user)?.HasBet">Stand</Button><!--will just invoke function-->
       </div>
 <!--      <div class="footer">-->
 <!--      </div>-->

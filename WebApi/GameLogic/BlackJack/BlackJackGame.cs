@@ -150,6 +150,7 @@ public class BlackJackGame : IBaseGame<StandardCard>
     }
     public bool GivingCards(){
         if (state == "GivingCards"){
+            BlackJackJsonState.AllPlayersHaveBet = true;
             foreach (KeyValuePair<string, BlackJackPlayer> player in Players)
                 if (player.Key != "Dealer" && player.Value.NotPlaying == false)
                     DrawCard(player.Key);

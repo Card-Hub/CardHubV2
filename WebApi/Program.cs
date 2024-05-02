@@ -53,7 +53,7 @@ builder.Services.AddSingleton<GameService>();
 builder.Services.AddTransient<CahGame>();
 builder.Services.AddSingleton<CahFactory>();
 builder.Services.AddSingleton<IDictionary<string, CahGame>>(_ => new ConcurrentDictionary<string, CahGame>());
-builder.Services.AddSingleton<IDictionary<string, BlackJackMessenger>>
+builder.Services.AddSingleton<IDictionary<string, BlackJackMessenger>>();
 
 
 
@@ -85,6 +85,11 @@ app.MapHub<CahHub>("/cahhub", options =>
 });
 
 app.MapHub<CahHub>("/unehub", options =>
+{
+    options.AllowStatefulReconnects = true;
+});
+
+app.MapHub<BlackJackHub>("/blackjackhub", options =>
 {
     options.AllowStatefulReconnects = true;
 });

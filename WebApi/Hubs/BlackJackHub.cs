@@ -27,6 +27,7 @@ public class BlackJackHub : Hub
 
     public async Task JoinRoom(ConnectionOptions connectionOptions)
     {
+        string Name = connectionOptions.Name;
         var roomId = connectionOptions.Room;
         if (!TryGetGame(out var game, roomId))
         {
@@ -36,48 +37,25 @@ public class BlackJackHub : Hub
         else
         {
             if (connectionOptions.Name is null) return;
-            if (!game.AddPlayer(ContextId)) return;
+            if (!game.AddPlayer(Name, ContextId)) return;
         }
         
         Context.Items.Add(Room, roomId);
 
         await Groups.AddToGroupAsync(ContextId, roomId);
     }
+
     public async Task StartGame()
     {
         if (!TryGetGame(out var game)) return;
         
-        var playerHands = game.StartGame();
+        game.StartGame();
         
         await Clients.Group(GetRoomId()).SendAsync("GameStarted");
-        foreach (var (player, cards) in playerHands)
-        {
-            await Clients.Client(player).SendAsync("ReceiveCards", cards);
-        }
-    }
-    
-    public async Task SendCards(List<CahCard> cards)
-    {
-        if (!TryGetGame(out var game)) return;
-        if (!game.PlayCards(ContextId, cards)) return;
-
-        await Clients.Client(ContextId).SendAsync("CardsPlayed", cards);
-    }
-
-    public async Task Gamble(CahCard pickedCard, CahCard gambledCard)
-    {
-        if (!TryGetGame(out var game)) return;
-        if (!game.Gamble(ContextId, pickedCard, gambledCard)) return;
-
-        await Clients.Client(ContextId).SendAsync("Gambled", pickedCard, gambledCard);
-    }
-
-    public async Task SendWinner(string winner)
-    {
-        if (!TryGetGame(out var game)) return;
-        if (!game.SelectWinner(ContextId, winner)) return;
-
-        await Clients.Group(GetRoomId()).SendAsync("ReceiveWinner", winner);
+        // foreach (var (player, cards) in playerHands)
+        // {
+        //     await Clients.Client(player).SendAsync("ReceiveCards", cards);
+        // }
     }
 
     public async Task Ping() => await Clients.Caller.SendAsync("Pong");
@@ -86,7 +64,7 @@ public class BlackJackHub : Hub
   
     #region Helpers
     
-    private bool TryGetGame(out CahGame game, string? roomId = null)
+    private bool TryGetGame(out BlackJackGame game, string? roomId = null)
     {
         roomId ??= GetRoomId();
         return _games.TryGetValueAs(roomId, out game);

@@ -51,6 +51,7 @@ declare global {
     }
     
     interface BlackJackPlayer extends Player {
+        strConn: string
         Hand: StandardCard[]
         CurrentScore: number
         TotalMoney: number
@@ -62,7 +63,6 @@ declare global {
         StillPlaying: boolean
         Standing: boolean
         PickingWildColor: boolean;
-        Hand: UNOCard[];
     }
 
     interface CahCard {

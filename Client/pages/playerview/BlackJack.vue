@@ -53,16 +53,11 @@ const stand = () => {
 }
 
 const getUserIcon = () => {
-  // iterate through players to find the user's avatar
-  // let userIcon = "";
-  // players.value.forEach(p => { if (p.Name === user.value) { userIcon = p.Avatar; } });
-  //
-  // return new URL(`../../assets/icons/avatars/${userIcon}.png`, import.meta.url);
   return new URL(`../../assets/icons/avatars/lyssie.png`, import.meta.url);
 };
 
 const findPlayerByName = (userConn: string) => {
-      return players.value.find(player => player.Namee === user);
+      return players.value.find(player => player.strConn === user);
 };
 
 </script>

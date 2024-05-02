@@ -61,8 +61,7 @@ const getUserIcon = () => {
   return new URL(`../../assets/icons/avatars/lyssie.png`, import.meta.url);
 };
 
-const findPlayerByName = (userConn: string) {
-      // Find player object in Players array based on player's name
+const findPlayerByName = (userConn: string) => {
       return players.value.find(player => player.Namee === user);
 };
 

@@ -31,6 +31,8 @@ const whiteCards = ref<CahCard[]>([
   { text: 'uhhhh', type: CahType.White }
 ]);
 
+const blackCard = ref<CahCard>({ text: 'Hello', type: CahType.Black });
+
 const currentPlayer = ref<string>("lyssie");
 const dealersTurn = ref<boolean>(false);
 
@@ -104,6 +106,13 @@ const isCurrentPlayer = (player: string) => {
   }
 };
 
+const cardBlackStyle = () => {
+  return {
+    transform: `translate(0%, 0%) rotate(0deg)`,
+    zIndex: 1
+  };
+};
+
 const getCARD = () => {
   return new URL(`../../assets/icons/standardDeck/diamonds.svg`, import.meta.url);
 };
@@ -121,7 +130,7 @@ const getCARD = () => {
 <!--      </div>-->
       
       <div>
-        <CahDisplay 
+        <CahDisplay :card="blackCard" :style="cardBlackStyle()" />
         <CahDisplay v-for="(card, index) in whiteCards" :key="index" :card="card" :style="cardStyle(index)" />
       </div>
       

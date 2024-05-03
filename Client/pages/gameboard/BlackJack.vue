@@ -3,13 +3,16 @@ import { ref } from "vue";
 import { storeToRefs } from "pinia";
 
 
+
 import StandardnoshadowCard from "~/components/noShadowCard/StandardnoshadowCard.vue";
 import StandardCardDisplay from "~/components/Card/StandardCardDisplay.vue";
 
 const store = useBlackJackStore();
+const baseStore = useBlackJackStore();
 
-const { players, currentPlayer, winners, losers, stalemates, user, allPlayersHaveBet } = storeToRefs(store);
 
+const { winners, losers, stalemates, user} = storeToRefs(store);
+const {currentPlayer, players, allPlayersHaveBet } = storeToRefs(store);
 // const {startGame} = store;
 
 //fulscreen
@@ -27,11 +30,6 @@ const dealerCards = ref<StandardCard[]>([
 //reverse dealer cards
 dealerCards.value.reverse();
 
-// const currentPlayer = ref<string>("lyssie");
-// const dealersTurn = ref<boolean>(false);
-
-//const currentColor = ref<string>("red");
-// const { currentColor, players, currentPlayer, discardPile  } = storeToRefs(uneStore);
 const getCardStyle = (index: number) => {
   let randomX = index * 50;
   let randomY = index * 3;
@@ -56,6 +54,10 @@ const getPlayerIcon = (player: string) => {
   return new URL(`../../assets/icons/avatars/${ player }.png`, import.meta.url);
 };
 
+
+const findPlayerByID = (userConn: string) => {
+      return players.value.find(player => player.strConn === userConn);
+};
 
 const getPlayerIconStyle = (index: number) => {
   const totalPlayers = players.value.length;
@@ -121,8 +123,13 @@ const getCARD = () => {
 
           </div-->
           <div class="!dealersTurn"></div>
-          <StandardnoshadowCard :card="dealerCards[0]" class="standardCardDisplay"/>
-          <StandardnoshadowCard :card="dealerCards[1]" class="standardCardDisplay"/>
+          <!--StandardnoshadowCard :card="dealerCards[0]" class="standardCardDisplay"/>
+          <StandardnoshadowCard :card="dealerCards[1]" class="standardCardDisplay"/-->
+            <div v-if = "allPlayersHaveBet === true" class="flex flex-row">
+              <div v-for = "card1 in findPlayerByID('Dealer')?.Hand">
+              <StandardnoshadowCard :card="card1" class="standardCardDisplay"/>
+            </div>
+            </div>
           <div class="deck-card flex justify-center items-center bg-zinc-800 rounded-md shadow-md mb-2">
             <img :src="getCARD()" alt="game icon" class="une-logo"/>
           </div>

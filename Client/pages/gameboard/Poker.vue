@@ -3,12 +3,12 @@ import {useUneStore} from "~/stores/uneStore";
 import {type ConfigurableDocument, type MaybeElementRef, useFullscreen } from '@vueuse/core';
 import {defineComponent, ref, onMounted, type ComputedRef, type Ref, computed} from "vue";
 import {storeToRefs} from "pinia";
-import {useWebSocketStore} from "~/stores/webSocketStore";
+// import {useWebSocketStore} from "~/stores/webSocketStore";
 
 import StandardnoshadowCard from "~/components/noShadowCard/StandardnoshadowCard.vue";
 import StandardCardDisplay from "~/components/Card/StandardCardDisplay.vue";
 
-const store = useWebSocketStore();
+// const store = useWebSocketStore();
 const {user, users, room, connection} = storeToRefs(store);
 const {startGame} = store;
 // uncomment these out later

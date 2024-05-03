@@ -5,10 +5,10 @@ import UNOCardDisplay from "~/components/Card/UNECardDisplay.vue";
 import StandardCardDisplay from "~/components/Card/StandardCardDisplay.vue";
 
 import { storeToRefs } from "pinia";
-import { useWebSocketStore } from "~/stores/webSocketStore";
+// import { useWebSocketStore } from "~/stores/webSocketStore";
 import AznflushRules from "~/components/gameRules/AznflushRules.vue";
 
-const store = useWebSocketStore();
+// const store = useWebSocketStore();
 const { connection, isConnected, messages, user, room } = storeToRefs(store);
 const { tryCreateRoom, tryJoinRoom, sendGameType } = store;
 

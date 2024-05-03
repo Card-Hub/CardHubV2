@@ -2,10 +2,10 @@
 import { ref } from 'vue';
 import StandardCardDisplay from './Card/StandardCardDisplay.vue';
 import UNOCardDisplay from "~/components/Card/UNECardDisplay.vue";
-import { useWebSocketStore } from "~/stores/webSocketStore";
+// import { useWebSocketStore } from "~/stores/webSocketStore";
 import { storeToRefs } from "pinia";
 
-const store = useWebSocketStore();
+// const store = useWebSocketStore();
 const { connection, isConnected, cards, messages, users, user, room } = storeToRefs(store);
 const { tryJoinRoom, sendCard, drawCard } = store;
 

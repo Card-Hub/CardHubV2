@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import { useWebSocketStore } from "~/stores/webSocketStore";
+// import { useWebSocketStore } from "~/stores/webSocketStore";
 
 // const { $api } = useNuxtApp();
 
-const store = useWebSocketStore();
+// const store = useWebSocketStore();
 const { cards, users, user, timer } = storeToRefs(store);
 const { tryJoinRoom, sendCard, drawCard } = store;
 

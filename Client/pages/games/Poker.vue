@@ -4,11 +4,11 @@ import TabMenu from 'primevue/tabmenu';
 import StandardCardDisplay from "~/components/Card/StandardCardDisplay.vue";
 
 import { storeToRefs } from "pinia";
-import { useWebSocketStore } from "~/stores/webSocketStore";
+// import { useWebSocketStore } from "~/stores/webSocketStore";
 import {navigateTo} from "nuxt/app";
 import PokerRules from "~/components/gameRules/PokerRules.vue";
 
-const store = useWebSocketStore();
+// const store = useWebSocketStore();
 const { connection, isConnected, messages, user, room } = storeToRefs(store);
 const { tryCreateRoom, tryJoinRoom, sendGameType } = store;
 

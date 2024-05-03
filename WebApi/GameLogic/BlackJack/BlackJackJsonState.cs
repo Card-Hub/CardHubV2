@@ -18,8 +18,7 @@ public class BlackJackJsonState {
     public string State;
     public bool AllPlayersHaveBet;
     public bool GameStarted;
-
-
+    public bool DealersTurn;
     // add lot of button code here
     public BlackJackJsonState() {
         GameType = "Black Jack";
@@ -32,6 +31,7 @@ public class BlackJackJsonState {
         State = "";
         AllPlayersHaveBet = false;
         GameStarted = false;
+        DealersTurn = false;
     }
     public void Update(BlackJackGame game) {
         PlayerNames = game.GetPlayerList();

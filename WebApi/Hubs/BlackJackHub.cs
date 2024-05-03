@@ -59,6 +59,12 @@ public class BlackJackHub : Hub
     }
 
 
+    public async Task RestartBlackJackHub()
+    {
+        if (!TryGetGame(out var game)) return;
+        game.Restart();
+    }
+
     public async Task StartGame()
     {
         if (!TryGetGame(out var game)) return;

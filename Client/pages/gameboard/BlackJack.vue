@@ -8,11 +8,12 @@ import StandardnoshadowCard from "~/components/noShadowCard/StandardnoshadowCard
 import StandardCardDisplay from "~/components/Card/StandardCardDisplay.vue";
 
 const store = useBlackJackStore();
-const baseStore = useBlackJackStore();
+const baseStore = useBaseStore();
 
 
 const { winners, losers, stalemates, user} = storeToRefs(store);
 const {currentPlayer, players, dealersTurn, allPlayersHaveBet } = storeToRefs(store);
+const {users} = storeToRefs(baseStore);
 const  {restart} = store;
 // const {startGame} = store;
 
@@ -113,10 +114,10 @@ const getCARD = () => {
   <div class="gameboard-container">
     <div class="gameboard">
       <div class="player-icons">
-        <div class="player-icon" v-for="(player, index) in players" :key="index"
+        <div class="player-icon" v-for="(player, index) in users" :key="index"
              :style="{ ...getPlayerIconStyle(index), ...isCurrentPlayer(player.Name) }">
-          <img :src="getPlayerIcon(player.Avatar)" alt="Player Icon" class="player-icon-img"/>
-          <p class="player-name"> {{ player.Name }} </p>
+          <img :src="getPlayerIcon(player.avatar)" alt="Player Icon" class="player-icon-img"/>
+          <p class="player-name"> {{ player.name }} </p>
         </div>
       </div>
       <div class="game-table rounded-tr-full shadow-lg">

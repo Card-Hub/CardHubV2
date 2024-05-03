@@ -71,6 +71,8 @@ public class BlackJackGame : IBaseGame<StandardCard>
             state = "TakingBets";
             Console.WriteLine("\n\nim here now changing state to taking bets\n\n");
             // await _messenger.SendFrontendJson(GetAllConnStrsIncGameboard(), GetGameState());
+            BlackJackJsonState.Update(this);
+            _messenger.SendFrontendJson(GetAllConnStrsIncGameboard(), GetGameState());
             return true;
         }
         Console.WriteLine("Not all players have made bets yet");
@@ -92,6 +94,8 @@ public class BlackJackGame : IBaseGame<StandardCard>
             BlackJackJsonState.Winners.Clear();
             BlackJackJsonState.Losers.Clear();
             BlackJackJsonState.Stalemates.Clear();
+            BlackJackJsonState.AllPlayersHaveBet = false;
+            BlackJackJsonState.DealersTurn = false;
             PlayerOrder.BackToFirstPlayer();
             BlackJackJsonState.Update(this);
             _messenger.SendFrontendJson(GetAllConnStrsIncGameboard(), GetGameState());
@@ -289,6 +293,7 @@ public class BlackJackGame : IBaseGame<StandardCard>
 
     public bool MakeListsAndPayPlayers(){
         if (state == "MakeListsAndPayPlayers"){
+            BlackJackJsonState.DealersTurn = true;
             foreach (KeyValuePair<string, BlackJackPlayer> player in Players) {
                 if (player.Key != "Dealer" && player.Value.NotPlaying == false) {
                     if (player.Value.CurrentScore > Players["Dealer"].CurrentScore && player.Value.Busted == false || Players["Dealer"].Busted && player.Value.Busted == false) {
@@ -306,6 +311,8 @@ public class BlackJackGame : IBaseGame<StandardCard>
                 } else
                     continue;
             }
+            BlackJackJsonState.Update(this);
+            _messenger.SendFrontendJson(GetAllConnStrsIncGameboard(), GetGameState());
             state = "Restart";//send the strings here to frontend to parse.
             return true;
         }else {
@@ -322,7 +329,7 @@ public class BlackJackGame : IBaseGame<StandardCard>
 
     public bool DealersTurn(){//dealer draws cards
         if (state == "DealersTurn") {
-            
+
             Console.WriteLine("im if statement dealersturn");
             int score = GetPlayerScoreFromGame("Dealer");
             int x = 0;

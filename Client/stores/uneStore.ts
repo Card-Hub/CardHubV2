@@ -47,6 +47,13 @@ export const useUneStore = defineStore("une", () => {
           log("Received json");
           parseJson(json);
       });
+        gameConnection.on("ReceiveError", (errorMessage: string) => {
+          toast.add({
+                  severity: "contrast",
+                  summary: errorMessage,
+                  life: 5000
+                });
+        });
     };
 
 
@@ -78,7 +85,24 @@ export const useUneStore = defineStore("une", () => {
       log("Clicked Start Game");
       await gameConnection.value?.invoke("StartGame");
     }
-    
+
+    //
+    const drawCard = async() : Promise<void> => {
+      log("Clicked Draw");
+      await gameConnection.value?.invoke("DrawCard");
+    }
+    const pressUne = async() : Promise<void> => {
+      log("Clicked Une");
+      await gameConnection.value?.invoke("PressUne");
+    }
+    const selectWildColor = async(color: string) : Promise<void> => {
+      log("Selected wild color ${color}");
+      await gameConnection.value?.invoke("SelectWildColor", color);
+    }
+    const playCard = async(cardJson: string) : Promise<void> => {
+      log("Drew wild color ${color}");
+      await gameConnection.value?.invoke("PlayCard", cardJson);
+    }
 
     //
 
@@ -129,6 +153,10 @@ export const useUneStore = defineStore("une", () => {
 
         startGame,
         parseJson,
+        drawCard,
+        selectWildColor,
+        pressUne,
+        playCard,
         gameType,
         gameStarted,
         currentColor,

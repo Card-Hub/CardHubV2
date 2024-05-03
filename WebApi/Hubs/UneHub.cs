@@ -4,6 +4,7 @@ using WebApi.GameLogic;
 using WebApi.GameLogic.LyssieUno;
 using WebApi.Models;
 using WebApi.Services;
+using Newtonsoft.Json;
 
 namespace WebApi.Hubs;
 
@@ -70,6 +71,48 @@ public class UneHub : Hub
         //{
         //    await Clients.Client(player).SendAsync("ReceiveCards", cards);
         //}
+    }
+    public async Task DrawCard()
+    {
+        if (!TryGetGame(out var game)) return;
+        await game.DrawCard(ContextId);
+    }
+    public async Task SelectWildColor(string color)
+    {
+        UnoColorLyssie colorEnum = UnoColorLyssie.Black;
+        if (!TryGetGame(out var game)) return;
+        switch (color.ToLower()) {
+          case "red":
+            colorEnum = UnoColorLyssie.Red;
+            break;
+          case "blue":
+            colorEnum = UnoColorLyssie.Blue;
+            break;
+          case "green":
+            colorEnum = UnoColorLyssie.Green;
+            break;
+          case "yellow":
+            colorEnum = UnoColorLyssie.Yellow;
+            break;
+          default:
+            break;
+        }
+        await game.SelectWild(ContextId, colorEnum);
+    }
+
+    public async Task PressUne() {
+      if (!TryGetGame(out var game)) return;
+      await game.PressUne(ContextId);
+    }
+    public async Task PlayCard(string cardJson) {
+      // correct for DrawTwo lmao
+      string newCardJson = cardJson;
+      newCardJson = newCardJson.Replace("Draw Two", "DrawTwo");
+      newCardJson = newCardJson.Replace("Wild Draw Four", "WildDrawFour");
+      newCardJson = newCardJson.Replace("Skip All", "SkipAll");
+      UnoCardModLyssie card = JsonConvert.DeserializeObject<UnoCardModLyssie>(newCardJson);
+      if (!TryGetGame(out var game)) return;
+      await game.PlayCard(ContextId, card);
     }
     
     // await _hubContext.Clients.Group(Room).SendAsync("ReceiveBlackCard", _currentBlackCard);

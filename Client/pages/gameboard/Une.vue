@@ -184,14 +184,6 @@ const handleExit = () => {
 </script>
 
 <template>
-  <div class="player-icon" v-for="(player, index) in players" :key="index"
-        :style="{ ...getPlayerIconStyle(index), ...isCurrentPlayer(player.Name) }">
-        <p >{{ player.Avatar }}</p>
-          <!--<img :src="getPlayerIcon(player.Avatar)" alt="Player Icon" class="player-icon-img"/>-->
-          
-<!--          <p> {{ players[index].Name.length }}</p>-->
-        <!--</div>-->
-  </div>
   <!--  <p> {{ currentPlayer }}</p>-->
   <!--  <p> {{ discardPile }}</p>-->
   <!--  <p> {{ discardedCardsToDisplay }}</p>-->
@@ -201,9 +193,8 @@ const handleExit = () => {
       <div class="player-icons grid grid-cols-2 content-center">
         <div class="player-icon" v-for="(player, index) in players" :key="index"
         :style="{ ...getPlayerIconStyle(index), ...isCurrentPlayer(player.Name) }">
-        <p>{{player.Avatar}}</p>
           <img :src="getPlayerIcon(player.Avatar)" alt="Player Icon" class="player-icon-img"/>
-          
+          <p>Hi</p>
 <!--          <p> {{ players[index].Name.length }}</p>-->
         </div>
       </div>

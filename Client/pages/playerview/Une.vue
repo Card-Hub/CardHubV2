@@ -30,6 +30,7 @@
   //const { playCard, selectColor, drawCard, pressUne } = store;
   const uneStore = useUneStore();
   const { winner, currentPlayer, players, discardPile, someoneNeedsToSelectColor, playerWhoHasPrompt, currentColor } = storeToRefs(uneStore);
+  const { drawCard, selectWildColor, pressUne, playCard} = uneStore;
  interface Player {
          Name: string
          Avatar: string
@@ -139,17 +140,17 @@
   //  await navigateTo("/join");
   };
   
-  const isCurrentPlayer = () => {
-    if (user.value !== currentPlayer.value) {
-      toast.add({
-        severity: "error",
-        summary: "It's not your turn!",
-        detail: "Please wait for your turn to play!",
-        life: 5000
-      });
-    }
+  //const isCurrentPlayer = () => {
+  //  if (user.value !== currentPlayer.value) {
+  //    toast.add({
+  //      severity: "error",
+  //      summary: "It's not your turn!",
+  //      detail: "Please wait for your turn to play!",
+  //      life: 5000
+  //    });
+  //  }
     
-  };
+  //};
 
   const canBePlayed = (card: UNOCard) => {
     return card.Color.toLowerCase() === currentColor.value.toLowerCase() || card.Value.toLowerCase() === discardPile.value[discardPile.value.length - 1].Value.toLowerCase() || card.Color.toLowerCase() === 'black';
@@ -159,7 +160,6 @@
 
 
 <template>
-  <p class="text-white"> kkkk {{ user }}</p>
   <div class="playerview-une-container w-full p-6">
     <Toast/>
     
@@ -219,7 +219,7 @@
                       :key="card.Id"
                       :card="card"
                       :isSelected="canBePlayed(card) && currentPlayer === user"
-                      @click="{...playCard(JSON.stringify(card)), ...isCurrentPlayer()}"
+                      @click="playCard(JSON.stringify(card))"
       />
     </div>
 
@@ -256,10 +256,10 @@
     <div v-if="winner==='' && someoneNeedsToSelectColor && currentPlayer === user && someoneNeedsToSelectColor" class="select-color">
       <h2>Select a Color</h2>
       <div class="select-color-inner">
-        <Button class="red-button color-button" @click="selectColor('red')">Red</Button>
-        <Button class="green-button color-button" @click="selectColor('green')">Green</Button>
-        <Button class="blue-button color-button" @click="selectColor('blue')">Blue</Button>
-        <Button class="yellow-button color-button" @click="selectColor('yellow')">Yellow</Button>
+        <Button class="red-button color-button" @click="selectWildColor('red')">Red</Button>
+        <Button class="green-button color-button" @click="selectWildColor('green')">Green</Button>
+        <Button class="blue-button color-button" @click="selectWildColor('blue')">Blue</Button>
+        <Button class="yellow-button color-button" @click="selectWildColor('yellow')">Yellow</Button>
       </div>
     </div>
   </div>

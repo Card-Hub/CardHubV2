@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { storeToRefs } from "pinia";
+import { CahType } from "~/types";
 
-import { useBaseStore } from "~/stores/baseStore";
-import { useCahStore } from "~/stores/cahStore";
-import CahDisplay from "~/components/Card/CahDisplay.vue";
-// get players from store
+
 const baseStore = useBaseStore();
 const { isPlayer, messages, users, room, user, currentAvatar } = storeToRefs(baseStore);
+
 const cahStore = useCahStore();
 const {} = storeToRefs(cahStore);
 
@@ -20,11 +19,6 @@ const getPrimeIcon = (name: string) => {
   return new URL(`../../assets/icons/primeIcons/${ name }.svg`, import.meta.url);
 };
 
-const enum CahType {
-  White,
-  Black
-}
-
 const whiteCards = ref<CahCard[]>([
   { text: 'Hello', type: CahType.White },
   { text: 'UR mom', type: CahType.White },
@@ -36,8 +30,7 @@ const blackCard = ref<CahCard>({ text: 'Hello', type: CahType.Black });
 const currentPlayer = ref<string>("lyssie");
 const dealersTurn = ref<boolean>(false);
 
-//const currentColor = ref<string>("red");
-// const { currentColor, players, currentPlayer, discardPile  } = storeToRefs(uneStore);
+
 const getCardStyle = (index: number) => {
   let randomX = index * 50;
   let randomY = index * 3;
@@ -60,39 +53,6 @@ const cardStyle = (num: number) => {
 
 const getPlayerIcon = (player: string) => {
   return new URL(`../../assets/icons/avatars/${ player }.png`, import.meta.url);
-};
-
-
-const getPlayerIconStyle = (index: number) => {
-  const totalPlayers = players.value.length;
-  let xpos = 0;
-  let ypos = 0;
-
-  if (totalPlayers === 2) {
-    xpos = index === 0 ? 50 : -51;
-    ypos = index === 0 ? -350 : 350;
-  } else if (totalPlayers === 3) {
-    xpos = index === 0 ? 151 : index === 1 ? -276 : 251;
-    ypos = index === 0 ? -350 : index === 1 ? 350 : 350;
-  } else if (totalPlayers === 4) {
-    xpos = index === 0 ? 150 : index === 1 ? -456 : index === 2 ? -56 : 356;
-    ypos = index === 0 ? -350 : index === 1 ? 0 : index === 2 ? 350 : 0;
-  } else if (totalPlayers === 5) {
-    xpos = index === 0 ? 225 : index === 1 ? -475 : index === 2 ? -251 : index === 3 ? 151 : 375;
-    ypos = index === 0 ? -300 : index === 1 ? 0 : index === 2 ? 300 : index === 3 ? 300 : 0;
-  } else if (totalPlayers === 6) {
-    xpos = index === 0 ? 500 : index === 1 ? -70 : index === 2 ? -525 : index === 3 ? -300 : index === 4 ? 60 : 325;
-    ypos = index === 0 ? -300 : index === 1 ? -300 : index === 2 ? 0 : index === 3 ? 300 : index === 4 ? 300 : 0;
-  } else if (totalPlayers === 7) {
-    xpos = index === 0 ? 550 : index === 1 ? -25 : index === 2 ? -425 : index === 3 ? -530 : index === 4 ? -350 : index === 5 ? 0 : 265;
-    ypos = index === 0 ? -300 : index === 1 ? -300 : index === 2 ? -150 : index === 3 ? 150 : index === 4 ? 300 : index === 5 ? 300 : 0;
-  } else if (totalPlayers === 8) {
-    xpos = index === 0 ? 600 : index === 1 ? 30 : index === 2 ? -375 : index === 3 ? -475 : index === 4 ? -300 : index === 5 ? 50 : index === 6 ? 265 : 150;
-    ypos = index === 0 ? -300 : index === 1 ? -300 : index === 2 ? -150 : index === 3 ? 150 : index === 4 ? 300 : index === 5 ? 300 : index === 6 ? 150 : -150;
-  }
-  return {
-    transform: `translate(${ xpos }%, ${ ypos }%)`
-  };
 };
 
 const isCurrentPlayer = (player: string) => {
@@ -133,9 +93,6 @@ const getCARD = () => {
         <CahDisplay :card="blackCard" :style="cardBlackStyle()" />
         <CahDisplay v-for="(card, index) in whiteCards" :key="index" :card="card" :style="cardStyle(index)" />
       </div>
-      
-
-
     </div>
   </div>
 

@@ -1,25 +1,23 @@
 <script setup lang="ts">
 
-import { storeToRefs } from "pinia";
-import AvatarSelection from "~/components/AvatarSelection.vue";
 import dialog from 'primevue/dialog';
-import Chat from "~/components/Chat.vue";
 import { GameType } from "~/types";
+import { ref, computed, onMounted } from "vue";
+import { storeToRefs } from "pinia";
 import {useBaseStore} from "~/stores/baseStore";
 import {useCahStore} from "~/stores/cahStore";
+import Dialog from "primevue/dialog";
+
 
 const { $gameToString } = useNuxtApp();
 
-import {ref, computed, onMounted} from "vue";
-import CahDisplay from "~/components/Card/CahDisplay.vue";
-import Dialog from "primevue/dialog";
 const baseStore = useBaseStore();
 const { isPlayer, messages, users, room, currentAvatar } = storeToRefs(baseStore);
 const {  } = baseStore;
 
 const cahStore = useCahStore();
 const { gameStarted } = storeToRefs(cahStore);
-const { ping } = cahStore;
+const { ping, startGame } = cahStore;
 
 
 import sillyFun from '../../assets/audio/music/sillyFun.mp3';
@@ -166,9 +164,6 @@ const convertBase = (player: CahPlayer) => {
       </p>
 
       <AvatarSelection class="align-center"/>
-      <div class="">
-        <Button class="mt-5" @click="playerStart" v-if="true">Join Game</Button>
-      </div>
     </div>
 
     <div v-else-if="!isPlayer" class="flex min-h-screen">
@@ -203,7 +198,7 @@ const convertBase = (player: CahPlayer) => {
           <p class="text-6xl">
             {{ room }}
           </p>
-          <Button class="mt-48" @click="gameboardStart">Start Game</Button>
+          <Button class="mt-48" @click="startGame">Start Game</Button>
         </div>
       </div>
       <div class="flex flex-col w-1/3">

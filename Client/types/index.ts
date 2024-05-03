@@ -91,7 +91,7 @@ declare global {
     }
 }
 
-export const enum CahType {
+export enum CahType {
     White,
     Black
 }

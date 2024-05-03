@@ -95,6 +95,9 @@ watch(gameStarted, (value) => {
 });
 
 const gameboardStart = async () => {
+  //stop music
+  bgMusic.loop = false;
+  bgMusic.pause();
   startGame();
   await navigateTo("/gameboard/" + $gameToString(GameType.Une));
 }
@@ -134,11 +137,6 @@ const kickPlayer = (user: BasePlayer) => {
 //}
 
 
-
-
-
-
-//import CahDisplay from "~/components/Card/CahDisplay.vue";
 
 
 
@@ -219,11 +217,11 @@ const getIconGivenName = (name: string) => {
           <SvgoStandardDeckSpades class="suit w-80 h-80 absolute z-0 bottom-12 -left-24 rotate-[-20deg]" :fontControlled="false" filled/>
 
           <div class="m-8 flex flex-col gap-4">
-            <div v-for="lobbyUser in lobbyUsers as LobbyUser[]" class="rounded-full flex card items-center justify-content h-16 w-full justify-between">
+            <div v-for="lobbyUser in users" class="rounded-full flex card items-center justify-content h-16 w-full justify-between">
               <!--<i class="pi pi-user mx-4 text-neutral-300" style="font-size: 1.5rem"></i>-->
               <div class="flex flex-row  items-center">
-                <img :src="getIcon(lobbyUser.Avatar)" alt="avatar Icon" class="lobby-player-icon-img">
-                <span class="text-2xl text-neutral-300 ">{{ lobbyUser.Name }} </span>
+                <img :src="getIcon(lobbyUser.avatar)" alt="avatar Icon" class="lobby-player-icon-img">
+                <span class="text-2xl text-neutral-300 ">{{ lobbyUser.name }} </span>
               </div>
               <Button class="kick-btn" @click="kickPlayer(lobbyUser)"> Kick </Button>
             </div>
@@ -233,7 +231,7 @@ const getIconGivenName = (name: string) => {
       <div class="flex justify-center w-1/3">
         <div class="flex flex-col items-center">
           <h1 class="text-6xl">
-            {{ gameType }}
+            UNE
           </h1>
           <p class="mt-24 text-xl">
             Room Code

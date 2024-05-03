@@ -73,7 +73,7 @@ public class UnoGameModLyssie
 
       foreach (var player in _playerOrder.GetPlayers(LyssiePlayerStatus.Active))
       {
-          var drawnCards = _deck.Draw(2);
+          var drawnCards = _deck.Draw(7);
           _players[player].AddCards(drawnCards);
       }
 

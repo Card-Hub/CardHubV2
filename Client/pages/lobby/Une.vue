@@ -16,6 +16,7 @@ const {  } = baseStore; // ??
 const uneStore = useUneStore();
 const { ping } = uneStore;
 const { startGame } = uneStore;
+const { gameStarted } = storeToRefs(uneStore);
 //const { gameType, gameStarted } = storeToRefs(uneStore);
 const { $gameToString } = useNuxtApp();
 // will allow for a popup of the chat
@@ -34,6 +35,16 @@ const visible = ref(false);
 //import AvatarSelection from "~/components/AvatarSelection.vue";
 //import dialog from 'primevue/dialog';
 //import Chat from "~/components/Chat.vue";
+
+watch(gameStarted, (value) => {
+  if (value) {
+    if (isPlayer.value) {
+      playerStart();
+    } else {
+      gameboardStart();
+    }
+  }
+});
 
 const gameboardStart = async () => {
   startGame();

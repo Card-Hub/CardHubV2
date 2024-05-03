@@ -55,7 +55,8 @@ const cardStyle = (num: number) => {
 };
 
 const getPlayerIcon = (player: string) => {
-  return new URL(`../../assets/icons/avatars/${player}.png`, import.meta.url);
+  if (player != "") { return new URL(`../../assets/icons/avatars/${player}.png`, import.meta.url); }
+  else { return new URL(`../../assets/icons/avatars/amongusNugget.png`, import.meta.url);}
 };
 
 const discardedCardsToDisplay = computed(() => {
@@ -183,6 +184,14 @@ const handleExit = () => {
 </script>
 
 <template>
+  <div class="player-icon" v-for="(player, index) in players" :key="index"
+        :style="{ ...getPlayerIconStyle(index), ...isCurrentPlayer(player.Name) }">
+        <p >{{ player.Avatar }}</p>
+          <!--<img :src="getPlayerIcon(player.Avatar)" alt="Player Icon" class="player-icon-img"/>-->
+          
+<!--          <p> {{ players[index].Name.length }}</p>-->
+        <!--</div>-->
+  </div>
   <!--  <p> {{ currentPlayer }}</p>-->
   <!--  <p> {{ discardPile }}</p>-->
   <!--  <p> {{ discardedCardsToDisplay }}</p>-->
@@ -191,7 +200,8 @@ const handleExit = () => {
     <div class="gameboard">
       <div class="player-icons grid grid-cols-2 content-center">
         <div class="player-icon" v-for="(player, index) in players" :key="index"
-             :style="{ ...getPlayerIconStyle(index), ...isCurrentPlayer(player.Name) }">
+        :style="{ ...getPlayerIconStyle(index), ...isCurrentPlayer(player.Name) }">
+        <p>{{player.Avatar}}</p>
           <img :src="getPlayerIcon(player.Avatar)" alt="Player Icon" class="player-icon-img"/>
           
 <!--          <p> {{ players[index].Name.length }}</p>-->

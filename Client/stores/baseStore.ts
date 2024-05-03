@@ -79,12 +79,14 @@ export const useBaseStore = defineStore("base", () => {
         }
     };
 
-    const tryConnectPlayer = async (user: string, room: string, gameType: GameType, callback: any): Promise<boolean> => {
+    const tryConnectPlayer = async (user1: string, room: string, gameType: GameType, callback: any): Promise<boolean> => {
         try {
-            const options: ConnectionOptions = { name: user, room: room };
+            const options: ConnectionOptions = { name: user1, room: room };
             const baseConnect = await joinRoom(options, gameType);
             const gameConnect = await joinRoom(options, gameType, callback);
 
+            // added!
+            user.value = user1;
             if (!baseConnect || !gameConnect) {
                 log("Failed to connect to server");
                 console.log("Base: ", baseConnect, "Game: ", gameConnect)

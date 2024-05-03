@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import {defineComponent, ref, onMounted, type ComputedRef, type Ref, computed} from "vue";
   import {storeToRefs} from "pinia";
-  import {useWebSocketStore} from "~/stores/webSocketStore";
+  import { useBaseStore } from "#imports";
   import toast from "@/utils/toast";
 
   import { type ConfigurableDocument, type MaybeElementRef, useFullscreen } from '@vueuse/core';
@@ -25,9 +25,9 @@
   const chatVisible = ref(false); // for popup dialog https://primevue.org/avatar/ for chat notification
   // const sideScroll= ref(false); // for scrolling view or all cards are viewable on screen by scrolling down
 
-  const store = useWebSocketStore(); 
-  const {user, users, room, connection } = storeToRefs(store);
-  const { playCard, selectColor, drawCard, pressUne } = store;
+  const baseStore = useBaseStore(); 
+  const {user, users, room } = storeToRefs(baseStore);
+  //const { playCard, selectColor, drawCard, pressUne } = store;
   const uneStore = useUneStore();
   const { winner, currentPlayer, players, discardPile, someoneNeedsToSelectColor, playerWhoHasPrompt, currentColor } = storeToRefs(uneStore);
  interface Player {
@@ -131,12 +131,12 @@
   };
   
   const handleExit = async () => {
-    // store.leaveRoom();
-    connection.value = null;
-    room.value = '';
+  //  // store.leaveRoom();
+  //  connection.value = null;
+  //  room.value = '';
 
-    // redirect to join page
-    await navigateTo("/join");
+  //  // redirect to join page
+  //  await navigateTo("/join");
   };
   
   const isCurrentPlayer = () => {
@@ -159,6 +159,7 @@
 
 
 <template>
+  <p class="text-white"> kkkk {{ user }}</p>
   <div class="playerview-une-container w-full p-6">
     <Toast/>
     

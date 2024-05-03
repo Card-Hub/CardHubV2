@@ -3,6 +3,7 @@ import Dialog from "primevue/dialog";
 import { ref } from "vue";
 import { storeToRefs } from "pinia";
 import { useFullscreen } from "@vueuse/core";
+import { CahType } from "~/types";
 import newPlayer from "assets/audio/soundEffects/newPlayer.mp4";
 import drawCard from "../../assets/audio/soundEffects/drawCard.mp4";
 import newMessage from "../../assets/audio/soundEffects/newMessage.mp4";
@@ -27,6 +28,9 @@ const settingsVisible = ref(false); // for popup dialog
 const baseStore = useBaseStore();
 const { isPlayer, messages, users, room, user, currentAvatar } = storeToRefs(baseStore);
 
+const cahStore = useCahStore();
+const { cards } = storeToRefs(cahStore);
+
 
 const getUserIcon = () => {
   // iterate through players to find the user's avatar
@@ -48,11 +52,6 @@ const handleExit = async () => {
   // redirect to join page
   await navigateTo("/join");
 };
-
-const enum CahType {
-  White,
-  Black
-}
 
 const selectCard = (card: CahCard) => {
   // send card to server
@@ -155,8 +154,6 @@ const seVolumeUp = () => {
             <Chat/>
           </Dialog>
         </div>
-
-        <!--      <i class="pi pi-fw pi-eye" @click="!sideScroll" style="font-size: 2.5rem"></i>-->
       </div>
     </div>
     
@@ -175,47 +172,6 @@ const seVolumeUp = () => {
         </div>
       </div>
     </div>
-
-<!--    <div class="w-full margin-auto">-->
-<!--      <h1 class="text-center">-->
-<!--      <span v-if="currentPlayer === user && winner != user">-->
-<!--          Your Turn!-->
-<!--      </span>-->
-<!--        <span v-if="winner == user">-->
-<!--          You Won!-->
-<!--      </span>-->
-<!--        <span v-if="currentPlayer !== user && winner === ''">{{ currentPlayer }} is playing...-->
-<!--      </span>-->
-<!--        <span v-if="currentPlayer !== user && winner !== ''">-->
-<!--        {{ winner }} won!-->
-<!--      </span>-->
-<!--      </h1>-->
-<!--    </div>-->
-    
-    
-    <!--<div class=" w-full flex overflow-x-auto border-2 border-solid border-[#960E16] border-radius-4 justify-center">
-      <UNOCardDisplay class="uneCard flex-none"
-          v-for="card in myCards"
-                        :key="card.Id"
-                        :card="card"
-                        :isSelected="false"
-          @click="playCard(JSON.stringify(card))"
-          />
-        </div>-->
-    <!--<div v-if="currentPlayer === user && false">
-    </div>-->
-    
-    <!--  winner -->
-<!--    <div v-if="winner!=''" class="winner">-->
-<!--      <div class="winner-inner">-->
-<!--      <span v-if="winner == user">-->
-<!--          You Won!-->
-<!--      </span>-->
-<!--        <span v-if="currentPlayer !== user && winner !== ''">-->
-<!--        {{ winner }} won!-->
-<!--      </span>-->
-<!--      </div>-->
-<!--    </div>-->
     
   </div>
 

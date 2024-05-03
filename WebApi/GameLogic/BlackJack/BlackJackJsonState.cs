@@ -16,6 +16,8 @@ public class BlackJackJsonState {
     public List<string> Losers;
     public List<string> Stalemates;
     public string State;
+    public bool AllPlayersHaveBet;
+    public bool GameStarted;
 
 
     // add lot of button code here
@@ -28,6 +30,8 @@ public class BlackJackJsonState {
         Losers = new();
         Stalemates = new();
         State = "";
+        AllPlayersHaveBet = false;
+        GameStarted = false;
     }
     public void Update(BlackJackGame game) {
         PlayerNames = game.GetPlayerList();

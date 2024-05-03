@@ -1,33 +1,51 @@
 <script setup lang="ts">
 
+
+import { ref, computed } from "vue";
 import { storeToRefs } from "pinia";
-import Une from "~/pages/games/Une.vue";
+//import Une from "~/pages/games/Une.vue";
+import UnoRules from "~/components/gameRules/UneRules.vue";
 import AvatarSelection from "~/components/AvatarSelection.vue";
 import Chat from "~/components/Chat.vue";
-
-const store = useWebSocketStore();
-const { isPlayer, messages, users, room, lobbyUsers } = storeToRefs(store);
-const { sendMessage, startGame } = store;
+import { GameType } from "~/types";
+import {useBaseStore} from "~/stores/baseStore";
+import {useUneStore} from "~/stores/uneStore";
+const baseStore = useBaseStore();
+const { isPlayer, messages, users, room, currentAvatar } = storeToRefs(baseStore);
+const {  } = baseStore; // ??
 const uneStore = useUneStore();
-const { gameType, gameStarted } = storeToRefs(uneStore);
-
-
+const { ping } = uneStore;
+//const { gameType, gameStarted } = storeToRefs(uneStore);
+const { $gameToString } = useNuxtApp();
 // will allow for a popup of the chat
 import dialog from 'primevue/dialog';
-import UnoRules from "~/components/gameRules/UnoRules.vue";
 const visible = ref(false);
 
-const gameboardStart = () => {
-  startGame();
-  navigateTo("/gameboard/" + gameType.value.toLowerCase());
+
+
+//const cahStore = useCahStore();
+
+//const store = useWebSocketStore();
+//const { isPlayer, messages, users, room, lobbyUsers } = storeToRefs(store);
+//const { sendMessage, startGame } = store;
+
+//import { storeToRefs } from "pinia";
+//import AvatarSelection from "~/components/AvatarSelection.vue";
+//import dialog from 'primevue/dialog';
+//import Chat from "~/components/Chat.vue";
+
+const gameboardStart = async () => {
+  // startGame();
+  await navigateTo("/gameboard/" + $gameToString(GameType.Une));
 }
 
 const playerStart = () => {
-  return navigateTo("/playerview/" + gameType.value.toLowerCase());
+  return navigateTo("/playerview/" + $gameToString(GameType.Une));
 }
 
 const getIcon = (avatar: string) => {
-  if (avatar == "" || avatar == null) {
+  if (avatar === "" || avatar == null) {
+    console.log("No avatar found: ", avatar);
     return new URL(`../../assets/icons/avatars/lyssie.png`, import.meta.url);
   }
   else {
@@ -35,12 +53,47 @@ const getIcon = (avatar: string) => {
   }
 };
 
+const kickPlayer = (user: BasePlayer) => {
+  console.log("Kicking player: " + user.name);
+  // send message to server to kick player
+  // BOOT PLAYER HERE
+  //kickPlayer(user);
+}
+
+//const getIconGivenName = (name: string) => {
+//  lobbyUsers.value.forEach(function (user: LobbyUser) {
+//    // console.log(value);
+//    if (user.Name == name) {
+//      return getIcon(user.Avatar);
+//    }else{
+//      return getIcon("lyssie");
+//    }
+//  });
+//  // if that fails
+//  return getIcon("lyssie");
+//}
+
+
+
+
+
+
+//import CahDisplay from "~/components/Card/CahDisplay.vue";
+
+
+
+//const visible = ref(false);
+
+
+
+
+
 const getIconGivenName = (name: string) => {
-  lobbyUsers.value.forEach(function (user: LobbyUser) {
+  users.value.forEach(function (user: BasePlayer) {
     // console.log(value);
-    if (user.Name == name) {
-      return getIcon(user.Avatar);
-    }else{
+    if (user.name === name) {
+      return getIcon(user.avatar);
+    } else {
       return getIcon("lyssie");
     }
   });
@@ -48,13 +101,10 @@ const getIconGivenName = (name: string) => {
   return getIcon("lyssie");
 }
 
-const kickPlayer = (lobbyUser: LobbyUser) => {
-  console.log("Kicking player: " + lobbyUser.Name);
-  // send message to server to kick player
-  // BOOT PLAYER HERE
-  // kickPlayer(lobbyUser);
-}
+
+
 </script>
+
 
 <template>
   <div>
@@ -62,7 +112,7 @@ const kickPlayer = (lobbyUser: LobbyUser) => {
 
       <div class="flex justify-between">
         <h1 >
-          {{ gameType }}
+          Une
         </h1>
         <div class="justify-left">
           <i class="pi pi-fw pi-comment" style="font-size: 2rem" @click="visible = true"></i>
@@ -77,12 +127,12 @@ const kickPlayer = (lobbyUser: LobbyUser) => {
       </p>
 
       <AvatarSelection class="align-center"/>
-      <div v-if="gameStarted" >
-        <NuxtLink to="/gameboard/une" class="mt-5">
+      <!--<div v-if="gameStarted" >--> <!--// just keep this div second button-->
+        <!--<NuxtLink to="/gameboard/une" class="mt-5">-->
           <!--          <Button>Join Game</Button>-->
-        </NuxtLink>
-        <Button class="mt-5" @click="playerStart" v-if="gameStarted">Join Game</Button>
-      </div>
+        <!--</NuxtLink>-->
+        <!--<Button class="mt-5" @click="playerStart" v-if="gameStarted">Join Game</Button>-->
+      <!--</div>-->
     </div>
 
     <div v-else-if="!isPlayer" class="flex min-h-screen">
@@ -133,6 +183,7 @@ const kickPlayer = (lobbyUser: LobbyUser) => {
       Error: No user type found
     </div>
   </div>
+  <Button @click="ping">Ping</Button>
 </template>
 
 <style scoped>

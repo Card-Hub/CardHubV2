@@ -46,14 +46,17 @@ builder.Services.AddSingleton<IDictionary<string, GameType>>(_ => new Concurrent
 builder.Services.AddSingleton<IDictionary<string, BaseRoom>>(_ => new ConcurrentDictionary<string, BaseRoom>());
 builder.Services.AddSingleton<CardDbContext>();
 builder.Services.AddSingleton<UnoDeckBuilder>();
-builder.Services.AddSingleton<UnoGameMod>();
+//builder.Services.AddSingleton<UnoGameMod>();
 builder.Services.AddSingleton<BlackJackGameStorage>();
 builder.Services.AddSingleton<UnoGameStorage>();
 builder.Services.AddSingleton<GameService>();
-
 builder.Services.AddTransient<CahGame>();
 builder.Services.AddSingleton<CahFactory>();
 builder.Services.AddSingleton<IDictionary<string, CahGame>>(_ => new ConcurrentDictionary<string, CahGame>());
+builder.Services.AddSingleton<IDictionary<string, BlackJackGame>>(_ => new ConcurrentDictionary<string, BlackJackGame>());
+builder.Services.AddSingleton<BlackJackMessenger>();
+
+
 
 
 var app = builder.Build();
@@ -79,6 +82,16 @@ app.MapHub<BaseHub>("/basehub", options =>
 });
 
 app.MapHub<CahHub>("/cahhub", options =>
+{
+    options.AllowStatefulReconnects = true;
+});
+
+app.MapHub<CahHub>("/unehub", options =>
+{
+    options.AllowStatefulReconnects = true;
+});
+
+app.MapHub<BlackJackHub>("/blackjackhub", options =>
 {
     options.AllowStatefulReconnects = true;
 });

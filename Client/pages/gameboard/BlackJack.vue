@@ -3,14 +3,16 @@ import {useUneStore} from "~/stores/uneStore";
 import {type ConfigurableDocument, type MaybeElementRef, useFullscreen } from '@vueuse/core';
 import {defineComponent, ref, onMounted, type ComputedRef, type Ref, computed} from "vue";
 import {storeToRefs} from "pinia";
-import {useWebSocketStore} from "~/stores/webSocketStore";
+
 
 import StandardnoshadowCard from "~/components/noShadowCard/StandardnoshadowCard.vue";
 import StandardCardDisplay from "~/components/Card/StandardCardDisplay.vue";
 
-const store = useWebSocketStore();
-const {user, users, room, connection} = storeToRefs(store);
-const {startGame} = store;
+const store = useBlackJackStore();
+
+const {players, currentPlayer, winners, losers, stalemates, user, allPlayersHaveBet} = storeToRefs(store);
+
+// const {startGame} = store;
 
 //fulscreen
 const { isFullscreen, enter, exit } = useFullscreen();
@@ -21,29 +23,14 @@ const getPrimeIcon = (name: string) => {
   return new URL(`../../assets/icons/primeIcons/${name}.svg`, import.meta.url);
 }
 
-// uncomment these out later
-// const {  cards, users, room } = storeToRefs(store);
-// const { cards } = storeToRefs(store);
-
 const dealerCards = ref<StandardCard[]>([
   {Id: 1, Suit: "hearts", Value: "Jack"},
   {Id: 2, Suit: "hearts", Value: "Ace"}]);
 //reverse dealer cards
 dealerCards.value.reverse();
 
-const players = ref<BlackJackPlayer[]>([
-  {Name: "lyssie", Avatar: "lyssie", Afk: false, Hand: [{Id: 1, Suit: "hearts", Value: "Jack"}, {Id: 2, Suit: "hearts", Value: "Ace"}], CurrentScore: 21, TotalMoney: 100, CurrentBet: 10, HasBet: true, NotPlaying: false, Busted: false, Winner: false, StillPlaying: true, Standing: false},
-  {Name: "juno", Avatar: "juno", Afk: false,Hand: [{Id: 1, Suit: "hearts", Value: "Jack"}, {Id: 2, Suit: "hearts", Value: "Ace"}], CurrentScore: 21, TotalMoney: 100, CurrentBet: 10, HasBet: true, NotPlaying: false, Busted: false, Winner: false, StillPlaying: true, Standing: false},
-  {Name: "oli", Avatar: "oli", Afk: false,Hand: [{Id: 1, Suit: "hearts", Value: "Jack"}, {Id: 2, Suit: "hearts", Value: "Ace"}], CurrentScore: 21, TotalMoney: 100, CurrentBet: 10, HasBet: true, NotPlaying: false, Busted: false, Winner: false, StillPlaying: true, Standing: false},
-  {Name: "liam", Avatar: "liam", Afk: false,Hand: [{Id: 1, Suit: "hearts", Value: "Jack"}, {Id: 2, Suit: "hearts", Value: "Ace"}], CurrentScore: 21, TotalMoney: 100, CurrentBet: 10, HasBet: true, NotPlaying: false, Busted: false, Winner: false, StillPlaying: true, Standing: false},
-  {Name: "andy", Avatar: "andy", Afk: false,Hand: [{Id: 1, Suit: "hearts", Value: "Jack"}, {Id: 2, Suit: "hearts", Value: "Ace"}], CurrentScore: 21, TotalMoney: 100, CurrentBet: 10, HasBet: true, NotPlaying: false, Busted: false, Winner: false, StillPlaying: true, Standing: false},
-  {Name: "alex", Avatar: "alex", Afk: false,Hand: [{Id: 1, Suit: "hearts", Value: "Jack"}, {Id: 2, Suit: "hearts", Value: "Ace"}], CurrentScore: 21, TotalMoney: 100, CurrentBet: 10, HasBet: true, NotPlaying: false, Busted: false, Winner: false, StillPlaying: true, Standing: false},
-  {Name: "ruby", Avatar: "ruby",Afk: false, Hand: [{Id: 1, Suit: "hearts", Value: "Jack"}, {Id: 2, Suit: "hearts", Value: "Ace"}], CurrentScore: 21, TotalMoney: 100, CurrentBet: 10, HasBet: true, NotPlaying: false, Busted: false, Winner: false, StillPlaying: true, Standing: false},
-  {Name: "fairy", Avatar: "fairy", Afk: false,Hand: [{Id: 1, Suit: "hearts", Value: "Jack"}, {Id: 2, Suit: "hearts", Value: "Ace"}], CurrentScore: 21, TotalMoney: 100, CurrentBet: 10, HasBet: true, NotPlaying: false, Busted: false, Winner: false, StillPlaying: true, Standing: false},
-]);
-
-const currentPlayer = ref<string>("lyssie");
-const dealersTurn = ref<boolean>(false);
+// const currentPlayer = ref<string>("lyssie");
+// const dealersTurn = ref<boolean>(false);
 
 //const currentColor = ref<string>("red");
 // const { currentColor, players, currentPlayer, discardPile  } = storeToRefs(uneStore);
@@ -132,9 +119,9 @@ const getCARD = () => {
       </div>
       <div class="game-table rounded-tr-full shadow-lg">
             <div class="card-pile">
-              <div v-if="dealersTurn">
+              <!--div v-if="dealersTurn">
                 
-              </div>
+              </div-->
               <div class="!dealersTurn"></div>
               <StandardnoshadowCard :card="dealerCards[0]" class="standardCardDisplay"/>
               <StandardnoshadowCard :card="dealerCards[1]" class="standardCardDisplay"/>

@@ -3,7 +3,7 @@ import {useUneStore} from "~/stores/uneStore";
 import {type ConfigurableDocument, type MaybeElementRef, useFullscreen } from '@vueuse/core';
 import {defineComponent, ref, onMounted, type ComputedRef, type Ref, computed} from "vue";
 import {storeToRefs} from "pinia";
-import {useWebSocketStore} from "~/stores/webSocketStore";
+//import {useWebSocketStore} from "~/stores/webSocketStore";
 
 import UNEnoshadowCard from "~/components/noShadowCard/UNEnoshadowCard.vue";
 

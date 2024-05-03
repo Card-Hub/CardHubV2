@@ -148,7 +148,7 @@ export const useBaseStore = defineStore("base", () => {
                     gameConnection.value = joinConnection;
                 }
             }
-            // registerBaseHandlers();
+
             return true;
         } catch (e) {
             log("Error in joinRoom", e);

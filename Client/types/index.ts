@@ -23,8 +23,15 @@ declare global {
     interface Player {
         Name: string
         Avatar: string
-        Afk: boolean
+        Afk?: boolean
         //cards: Card[]
+    }
+    
+    interface CahPlayer extends Player {
+        Hand: CahCard[]
+        Score: number
+        IsCzar: boolean
+        IsWinner: boolean
     }
     
     interface unePlayer extends Player {
@@ -44,6 +51,7 @@ declare global {
     }
     
     interface BlackJackPlayer extends Player {
+        strConn: string
         Hand: StandardCard[]
         CurrentScore: number
         TotalMoney: number
@@ -54,8 +62,7 @@ declare global {
         Winner: boolean
         StillPlaying: boolean
         Standing: boolean
-        PickingWildColor: boolean;
-        Hand: UNOCard[];
+        Name: string;
     }
 
     interface CahCard {

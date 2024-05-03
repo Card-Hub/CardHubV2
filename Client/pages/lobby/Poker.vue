@@ -13,7 +13,7 @@ const { gameType, gameStarted } = storeToRefs(uneStore);
 
 // will allow for a popup of the chat
 import dialog from 'primevue/dialog';
-import UnoRules from "~/components/gameRules/UnoRules.vue";
+import UnoRules from "~/components/gameRules/UneRules.vue";
 const visible = ref(false);
 
 const gameboardStart = () => {

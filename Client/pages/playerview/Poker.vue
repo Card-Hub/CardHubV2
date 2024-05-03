@@ -6,7 +6,7 @@ import {useWebSocketStore} from "~/stores/webSocketStore";
 
 import UNEnoshadowCard from "~/components/noShadowCard/UNEnoshadowCard.vue";
 import StandardCardDisplay from "~/components/Card/StandardCardDisplay.vue";
-import UNOCardDisplay from "~/components/Card/UNOCardDisplay.vue";
+import UNOCardDisplay from "~/components/Card/UNECardDisplay.vue";
 
 import toast from "@/utils/toast";
 
@@ -24,7 +24,7 @@ const getPrimeIcon = (name: string) => {
 // https://primevue.org/dialog
 import Dialog from 'primevue/dialog';
 import Chat from "~/components/Chat.vue";
-import UnoRules from "~/components/gameRules/UnoRules.vue";
+import UnoRules from "~/components/gameRules/UneRules.vue";
 import PokerRules from "~/components/gameRules/PokerRules.vue"; // for popup dialog
 const rulesVisible = ref(false); // for popup dialog
 const chatVisible = ref(false); // for popup dialog https://primevue.org/avatar/ for chat notification

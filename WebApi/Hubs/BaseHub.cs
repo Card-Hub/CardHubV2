@@ -118,6 +118,8 @@ public class BaseHub : Hub<IBaseClient>
     
     public async Task SendMessage(string message)
     {
+      // make sure no words in message are in list of bad words
+      
         await Clients.Group(ContextRoomId).ReceiveMessage(
             new PlayerMessage
             {

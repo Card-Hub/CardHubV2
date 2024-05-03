@@ -55,6 +55,7 @@ const stand = () => {
 }
 
 const getUserIcon = () => {
+  // return new URL('../../assets/icons/avatars/${ user.value.name }.png`, import.meta.url);
   return new URL(`../../assets/icons/avatars/lyssie.png`, import.meta.url);
 };
 

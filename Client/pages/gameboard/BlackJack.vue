@@ -13,6 +13,7 @@ const baseStore = useBlackJackStore();
 
 const { winners, losers, stalemates, user} = storeToRefs(store);
 const {currentPlayer, players, dealersTurn, allPlayersHaveBet } = storeToRefs(store);
+const  {restart} = store;
 // const {startGame} = store;
 
 //fulscreen
@@ -131,6 +132,9 @@ const getCARD = () => {
                   <StandardnoshadowCard :card="card1" class="standardCardDisplay"/>
                 </div>
               </div>
+              <div v-if ="dealersTurn">
+                <Button class="font-bold button shadow" @click="restart">Retstart</Button>
+              </div>
             </div>
           <div v-if ="!dealersTurn" class="deck-card flex justify-center items-center bg-zinc-800 rounded-md shadow-md mb-2">
             <img :src="getCARD()" alt="game icon" class="une-logo"/>
@@ -153,6 +157,7 @@ const getCARD = () => {
         Stalemates
         {{stalemates1}}
       </div>
+
 
 
     </div>

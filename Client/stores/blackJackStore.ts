@@ -68,7 +68,10 @@ export const useBlackJackStore = defineStore("blackjack", () => {
     };
 
 
-    
+    const restart = async (): Promise<void> => {
+        if (gameConnection.value === null) return;
+        await gameConnection.value.invoke("RestartBlackJackHub");
+    };
 
     const standBlackJackPlayer = async (): Promise<void> => {
         if (gameConnection.value === null) return;
@@ -110,6 +113,7 @@ export const useBlackJackStore = defineStore("blackjack", () => {
         registerHandlersBlackJack,
         ping,
         startGame,
+        restart,
         gameType,
         players,
         currentPlayer,

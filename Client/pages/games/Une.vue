@@ -1,25 +1,38 @@
 <script setup lang="ts">
-  //https://primevue.org/tabmenu/
-  import TabMenu from 'primevue/tabmenu';
-  import { ref, computed } from 'vue';
-  import UNOCardDisplay from "~/components/Card/UNOCardDisplay.vue";
 
-  import { storeToRefs } from "pinia";
-  import { useWebSocketStore } from "~/stores/webSocketStore";
-  import UnoRules from "~/components/gameRules/UnoRules.vue";
+import { ref, computed } from 'vue';
+import UneRules from "~/components/gameRules/UneRules.vue";
+import { GameType } from "~/types";
+import {useBaseStore} from "~/stores/baseStore";
+import {useUneStore} from "~/stores/uneStore";
+import UNECardDisplay from "~/components/Card/UNECardDisplay.vue";
 
-  const store = useWebSocketStore();
-  const { connection, isConnected, messages, user, room } = storeToRefs(store);
-  const { tryCreateRoom, tryJoinRoom, sendGameType } = store;
 
-  const connectGameboard = async (): Promise<void> => {
-    const isRoomCreated = await tryCreateRoom();
-    if (isRoomCreated) {
-      await sendGameType("UNE");
-      // await navigateTo('/playerview');
-      await navigateTo("/lobby/une");
-    }
-  };
+const baseStore = useBaseStore();
+const { tryConnectGameboard } = baseStore;
+
+const uneStore = useUneStore();
+const { registerHandlers } = uneStore;
+
+
+const connectGameboard = async (): Promise<void> => {
+  const isConnected = await tryConnectGameboard(GameType.Une, registerHandlers);
+  if (!isConnected) return;
+
+  await navigateTo({ path: "/lobby/une" });
+};
+
+const getCards = () => {
+  return new URL(`../../assets/icons/une/une.svg`, import.meta.url);
+};
+
+const active = ref(0); // 0 = none, 1 = rules, 2 = cards
+//for the tab menu
+const items = ref([
+  { label: "None", icon: "pi pi-fw pi-eye-slash" },
+  { label: "Rules", icon: "pi pi-fw pi-info-circle" },
+  { label: "Cards", icon: "pi pi-fw pi-mobile" }
+]);
 
 
   // create uno deck of cards
@@ -51,19 +64,11 @@
     });
   }
 
-  const playerHand = ref<UNOCard[]>(unoDeck);
+  //const playerHand = ref<UNOCard[]>(unoDeck);
   
   const getUNE = () => {
     return new URL(`../../assets/icons/unoDeck/UNE.svg`, import.meta.url);
   };
-
-  const active = ref(0); // 0 = none, 1 = rules, 2 = cards
-  //for the tab menu
-  const items = ref([
-      { label: "None", icon: "pi pi-fw pi-eye-slash" },
-      { label: "Rules", icon: "pi pi-fw pi-info-circle" },
-      { label: "Cards", icon: "pi pi-fw pi-mobile" }
-  ]);
 </script>
 
 <template>
@@ -103,12 +108,12 @@
     
     <div class="rules-container" v-if="active === 1">
       <div class="rules">
-        <UnoRules />
+        <UneRules />
       </div>
     </div>
     
     <div class="card-container" v-else-if="active === 2">
-      <UNOCardDisplay v-for="card in unoDeck"
+      <UNECardDisplay v-for="card in unoDeck"
                       :key="card.Id"
                       :card="card"
       />

@@ -7,9 +7,9 @@ import {storeToRefs} from "pinia";
 
 import UNEnoshadowCard from "~/components/noShadowCard/UNEnoshadowCard.vue";
 
-const store = useWebSocketStore();
-const {user, users, room, connection} = storeToRefs(store);
-const {startGame} = store;
+//const store = useWebSocketStore();
+//const {user, users, room, connection} = storeToRefs(store);
+//const {startGame} = store;
 const uneStore = useUneStore();
 // uncomment these out later
 // const {  cards, users, room } = storeToRefs(store);

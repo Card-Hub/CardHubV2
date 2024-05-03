@@ -6,9 +6,9 @@ using WebApi.Common;
 
 // Stores games and settings for specified rooms.
 public class BlackJackGameStorage {
-  private IHubContext<BaseHub> HubContext;
+  private IHubContext<UneHub> HubContext;
   public Dictionary<string, BlackJackGame> GamesFromRoomCodes { get; private set; } = new();
-  public BlackJackGameStorage(IHubContext<BaseHub> hubContext) {
+  public BlackJackGameStorage(IHubContext<UneHub> hubContext) {
     this.HubContext = hubContext;
   }
   public async void BuildGame(string roomCode, string gameboardConnStr) {

@@ -8,8 +8,8 @@ namespace WebApi.Hubs;
 // stubbed out
 
 public class UnoMessenger : iUnoMessenger {
-  IHubContext<BaseHub> Context;
-  public UnoMessenger(IHubContext<BaseHub> context) {
+  IHubContext<UneHub> Context;
+  public UnoMessenger(IHubContext<UneHub> context) {
     this.Context = context;
   }
 
@@ -18,7 +18,9 @@ public class UnoMessenger : iUnoMessenger {
   {
     //Console.WriteLine($"UnoMessenger sent to the frontend: \n {json}");
     foreach (var connStr in connStrs) {
-      Context.Clients.Client(connStr).SendAsync("ReceiveJson", json);
+      Console.WriteLine($"Sending json to: {connStr }");
+      await Context.Clients.Client(connStr).SendAsync("ReceiveJson", json);
+      await Context.Clients.Client(connStr).SendAsync("test", json);
     }
   }
 

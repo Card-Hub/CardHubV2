@@ -15,6 +15,7 @@ const { isPlayer, messages, users, room, currentAvatar } = storeToRefs(baseStore
 const {  } = baseStore; // ??
 const uneStore = useUneStore();
 const { ping } = uneStore;
+const { startGame } = uneStore;
 //const { gameType, gameStarted } = storeToRefs(uneStore);
 const { $gameToString } = useNuxtApp();
 // will allow for a popup of the chat
@@ -35,7 +36,7 @@ const visible = ref(false);
 //import Chat from "~/components/Chat.vue";
 
 const gameboardStart = async () => {
-  // startGame();
+  startGame();
   await navigateTo("/gameboard/" + $gameToString(GameType.Une));
 }
 

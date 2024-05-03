@@ -28,6 +28,7 @@ public class UneHub : Hub
 
     public async Task JoinRoom(ConnectionOptions connectionOptions)
     {
+      Console.WriteLine("JoinRoom UneHub");
         var roomId = connectionOptions.Room;
         if (!TryGetGame(out var game, roomId))
         {
@@ -37,11 +38,13 @@ public class UneHub : Hub
             //newGame.Room = roomId;
             //newGame.PickingFinished += TimerTest;
             _games.Add(roomId, newGame);
+            Console.WriteLine("Joined as gameboard.");
         }
         else
         {
             if (connectionOptions.Name is null) return;
             if (!game.AddPlayer(connectionOptions.Name, ContextId)) return;
+            Console.WriteLine("Joined as player.");
         }
         
         Context.Items.Add(Room, roomId);
@@ -111,7 +114,7 @@ public class UneHub : Hub
     //    await Clients.Group(GetRoomId()).SendAsync("ReceiveWinner", winner);
     //}
 
-    public async Task PingUne() => await Clients.Caller.SendAsync("PongUne");
+    public async Task Ping() => await Clients.Caller.SendAsync("Pong");
     
 
   

@@ -21,6 +21,7 @@ export const useCahStore = defineStore("cah", () => {
     const baseStore = useBaseStore();
     const { gameConnection, isPlayer, gameType } = storeToRefs(baseStore);
 
+    const cards = ref<CahCard[]>([]);
     const gameStarted = ref<boolean>(false);
     const isGameConnected = computed<boolean>(() => gameConnection.value !== null && gameConnection.value.state === HubConnectionState.Connected);
 
@@ -34,6 +35,15 @@ export const useCahStore = defineStore("cah", () => {
 
         gameConnection.on("GameStarted", () => {
             gameStarted.value = true;
+        });
+
+        gameConnection.on("ReceiveCards", (whiteCards: CahCard[]) => {
+            cards.value.push(...whiteCards);
+        });
+
+        gameConnection.on("CardsPlayed", (whiteCards: CahCard[]) => {
+            log("Received cards played", whiteCards);
+            cards.value = cards.value.filter(card => !whiteCards.includes(card));
         });
 
         gameConnection.on("Pong", () => {
@@ -57,7 +67,7 @@ export const useCahStore = defineStore("cah", () => {
     // Must return all state properties
     // https://pinia.vuejs.org/core-concepts/
     return {
-        isGameConnected, gameStarted,
+        isGameConnected, gameStarted, cards,
         registerHandlersCah, ping, startGame
     };
 });

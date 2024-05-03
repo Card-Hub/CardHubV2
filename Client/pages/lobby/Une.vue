@@ -136,15 +136,7 @@ const kickPlayer = (user: BasePlayer) => {
 //  return getIcon("lyssie");
 //}
 
-
-
-
-
 //const visible = ref(false);
-
-
-
-
 
 const getIconGivenName = (name: string) => {
   users.value.forEach(function (user: BasePlayer) {

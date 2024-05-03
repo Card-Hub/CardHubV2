@@ -44,14 +44,16 @@ const getCahLogo = () => {
     <div id="text-container">
       <span>{{ card.text }}</span>
     </div>
-<!--    <img :src="getCahLogo()" alt="cah logo" class="absolute bottom-2 right-2 w-14 h-14" />-->
+    <!--    <img :src="getCahLogo()" alt="cah logo" class="absolute bottom-2 right-2 w-14 h-14" />-->
   </div>
 </template>
 
 <style scoped>
 #card {
-  width: 100px;
-  height: 150px;
+  width: 15vw;
+  height: 25vw;
+  max-height: 250px;
+  max-width: 150px;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
   cursor: pointer;

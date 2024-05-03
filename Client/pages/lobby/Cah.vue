@@ -10,7 +10,7 @@ import {useCahStore} from "~/stores/cahStore";
 
 const { $gameToString } = useNuxtApp();
 
-import { ref, computed } from "vue";
+import {ref, computed, onMounted} from "vue";
 import CahDisplay from "~/components/Card/CahDisplay.vue";
 import Dialog from "primevue/dialog";
 const baseStore = useBaseStore();
@@ -28,15 +28,23 @@ const settingsVisible = ref(false);
 const seVolume = ref(0.5);
 
 const bgMusic = new Audio(sillyFun);
-const bgVolume = ref(0);
+const bgVolume = ref(0.5);
 
 const updateBGVolume = () => {
   bgMusic.volume = bgVolume.value;
 };
 
-if(!isPlayer.value){
-  bgMusic.loop = false;
-  bgMusic.play();
+onMounted(() => {
+  if(!isPlayer.value && room.value !== "" && !gameStarted.value){
+    bgMusic.play();
+  }  else {
+    bgMusic.loop = false;
+  }
+});
+
+if(!isPlayer.value && room.value !== ""){
+  // bgMusic.loop = false;
+  // bgMusic.play();
 }
 
 const bgVolumeDown = () => {

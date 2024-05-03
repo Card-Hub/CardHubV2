@@ -94,7 +94,22 @@ const getPoster = () => {
         <br> <a href="https://learn.microsoft.com/en-us/dotnet/"> .net C# documentation </a>
         <br> <a href="https://www.w3.org/WAI/WCAG22/quickref/"> WCAG Guidelines </a>
         <br> <a href="https://github.com/tsparticles/vue3"> Particles License </a> </p>
+
+      
+        <p class="resources">
+          Music Credit:
+          <br> Lobby Music:  <a href="https://www.youtube.com/watch?v=L12t7WpzUxA"> Silly Fun by Kevin Maclead </a>
+          <br> Game Music:  <a href="https://clipchamp.com/en/windows-video-editor/"> Sway by Microsoft Clipchamp </a>
+        </p>
+
+      <p class="resources">
+        Sound Effects:
+        <br> <a href="https://www.youtube.com/watch?v=2jktMTAt2UI"> Draw/Play Card </a>
+        <br> <a href="https://clipchamp.com/en/windows-video-editor/"> Send Message, New Message, New Player  </a>
+      </p>
     </div>
+    <br><br>
+    
   </div>
   <Footer />
 </template>

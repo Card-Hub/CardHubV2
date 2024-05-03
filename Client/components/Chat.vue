@@ -1,15 +1,32 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, defineProps } from 'vue';
 import { useBaseStore } from '~/stores/baseStore';
 import { storeToRefs } from "pinia";
 
 const store = useBaseStore();
 const { isPlayer, messages, user, users } = storeToRefs(store);
 const { sendMessage } = store;
+
+import clickMessage from '../assets/audio/soundEffects/sendMessage.mp4';
+const seCM = new Audio(clickMessage);
+
+//set a prop to receive the volume 
+const props = defineProps<{
+  seVolume?: number;
+}>();
+// seCM.volume = props.seVolume;
+
+
+const playClickMessage = () => {
+  seCM.volume = props.seVolume;
+  seCM.play();
+};
 // ref
 const newMessage1 = ref('');//find a way to get rid fo this
+
 const handleSendMessage = () => {
     console.log("inside handlemessage", newMessage1.value);
+    playClickMessage();
     sendMessage(newMessage1.value);
     newMessage1.value = '';
 };

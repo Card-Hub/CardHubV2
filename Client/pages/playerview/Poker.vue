@@ -2,7 +2,6 @@
 import {defineComponent, ref, onMounted} from "vue";
 //impor
 import {storeToRefs} from "pinia";
-import {useWebSocketStore} from "~/stores/webSocketStore";
 
 import UNEnoshadowCard from "~/components/noShadowCard/UNEnoshadowCard.vue";
 import StandardCardDisplay from "~/components/Card/StandardCardDisplay.vue";

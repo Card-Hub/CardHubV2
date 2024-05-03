@@ -4,7 +4,7 @@ declare global {
     
     interface Card {
         Id: number
-        Value: string
+        Value?: string
     }
     
     interface StandardCard extends Card {
@@ -83,6 +83,11 @@ declare global {
     interface BasePlayer {
         name: string;
         avatar: string;
+    }
+
+    interface PlayerMessage {
+        name: string;
+        message: string;
     }
 }
 

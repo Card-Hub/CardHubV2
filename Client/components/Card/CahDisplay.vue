@@ -7,9 +7,24 @@ export interface Props {
 
 const props = defineProps<Props>();
 const emits = defineEmits();
+
+const enum CahType {
+  White,
+  Black
+}
+
+const getcardColor = (type: CahType) => {
+  if (type === CahType.Black) {
+    return "black";
+  } else {
+    return "white";
+  }
+};
 const handleClick = () => {
   emits("cardClicked", props.card);
 };
+
+
 
 const displayText = (text: string) => {
 

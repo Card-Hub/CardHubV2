@@ -12,6 +12,7 @@ const { $gameToString } = useNuxtApp();
 
 import { ref, computed } from "vue";
 import CahDisplay from "~/components/Card/CahDisplay.vue";
+import Dialog from "primevue/dialog";
 const baseStore = useBaseStore();
 const { isPlayer, messages, users, room, currentAvatar } = storeToRefs(baseStore);
 const {  } = baseStore;
@@ -21,7 +22,40 @@ const { gameStarted } = storeToRefs(cahStore);
 const { ping } = cahStore;
 
 
+import sillyFun from '../../assets/audio/music/sillyFun.mp3';
 const visible = ref(false);
+const settingsVisible = ref(false);
+const seVolume = ref(0.5);
+
+const bgMusic = new Audio(sillyFun);
+const bgVolume = ref(0);
+
+const updateBGVolume = () => {
+  bgMusic.volume = bgVolume.value;
+};
+
+if(!isPlayer.value){
+  bgMusic.loop = false;
+  bgMusic.play();
+}
+
+const bgVolumeDown = () => {
+  bgVolume.value = 0;
+  bgMusic.volume = bgVolume.value;
+};
+
+const bgVolumeUp = () => {
+  bgVolume.value = 1;
+  bgMusic.volume = bgVolume.value;
+};
+
+const seVolumeDown = () => {
+  seVolume.value = 0;
+};
+
+const seVolumeUp = () => {
+  seVolume.value = 1;
+};
 
 watch(gameStarted, (value) => {
   if (value) {
@@ -104,6 +138,18 @@ const convertBase = (player: CahPlayer) => {
           <Dialog v-model="visible" class="chat-container" header="Chat" :visible="visible" @update:visible="visible = $event">
             <Chat/>
           </Dialog>
+
+          <i class="pi pi-fw pi-cog" style="font-size: 2rem" @click="settingsVisible = true"></i>
+          <Dialog v-model="settingsVisible" class="w-auto h-auto" header="Settings" :visible="settingsVisible" @update:visible="settingsVisible = $event">
+            <h1 class="text-center">Sound Effects</h1> <br>
+            <div class="flex flex-row justify-content-center align-middle">
+              <i class="pi pi-fw pi-volume-down" style="font-size: 2rem" @click="seVolumeDown"></i>
+              <div class="content-around">
+                <Slider v-model="seVolume" :min="0" :max="1" :step="0.1" class="w-96"/>
+              </div>
+              <i class="pi pi-fw pi-volume-up" style="font-size: 2rem" @click="seVolumeUp"></i>
+            </div><br>
+          </Dialog>
         </div>
       </div>
 
@@ -153,6 +199,20 @@ const convertBase = (player: CahPlayer) => {
         </div>
       </div>
       <div class="flex flex-col w-1/3">
+        <div class="absolute top-4 right-4">
+          <i class="pi pi-fw pi-cog" style="font-size: 2rem" @click="settingsVisible = true"></i>
+          <Dialog v-model="settingsVisible" class="w-auto h-auto" header="Settings" :visible="settingsVisible" @update:visible="settingsVisible = $event">
+            <h1 class="text-center">Background Music</h1> <br>
+            <div class="flex flex-row justify-content-center align-middle">
+              <i class="pi pi-fw pi-volume-down" style="font-size: 2rem" @click="bgVolumeDown"></i>
+              <div class="content-around">
+                <Slider v-model="bgVolume" :min="0" :max="1" :step="0.1" class="w-96" @change="updateBGVolume"/>
+              </div>
+              <i class="pi pi-fw pi-volume-up" style="font-size: 2rem" @click="bgVolumeUp"></i>
+            </div><br>
+          </Dialog>
+        </div>
+        
         <div class="chat-box">
           <Chat />
         </div>

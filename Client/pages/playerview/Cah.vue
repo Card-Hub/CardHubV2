@@ -20,13 +20,65 @@ const getPrimeIcon = (name: string) => {
 import Dialog from 'primevue/dialog';
 import Chat from "~/components/Chat.vue";
 import CahRules from "~/components/gameRules/CahRules.vue";
+import drawCard from '../../assets/audio/soundEffects/drawCard.mp4';
+import newMessage from '../../assets/audio/soundEffects/newMessage.mp4';
+import playCard from '../../assets/audio/soundEffects/playCard.mp4';
+import sendMessage from '../../assets/audio/soundEffects/sendMessage.mp4';
 const rulesVisible = ref(false); // for popup dialog
 const chatVisible = ref(false); // for popup dialog https://primevue.org/avatar/ for chat notification
+const settingsVisible = ref(false); // for popup dialog
 
-// convert user to CahPlayer
+// sound effects
+const bgVolume = ref(0.5);
+const seVolume = ref(0.5);
+
+const seDC = new Audio(drawCard);
+const seNM = new Audio(newMessage);
+const seNP = new Audio(newPlayer);
+const sePC = new Audio(playCard);
+const seSM = new Audio(sendMessage);
+
+const playDrawCard = () => {
+  seDC.volume = seVolume.value;
+  seDC.play();
+};
+const playNewMessage = () => {
+  seNM.volume = seVolume.value;
+  seNM.play();
+};
+const playPlayCard = () => {
+  sePC.volume = seVolume.value;
+  sePC.play();
+};
+const playSendMessage = () => {
+  seSM.volume = seVolume.value;
+  seSM.play();
+};
+
+const updateSEVolume = () => {
+  seDC.volume = seVolume.value;
+  seNM.volume = seVolume.value;
+  seNP.volume = seVolume.value;
+  sePC.volume = seVolume.value;
+  seSM.volume = seVolume.value;
+};
+
+const seVolumeDown = () => {
+  seVolume.value = 0;
+  updateSEVolume();
+};
+
+const seVolumeUp = () => {
+  seVolume.value = 1;
+  updateSEVolume();
+};
+
+// START OF WEBSOCKETS
 import {storeToRefs} from "pinia";
 import { useBaseStore} from "~/stores/baseStore";
 import { useCahStore } from "~/stores/cahStore";
+import newPlayer from "assets/audio/soundEffects/newPlayer.mp4";
+import CahDisplay from "~/components/Card/CahDisplay.vue";
 
 const baseStore = useBaseStore();
 const { isPlayer, messages, users, room, user, currentAvatar } = storeToRefs(baseStore);
@@ -48,6 +100,24 @@ const handleExit = async () => {
   // redirect to join page
   await navigateTo("/join");
 };
+
+const enum CahType {
+  White,
+  Black
+}
+
+const selectCard = (card: CahCard) => {
+  // send card to server
+  console.log(card);
+  playPlayCard();
+};
+
+//START STATIC INFO
+const hand = ref([
+  { text: 'Hello', type: CahType.White },
+  { text: 'UR mom', type: CahType.White },
+  { text: 'uhhhh', type: CahType.White }
+])
 </script>
 
 
@@ -63,6 +133,18 @@ const handleExit = async () => {
 
       <div class="left-div flex flex-row-reverse place-items-center gap-2">
         <img :src="getPrimeIcon('expand')" class="size-10" @click="toggle" />
+
+        <i class="pi pi-fw pi-cog" style="font-size: 2rem" @click="settingsVisible = true"></i>
+        <Dialog v-model="settingsVisible" class="w-auto h-auto" header="Settings" :visible="settingsVisible" @update:visible="settingsVisible = $event">
+          <h1 class="text-center">Sound Effects</h1> <br>
+          <div class="flex flex-row justify-content-center align-middle">
+            <i class="pi pi-fw pi-volume-down" style="font-size: 2rem" @click="seVolumeDown"></i>
+            <div class="content-around">
+              <Slider v-model="seVolume" :min="0" :max="1" :step="0.1" class="w-96" @change="updateSEVolume"/>
+            </div>
+            <i class="pi pi-fw pi-volume-up" style="font-size: 2rem" @click="seVolumeUp"></i>
+          </div><br>
+        </Dialog>
 
         <div class="card">
           <i class="pi pi-fw pi-info-circle" style="font-size: 2rem" @click="rulesVisible = true"></i>
@@ -82,6 +164,22 @@ const handleExit = async () => {
         </div>
 
         <!--      <i class="pi pi-fw pi-eye" @click="!sideScroll" style="font-size: 2.5rem"></i>-->
+      </div>
+    </div>
+    
+    <div class="hand-view">
+      <div class="cards-container">
+        <div class="cards-and-buttons">
+          <div class="cards">
+            <CahDisplay class="standardCardDisplay"
+                 v-for="card in hand"
+                 :key="card.text"
+                 :card="card"
+                 :isSelected="false"
+                 @click="selectCard(card)"
+            />
+          </div>
+        </div>
       </div>
     </div>
 

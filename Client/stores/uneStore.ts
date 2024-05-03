@@ -7,6 +7,7 @@ import { defineStore, storeToRefs } from "pinia";
 
 //import { defineStore } from "pinia";
 import {
+    type HubConnection,
     HubConnectionState
 } from "@microsoft/signalr";
 import { computed } from "vue";
@@ -26,20 +27,19 @@ export const useUneStore = defineStore("une", () => {
 
     const isGameConnected = computed<boolean>(() => gameConnection.value !== null && gameConnection.value.state === HubConnectionState.Connected);
 
-    watch(gameConnection, async (newValue, oldValue) => {
-        if (newValue === null || !isGameConnected.value) return;
+    // watch(gameConnection, async (newValue, oldValue) => {
+    //     if (newValue === null || !isGameConnected.value) return;
+    //
+    //     registerHandlersUne();
+    // });
 
-        registerHandlers();
-    });
-
-    const registerHandlers = (): void => {
-        if (gameConnection.value === null) return;
+    const registerHandlersUne = (gameConnection: HubConnection): void => {
+        if (gameConnection === null) return;
 
         //gameConnection.value.on("ReceiveCards", (cards: CahCard[]) => {
         //    log("Received cards", cards);
         //});
-
-        gameConnection.value.on("Pong", () => {
+        gameConnection.on("PongUne", () => {
             log("Received pong");
         });
     };
@@ -67,7 +67,7 @@ export const useUneStore = defineStore("une", () => {
 
     const ping = async (): Promise<void> => {
         if (!isGameConnected) return;
-        await gameConnection.value?.invoke("Ping");
+        await gameConnection.value?.invoke("PingUne");
     };
 
 
@@ -75,7 +75,7 @@ export const useUneStore = defineStore("une", () => {
     // https://pinia.vuejs.org/core-concepts/
     return {
         isGameConnected,
-        closeConnection, sendAvatar, sendGameType, kickPlayer, registerHandlers, ping
+        closeConnection, sendAvatar, sendGameType, kickPlayer, registerHandlersUne, ping
     };
 });
 

@@ -11,6 +11,9 @@ const { $api, $gameToString } = useNuxtApp();
 const cahStore = useCahStore();
 const { registerHandlersCah } = cahStore;
 
+const uneStore = useUneStore();
+const { registerHandlersUne } = uneStore;
+
 const store = useBaseStore();
 const { isBaseConnected, messages } = storeToRefs(store);
 const { tryConnectPlayer } = store;
@@ -35,8 +38,11 @@ const connectPlayer = async (): Promise<void> => {
     case GameType.Cah:
       callback = registerHandlersCah;
       break;
+    case GameType.Une:
+      callback = registerHandlersUne;
+      break;
     default:
-      console.log("doing the default")
+      console.log("In join - invalid game type");
       break;
   }
   const isConnected = await tryConnectPlayer(user.value, room.value, type, callback);

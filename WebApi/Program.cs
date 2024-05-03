@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using WebApi.Common;
 using WebApi.Controllers;
 using WebApi.GameLogic;
+using WebApi.GameLogic.LyssieUno;
 using WebApi.Hubs;
 using WebApi.Models;
 using WebApi.Services;
@@ -55,6 +56,8 @@ builder.Services.AddSingleton<CahFactory>();
 builder.Services.AddSingleton<IDictionary<string, CahGame>>(_ => new ConcurrentDictionary<string, CahGame>());
 builder.Services.AddSingleton<IDictionary<string, BlackJackGame>>(_ => new ConcurrentDictionary<string, BlackJackGame>());
 builder.Services.AddSingleton<BlackJackMessenger>();
+builder.Services.AddSingleton<UnoMessenger>();
+builder.Services.AddSingleton<IDictionary<string, UnoGameModLyssie>>(_ => new ConcurrentDictionary<string, UnoGameModLyssie>());
 
 
 
@@ -86,7 +89,7 @@ app.MapHub<CahHub>("/cahhub", options =>
     options.AllowStatefulReconnects = true;
 });
 
-app.MapHub<CahHub>("/unehub", options =>
+app.MapHub<UneHub>("/unehub", options =>
 {
     options.AllowStatefulReconnects = true;
 });
@@ -99,4 +102,3 @@ app.MapHub<BlackJackHub>("/blackjackhub", options =>
 app.Run();
 
 public partial class Program { }
-

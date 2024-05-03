@@ -12,11 +12,11 @@ const baseStore = useBaseStore();
 const { tryConnectGameboard } = baseStore;
 
 const uneStore = useUneStore();
-const { registerHandlers } = uneStore;
+const { registerHandlersUne } = uneStore;
 
 
 const connectGameboard = async (): Promise<void> => {
-  const isConnected = await tryConnectGameboard(GameType.Une, registerHandlers);
+  const isConnected = await tryConnectGameboard(GameType.Une, registerHandlersUne);
   if (!isConnected) return;
 
   await navigateTo({ path: "/lobby/une" });

@@ -61,7 +61,6 @@ builder.Services.AddSingleton<IDictionary<string, UnoGameModLyssie>>(_ => new Co
 
 
 
-
 var app = builder.Build();
 
 app.UseHttpsRedirection();

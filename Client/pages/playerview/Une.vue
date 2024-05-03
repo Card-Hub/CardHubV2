@@ -44,53 +44,59 @@
      };
 
   const myCards = computed(() => {
-  let mc = <UNOCard[]>[];
-  if (players.value != null) {
-    players.value.forEach(player => {
-      if (player.Name == user.value) {
-        player.Hand.forEach(card => {
-          // translate between json and unocard
-          mc.push({Id:card.Id, Value:card.Value, Color:card.Color});
-        });
-      }
-    });
-  }
-  // sort cards by color then value
-  mc.sort((a, b) => {
-    if (a.Color < b.Color) {
-      return -1;
-    } else if (a.Color > b.Color) {
-      return 1;
-    } else {
-      if (a.Value < b.Value) {
+    let mc = <UNOCard[]>[];
+    if (players.value != null) {
+      players.value.forEach(player => {
+        if (player.Name == user.value) {
+          player.Hand.forEach(card => {
+            // translate between json and unocard
+            mc.push({Id:card.Id, Value:card.Value, Color:card.Color});
+          });
+        }
+      });
+
+
+    mc.sort((a, b) => {
+      if (a.Color < b.Color) {
         return -1;
-      } else if (a.Value > b.Value) {
+      } else if (a.Color > b.Color) {
         return 1;
       } else {
-        return 0;
+        if (a.Value < b.Value) {
+          return -1;
+        } else if (a.Value > b.Value) {
+          return 1;
+        } else {
+          return 0;
+        }
       }
-    }
+    });
+    return mc;
+  };
   });
-  return mc;
-});
+
+const canPressUne = computed(() => {
+    let you = players.value.find(player => player.Name === user.value);
+    return you?.CanPressUne;
+  });
+  // sort cards by color then value
 // object of players with information about avatar, name, and cards
 
   
-  const callUne = () => {
-    // record who pressed button first
-    playerWhoHasPrompt.value = user.value;
+  //const callUne = () => {
+  //  // record who pressed button first
+  //  playerWhoHasPrompt.value = user.value;
     
-    // disable une button for all players
-    document.getElementById("uneButton").setAttribute("disabled", "disabled");
+  //  // disable une button for all players
+  //  document.getElementById("uneButton").setAttribute("disabled", "disabled");
     
-    // check if current player was the first to press the button and give them a card if they were not
-    if (playerWhoHasPrompt.value !== currentPlayer.value) {
-      drawCard();
-      drawCard();
-    }
-    playerWhoHasPrompt.value = ""; // reset prompt
+  //  // check if current player was the first to press the button and give them a card if they were not
+  //  if (playerWhoHasPrompt.value !== currentPlayer.value) {
+  //    drawCard();
+  //    drawCard();
+  //  }
+  //  playerWhoHasPrompt.value = ""; // reset prompt
     
-  };
   
   // enable une button if player has one card left
   const validateUneCall = () => {
@@ -105,15 +111,15 @@
     return isValid;
   };
 
-  const canPressUne = () => {
-    let canPress = false;
-    players.value.forEach(player => {
-      if (player.Name === user.value && player.CanPressUne) {
-        canPress = true;
-      }
-    });
-    return canPress;
-  }
+  //const canPressUne = () => {
+  //  let canPress = false;
+  //  players.value.forEach(player => {
+  //    if (player.Name === user.value && player.CanPressUne) {
+  //      canPress = true;
+  //    }
+  //  });
+  //  return canPress;
+  //}
   
   const getWinnerIcon = (player: string) => {
     // iterate through players to find the winner's avatar
@@ -211,16 +217,16 @@
     </div>
     
     <Button v-if="winner===''" class="float-right font-bold drawButton shadow mb-4" @click="drawCard">Draw</Button>
-    <Button v-if="winner===''" class="float-left font-bold uneButton shadow mb-4" :disabled="!canPressUne()" @click="pressUne">UNE!</Button>
+    <Button v-if="winner===''" class="float-left font-bold uneButton shadow mb-4" :disabled="!canPressUne" @click="pressUne">UNE!</Button>
     
     <div v-if="winner===''" class=" w-full flex flex-wrap justify-center">
       <UNOCardDisplay class="uneCard flex-wrap"
                       v-for="card in myCards"
                       :key="card.Id"
                       :card="card"
-                      :isSelected="canBePlayed(card) && currentPlayer === user"
+                      
                       @click="playCard(JSON.stringify(card))"
-      />
+      /> <!--:isSelected="canBePlayed(card) && currentPlayer === user"-->
     </div>
 
 <!--    <div v-if="winner==='' && updateScroll ===true" class=" w-full flex overflow-x-auto border-2 border-radius-4 justify-center">-->

@@ -33,6 +33,7 @@ export const useBaseStore = defineStore("base", () => {
     const baseConnection = ref<HubConnection | null>(null);
     const gameConnection = ref<HubConnection | null>(null);
     const isPlayer = ref<boolean | null>(null);
+    const gameType = ref<GameType | null>(null);
     const isBaseConnected = computed<boolean>(() => baseConnection.value !== null && baseConnection.value.state === HubConnectionState.Connected);
     const currentAvatar = computed<string | null>(() => {
         if (!isPlayer.value) return null;
@@ -48,7 +49,7 @@ export const useBaseStore = defineStore("base", () => {
 
     const runtimeConfig = useRuntimeConfig();
 
-    const tryConnectGameboard = async (gameType: GameType, callback: () => void): Promise<boolean> => {
+    const tryConnectGameboard = async (gameType: GameType, callback: any): Promise<boolean> => {
         try {
             const response = await $api<string>("Game/CreateRoom",
                 {
@@ -78,33 +79,27 @@ export const useBaseStore = defineStore("base", () => {
         }
     };
 
-    const tryConnectPlayer = async (user: string, room: string): Promise<GameType | null> => {
+    const tryConnectPlayer = async (user: string, room: string, gameType: GameType, callback: any): Promise<boolean> => {
         try {
-            const gameType = await $api<GameType>(`game/verifycode/${ room }`, { method: "GET" });
-            if (!gameType) {
-                log("Invalid room code");
-                return null;
-            }
-
             const options: ConnectionOptions = { name: user, room: room };
             const baseConnect = await joinRoom(options, gameType);
-            const gameConnect = await joinRoom(options, gameType, function () {});
+            const gameConnect = await joinRoom(options, gameType, callback);
 
             if (!baseConnect || !gameConnect) {
                 log("Failed to connect to server");
                 console.log("Base: ", baseConnect, "Game: ", gameConnect)
-                return null;
+                return false;
             }
 
             isPlayer.value = true;
-            return gameType;
+            return true;
         } catch (e) {
             log("Error in TryConnectPlayer", e);
-            return null;
+            return false;
         }
     };
 
-    const joinRoom = async (options: ConnectionOptions, gameType: GameType, callback?: () => void): Promise<boolean> => {
+    const joinRoom = async (options: ConnectionOptions, gameType: GameType, callback?: any): Promise<boolean> => {
         try {
             const isBase = callback === undefined || callback === null;
             // if (!isBase && !isBaseConnected.value) return false; // shit breaks
@@ -125,7 +120,8 @@ export const useBaseStore = defineStore("base", () => {
                 baseConnection.value = joinConnection;
                 registerBaseHandlers();
             } else {
-                callback?.();
+                gameConnection.value = joinConnection;
+                callback(joinConnection);
             }
 
             joinConnection.onclose(() => {
@@ -152,6 +148,7 @@ export const useBaseStore = defineStore("base", () => {
                     gameConnection.value = joinConnection;
                 }
             }
+            // registerBaseHandlers();
             return true;
         } catch (e) {
             log("Error in joinRoom", e);
@@ -197,7 +194,7 @@ export const useBaseStore = defineStore("base", () => {
     // Must return all state properties
     // https://pinia.vuejs.org/core-concepts/
     return {
-        baseConnection, gameConnection, isBaseConnected, isPlayer, messages, users, user, room, currentAvatar,
+        baseConnection, gameConnection, isBaseConnected, isPlayer, messages, users, user, room, currentAvatar, gameType,
         tryConnectGameboard, tryConnectPlayer, sendMessage, closeConnection, sendAvatar, kickPlayer
     };
 });

@@ -25,7 +25,7 @@ export const useBlackJackStore = defineStore("blackjack", () => {
   const discardPile = ref<UNOCard[]>([]);
   const deckAmt = ref<number>(0);
 
-  const { connection, isConnected, messages, user, room } = storeToRefs(store);
+  const { connection, isConnected, messages, room } = storeToRefs(store);
 
   const drawBlackJackCard = async (): Promise<void> => {
     if (connection.value === null) {

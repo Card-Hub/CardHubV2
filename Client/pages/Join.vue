@@ -6,8 +6,10 @@ import { computed } from "vue";
 import { useBaseStore } from "~/stores/baseStore";
 import { GameType } from "~/types";
 
-const { $gameToString } = useNuxtApp();
+const { $api, $gameToString } = useNuxtApp();
 
+const cahStore = useCahStore();
+const { registerHandlersCah } = cahStore;
 
 const store = useBaseStore();
 const { isBaseConnected, messages } = storeToRefs(store);
@@ -22,9 +24,24 @@ const isValidRoomCode = computed(() => {
 });
 
 const connectPlayer = async (): Promise<void> => {
-  const gameType = await tryConnectPlayer(user.value, room.value);
-  if (gameType) {
-    await navigateTo(`/lobby/${ $gameToString(gameType) }`);
+  const type = await $api<GameType>(`game/verifycode/${ room.value }`, { method: "GET" });
+  if (type === null || type === undefined) {
+    console.log("Invalid room code");
+    return;
+  }
+
+  let callback: any;
+  switch (type) {
+    case GameType.Cah:
+      callback = registerHandlersCah;
+      break;
+    default:
+      console.log("doing the default")
+      break;
+  }
+  const isConnected = await tryConnectPlayer(user.value, room.value, type, callback);
+  if (isConnected) {
+    await navigateTo(`/lobby/${ $gameToString(type) }`);
     return;
   }
 

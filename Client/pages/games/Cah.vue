@@ -9,11 +9,11 @@ const baseStore = useBaseStore();
 const { tryConnectGameboard } = baseStore;
 
 const cahStore = useCahStore();
-const { registerHandlers } = cahStore;
+const { registerHandlersCah } = cahStore;
 
 
 const connectGameboard = async (): Promise<void> => {
-  const isConnected = await tryConnectGameboard(GameType.Cah, registerHandlers);
+  const isConnected = await tryConnectGameboard(GameType.Cah, registerHandlersCah);
   if (!isConnected) return;
 
   await navigateTo({ path: "/lobby/cah" });

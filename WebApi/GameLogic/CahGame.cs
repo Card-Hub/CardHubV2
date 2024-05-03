@@ -52,7 +52,8 @@ public class CahGame
     private Deck<CahCard> _whiteDeck = new();
     private Deck<CahCard> _blackDeck = new();
     private List<CahCard> _gambledCards = [];
-    private CahCard? _currentBlackCard;
+    public CahCard? CurrentBlackCard { get; set; }
+    
     private int _pickAmount;
         
     private PlayerOrder _playerOrder = [];
@@ -67,9 +68,7 @@ public class CahGame
 
     public string Gameboard { get; set; }
     public string Room { get; set; }
-
-    IHubContext<BaseHub> _hubContext;
-
+    
     private static List<CahPack>? _cahPacks;
     
     public event EventHandler PickingFinished;
@@ -103,16 +102,11 @@ public class CahGame
         _judgingTimeLimit = TimeSpan.FromSeconds(5);
         _judgingTimer = new Timer(_judgingTimeLimit);
         _judgingTimer.Elapsed += OnJudgingTimeElapsed;
-        
-        _hubContext = hubContext;
     }
 
     public bool AddPlayer(string playerName)
     {
-        if (_players.ContainsKey(playerName) || playerName == Gameboard)
-        {
-            return false;
-        }
+        if (_players.ContainsKey(playerName) || playerName == Gameboard) return false;
 
         _players.Add(playerName, new CahPlayer(playerName));
         _playerOrder.Add(playerName);
@@ -133,15 +127,13 @@ public class CahGame
         _blackDeck.Shuffle();
         _playerOrder.ShuffleOrder();
 
-        var playerHands = new Dictionary<string, List<CahCard>>();
         foreach (var player in _playerOrder)
         {
             var drawnCards = _whiteDeck.Draw(10);
             _players[player].AddCards(drawnCards);
-            playerHands.Add(player, drawnCards);
         }
         
-        return playerHands;
+        return GetPlayerHands();
     }
 
     public object InitiatePicking()
@@ -151,8 +143,8 @@ public class CahGame
             _pickingTimer.Start();
         }
 
-        _currentBlackCard = _blackDeck.Draw();
-        _pickAmount = _currentBlackCard.PickAmount;
+        CurrentBlackCard = _blackDeck.Draw();
+        _pickAmount = CurrentBlackCard.PickAmount;
 
         var nonCzarPlayers = GetNonCzarPlayers();
         var cardCzar = _playerOrder.Current();
@@ -168,7 +160,6 @@ public class CahGame
         // return object that contains the current black card, the pick amount, playerhands, and the card czar
         return new
         {
-            BlackCard = _currentBlackCard,
             PickAmount = _pickAmount,
             PlayerHands = _playerOrder.Select(player => new
             {
@@ -179,12 +170,17 @@ public class CahGame
         };
     }
 
-    public bool PlayCards(string playerName, List<CahCard> cards)
+    public bool PlayCards(string playerName, List<CahCard> cards, out bool allPlayersMoved)
     {
+        allPlayersMoved = false;
         if (IsCzar(playerName) || _pickAmount != cards.Count) return false;
         if (!_players[playerName].EnqueueCards(cards)) return false;
         
         _playersMoved.Add(playerName);
+        if (_playersMoved.Count == _players.Count)
+        {
+            allPlayersMoved = true;
+        }
         return true;
     }
     
@@ -198,7 +194,7 @@ public class CahGame
     }
     
     // All players have picked their cards
-    private async Task AllPlayersMoved()
+    public async Task AllPlayersMoved()
     {
         lock (_lock)
         {
@@ -208,12 +204,12 @@ public class CahGame
         var nonCzarPlayers = GetNonCzarPlayers();
         foreach (var playerName in nonCzarPlayers)
         {
-            await _hubContext.Clients.Client(_playerOrder.Current()).SendAsync("ReceivePlayerCardPicks", playerName,
-                _players[playerName].DequeueCards());
+            // await _hubContext.Clients.Client(_playerOrder.Current()).SendAsync("ReceivePlayerCardPicks", playerName,
+            //     _players[playerName].DequeueCards());
         }
 
-        await _hubContext.Clients.Client(_playerOrder.Current())
-            .SendAsync("StartTimer", _judgingTimeLimit.Seconds);
+        // await _hubContext.Clients.Client(_playerOrder.Current())
+        //     .SendAsync("StartTimer", _judgingTimeLimit.Seconds);
         
         lock (_lock)
         {
@@ -233,20 +229,28 @@ public class CahGame
                 pickedCards.Enqueue(_players[playerName].PickRandomCard());
             }
 
-            await _hubContext.Clients.Client(_playerOrder.Current()).SendAsync("ReceivePlayerCardPicks", playerName,
-                _players[playerName].DequeueCards());
+            // await _hubContext.Clients.Client(_playerOrder.Current()).SendAsync("ReceivePlayerCardPicks", playerName,
+            //     _players[playerName].DequeueCards());
         }
 
-        await _hubContext.Clients.Client(_playerOrder.Current())
-            .SendAsync("StartTimer", _judgingTimeLimit.Seconds);
+        // await _hubContext.Clients.Client(_playerOrder.Current())
+        //     .SendAsync("StartTimer", _judgingTimeLimit.Seconds);
+    }
+
+    public bool SelectWinner()
+    {
+        var nonCzarPlayers = GetNonCzarPlayers().ToArray();
+        var index = new Random().Next(nonCzarPlayers.Length);
+        var player = nonCzarPlayers.ElementAt(index);
+        
+        return SelectWinner(Czar, player);
     }
     
-    // Czar selects a winner
     public bool SelectWinner(string playerSelecting, string playerSelected)
     {
         if (!IsCzar(playerSelecting) || IsCzar(playerSelected)) return false;
 
-        _players[playerSelected].AddWonCard(_currentBlackCard!);
+        _players[playerSelected].AddWonCard(CurrentBlackCard!);
         _playerOrder.SetNextCurrent();
 
         lock (_lock)
@@ -271,6 +275,17 @@ public class CahGame
         var player = _playerOrder.GetPlayer(playerName);
         return _players[player].GetHand();
     }
+    
+    public Dictionary<string, List<CahCard>> GetPlayerHands()
+    {
+        return _playerOrder.Select(player => new
+        {
+            Player = player,
+            Cards = _players[player].GetHand()
+        }).ToDictionary(x => x.Player, x => x.Cards);
+    }
+    
+    private string Czar => _playerOrder.Current();
 
     private bool IsCzar(string playerName) =>
         _playerOrder.Current() == playerName;

@@ -8,7 +8,6 @@ public class CahPlayer : CardPlayer<CahCard>
     public Queue<CahCard> PickedCards { get; }
     public int Score => WonCards.Count;
     private bool HasPlayed() => PickedCards.Count > 0;
-    private CahCard? _gambleCard;
 
     public CahPlayer(string name) : base(name)
     {
@@ -40,7 +39,6 @@ public class CahPlayer : CardPlayer<CahCard>
         if (PickedCards.Contains(whiteCard)) return false;
 
         WonCards.Remove(blackCard);
-        _gambleCard = whiteCard;
         return true;
     }
     

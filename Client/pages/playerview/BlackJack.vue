@@ -4,15 +4,18 @@ import {storeToRefs} from "pinia";
 import StandardCardDisplay from "~/components/Card/StandardCardDisplay.vue";
 import StandardnoshadowCard from "~/components/noShadowCard/StandardnoshadowCard.vue";
 import { useBlackJackStore } from "~/stores/blackJackStore";
+import { useBaseStore } from "#imports";
 // fullscreen
 const { isFullscreen, enter, exit } = useFullscreen();
 const el = ref(null)
 const { toggle } = useFullscreen(el)
 
 const store = useBlackJackStore();
+const baseStore = useBaseStore();
+const { user } = storeToRefs(baseStore);
 
 const { drawBlackJackCard, standBlackJackPlayer, betBlackJackPlayer } = store;
-const {players, currentPlayer, user, allPlayersHaveBet} = storeToRefs(store);
+const {players, currentPlayer, allPlayersHaveBet} = storeToRefs(store);
 // const player = findPlayerByName(user);
 
 const getPrimeIcon = (name: string) => {
@@ -39,6 +42,7 @@ const closeBetPopup = () => {
 }
 
 const bet = (amt: number) => {//invoke bet here
+  closeBetPopup();
   betBlackJackPlayer(amt);
 }
 
@@ -55,12 +59,18 @@ const getUserIcon = () => {
 };
 
 const findPlayerByName = (userConn: string) => {
-      return players.value.find(player => player.strConn === user.value);
+      return players.value.find(player => player.Name === user.value);
+};
+
+const findPlayerByID = (userConn: string) => {
+      return players.value.find(player => player.strConn === userConn);
 };
 
 </script>
  
 <template>
+  <p class="text-white"> fg{{  findPlayerByName(user)  }}</p>
+  <p class="text-white"> yeye{{players}}</p>
   <div class="playerview-une-container w-full p-6">
     <div class="flex flex-row justify-between">
       <div class="user-info flex place-items-center gap-3 bg-gray-600">
@@ -76,7 +86,6 @@ const findPlayerByName = (userConn: string) => {
           <Dialog v-model="rulesVisible" header="Rules" class="w-[900px] h-[900px]" :visible="rulesVisible" @update:visible="rulesVisible = $event">
             <BlackjackRules />
             <div class="flex justify-content-end gap-2">
-              <!--            <Button type="button" label="Exit" @click="rulesVisible = false"></Button>-->
             </div>
           </Dialog>
         </div>
@@ -88,7 +97,6 @@ const findPlayerByName = (userConn: string) => {
           </Dialog>
         </div>
 
-        <!--      <i class="pi pi-fw pi-eye" @click="!sideScroll" style="font-size: 2.5rem"></i>-->
       </div>
     </div>all
     
@@ -104,9 +112,9 @@ const findPlayerByName = (userConn: string) => {
         <span v-if="findPlayerByName(user)?.Busted == true">
             You Lose!
         </span>
-        <span v-if="currentPlayer !== user">{{ currentPlayer }} is playing...
+        <span v-if="currentPlayer !== user &&  allPlayersHaveBet === true">{{ findPlayerByID(user) }} is playing...
         </span>
-        <span v-if="allPlayersHaveBet == false">
+        <span v-if="allPlayersHaveBet === false">
             Everyone Take Bets!
         </span>
       </h1>
@@ -120,10 +128,10 @@ const findPlayerByName = (userConn: string) => {
         </div>
     
         <div class="cards-outer">
-            <div class="cards">
+            <!--div class="cards">
               <StandardnoshadowCard :card="findPlayerByName('Dealer')?.Hand[0]" class="standardCardDisplay"/>
               <StandardnoshadowCard :card="findPlayerByName('Dealer')?.Hand[1]" class="standardCardDisplay"/>  
-            </div>
+            </div-->
         </div>
 
         <div class="content-center stat-box">

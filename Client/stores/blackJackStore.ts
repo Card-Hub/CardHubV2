@@ -26,7 +26,7 @@ export const useBlackJackStore = defineStore("blackjack", () => {
     const winners = ref<string[]>([]);
     const losers = ref<string[]>([]);
     const stalemates = ref<string[]>([]);
-    const gameStarted = ref<boolean | null>(false);
+    const gameStarted = ref<boolean>(false);
     const allPlayersHaveBet = ref<boolean | null>(false);
     const currentPlayer = ref<string>("");
 
@@ -42,8 +42,22 @@ export const useBlackJackStore = defineStore("blackjack", () => {
         gameConnection.on("Pong", () => {
             log("Received pong from blackjack");
         });
+
+        gameConnection.on("GameStarted", () => {
+            gameStarted.value = true;
+        });
+        gameConnection.on("ReceiveJson", (json: string) => {
+            parseJson(json);
+            log(json);
+        });
     };
 
+    const startGame = async (): Promise<void> => {
+        if (!isGameConnected) return;
+        if (gameStarted.value) return;
+        
+        await gameConnection.value?.invoke("StartGame");
+    }
 
     const drawBlackJackCard = async (): Promise<void> => {
         if (gameConnection.value === null) return;
@@ -63,7 +77,7 @@ export const useBlackJackStore = defineStore("blackjack", () => {
         if (gameConnection.value === null) return;
 
         console.log("player has made bet");
-        await gameConnection.value.invoke("betBlackJackHub", bet);
+        await gameConnection.value.invoke("BetBlackJackHub", bet);
     };
 
     const ping = async (): Promise<void> => {
@@ -75,7 +89,7 @@ export const useBlackJackStore = defineStore("blackjack", () => {
     const parseJson = async (json: string) => {
         const parsed = JSON.parse(json);
         gameType.value = parsed.GameType;
-        players.value = parsed.ActivePlayers;
+        players.value = parsed.Players;
         currentPlayer.value = parsed.CurrentPlayer;
         winners.value = parsed.Winners;
         losers.value = parsed.Losers;
@@ -91,6 +105,7 @@ export const useBlackJackStore = defineStore("blackjack", () => {
         parseJson,
         registerHandlersBlackJack,
         ping,
+        startGame,
         gameType,
         players,
         currentPlayer,

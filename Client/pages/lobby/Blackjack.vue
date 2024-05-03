@@ -15,10 +15,23 @@ const { isPlayer, users, room, currentAvatar } = storeToRefs(baseStore);
 
 const store = useBlackJackStore();
 const { gameStarted } = storeToRefs(store);
-const { ping } = store;
+const { ping, startGame } = store;
+
+
 
 
 const visible = ref(false);
+
+
+watch(gameStarted, (value) => {
+  if (value) {
+    if (isPlayer.value) {
+      playerStart();
+    } else {
+      gameboardStart();
+    }
+  }
+});
 
 const gameboardStart = async () => {
   await navigateTo("/gameboard/" + $gameToString(GameType.BlackJack));
@@ -153,7 +166,7 @@ const convertBase = (player: BlackJackPlayer) => {
           <p class="text-6xl">
             {{ room }}
           </p>
-          <Button class="mt-48" @click="gameboardStart">Start Game</Button>
+          <Button class="mt-48" @click="startGame">Start Game</Button>
         </div>
       </div>
       <div class="flex flex-col w-1/3">

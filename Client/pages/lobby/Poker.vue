@@ -4,20 +4,16 @@ import Une from "~/pages/games/Une.vue";
 import AvatarSelection from "~/components/AvatarSelection.vue";
 import Chat from "~/components/Chat.vue";
 
-const store = useWebSocketStore();
-const { isPlayer, messages, users, room, lobbyUsers } = storeToRefs(store);
-const { sendMessage, startGame } = store;
-const uneStore = useUneStore();
-const { gameType, gameStarted } = storeToRefs(uneStore);
-
 
 // will allow for a popup of the chat
 import dialog from 'primevue/dialog';
 import UnoRules from "~/components/gameRules/UneRules.vue";
 const visible = ref(false);
 
+const isPlayer = ref<boolean>(true);
+
 const gameboardStart = () => {
-  startGame();
+  // startGame();
   navigateTo("/gameboard/poker");
 }
 
@@ -35,14 +31,14 @@ const getIcon = (avatar: string) => {
 };
 
 const getIconGivenName = (name: string) => {
-  lobbyUsers.value.forEach(function (user: LobbyUser) {
+  // lobbyUsers.value.forEach(function (user: LobbyUser) {
     // console.log(value);
-    if (user.Name == name) {
-      return getIcon(user.Avatar);
-    }else{
-      return getIcon("lyssie");
-    }
-  });
+  //   if (user.Name == name) {
+  //     return getIcon(user.Avatar);
+  //   }else{
+  //     return getIcon("lyssie");
+  //   }
+  // });
   // if that fails
   return getIcon("lyssie");
 }

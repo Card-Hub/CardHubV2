@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
 
-import { ref, computed } from "vue";
+import {ref, computed, onMounted} from "vue";
 import { storeToRefs } from "pinia";
 //import Une from "~/pages/games/Une.vue";
 import UnoRules from "~/components/gameRules/UneRules.vue";
@@ -15,11 +15,61 @@ const { isPlayer, messages, users, room, currentAvatar } = storeToRefs(baseStore
 const {  } = baseStore; // ??
 const uneStore = useUneStore();
 const { ping } = uneStore;
+const { startGame } = uneStore;
+const { gameStarted } = storeToRefs(uneStore);
 //const { gameType, gameStarted } = storeToRefs(uneStore);
 const { $gameToString } = useNuxtApp();
 // will allow for a popup of the chat
 import dialog from 'primevue/dialog';
+import Dialog from "primevue/dialog";
 const visible = ref(false);
+const settingsVisible = ref(false);
+const seVolume = ref(0.5);
+
+import sillyFun from '../../assets/audio/music/sillyFun.mp3';
+const bgMusic = new Audio(sillyFun);
+const bgVolume = ref(0.5);
+
+const playSillyFun = () => {
+  bgMusic.loop = true;
+  bgMusic.play();
+};
+
+// only allow for music to play if gameboard is in lobby
+onMounted(() => {
+  if(!isPlayer.value && room.value !== "" && !gameStarted.value){
+    playSillyFun();
+  }  else {
+    bgMusic.loop = false;
+  }
+});
+
+if(!isPlayer.value && room.value !== ""){
+  // playSillyFun();
+  // if (startGame()){
+  //   bgMusic.loop = false;
+  // }
+}
+
+const updateBGVolume = () => {
+  bgMusic.volume = bgVolume.value;
+};
+const bgVolumeDown = () => {
+  bgVolume.value = 0;
+  bgMusic.volume = bgVolume.value;
+};
+const bgVolumeUp = () => {
+  bgVolume.value = 1;
+  bgMusic.volume = bgVolume.value;
+};
+
+const seVolumeDown = () => {
+  seVolume.value = 0;
+};
+
+const seVolumeUp = () => {
+  seVolume.value = 1;
+};
 
 
 
@@ -34,8 +84,18 @@ const visible = ref(false);
 //import dialog from 'primevue/dialog';
 //import Chat from "~/components/Chat.vue";
 
+watch(gameStarted, (value) => {
+  if (value) {
+    if (isPlayer.value) {
+      playerStart();
+    } else {
+      gameboardStart();
+    }
+  }
+});
+
 const gameboardStart = async () => {
-  // startGame();
+  startGame();
   await navigateTo("/gameboard/" + $gameToString(GameType.Une));
 }
 
@@ -117,7 +177,19 @@ const getIconGivenName = (name: string) => {
         <div class="justify-left">
           <i class="pi pi-fw pi-comment" style="font-size: 2rem" @click="visible = true"></i>
           <Dialog v-model="visible" class="w-[900px] h-[900px]" header="Chat" :visible="visible" @update:visible="visible = $event">
-            <Chat/>
+            <Chat :seVolume="seVolume"/>
+          </Dialog>
+
+          <i class="pi pi-fw pi-cog" style="font-size: 2rem" @click="settingsVisible = true"></i>
+          <Dialog v-model="settingsVisible" class="w-auto h-auto" header="Settings" :visible="settingsVisible" @update:visible="settingsVisible = $event">
+            <h1 class="text-center">Sound Effects</h1> <br>
+            <div class="flex flex-row justify-content-center align-middle">
+              <i class="pi pi-fw pi-volume-down" style="font-size: 2rem" @click="seVolumeDown"></i>
+              <div class="content-around">
+                <Slider v-model="seVolume" :min="0" :max="1" :step="0.1" class="w-96"/>
+              </div>
+              <i class="pi pi-fw pi-volume-up" style="font-size: 2rem" @click="seVolumeUp"></i>
+            </div><br>
           </Dialog>
         </div>
       </div>
@@ -173,6 +245,31 @@ const getIconGivenName = (name: string) => {
         </div>
       </div>
       <div class="flex flex-col w-1/3">
+        <div class="absolute top-4 right-4">
+          <i class="pi pi-fw pi-cog" style="font-size: 2rem" @click="settingsVisible = true"></i>
+          <Dialog v-model="settingsVisible" class="w-auto h-auto" header="Settings" :visible="settingsVisible" @update:visible="settingsVisible = $event">
+            <h1 class="text-center">Background Music</h1> <br>
+            <div class="flex flex-row justify-content-center align-middle">
+              <i class="pi pi-fw pi-volume-down" style="font-size: 2rem" @click="bgVolumeDown"></i>
+              <div class="content-around">
+                <Slider v-model="bgVolume" :min="0" :max="1" :step="0.1" class="w-96" @change="updateBGVolume"/>
+              </div>
+              <i class="pi pi-fw pi-volume-up" style="font-size: 2rem" @click="bgVolumeUp"></i>
+            </div>
+
+            <br>
+            <h1 class="text-center">Sound Effects</h1> <br>
+            <div class="flex flex-row justify-content-center align-middle">
+              <i class="pi pi-fw pi-volume-down" style="font-size: 2rem" @click="seVolumeDown"></i>
+              <div class="content-around">
+                <Slider v-model="seVolume" :min="0" :max="1" :step="0.1" class="w-96"/>
+              </div>
+              <i class="pi pi-fw pi-volume-up" style="font-size: 2rem" @click="seVolumeUp"></i>
+            </div><br>
+          </Dialog>
+        </div>
+        
+        
         <div class="chat-box">
           <Chat />
         </div>

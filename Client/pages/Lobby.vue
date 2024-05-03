@@ -5,9 +5,9 @@ import Une from "~/pages/games/Une.vue";
 import AvatarSelection from "~/components/AvatarSelection.vue";
 import Chat from "~/components/Chat.vue";
 
-const store = useWebSocketStore();
-const { isPlayer, messages, users, room, lobbyUsers } = storeToRefs(store);
-const { sendMessage, startGame } = store;
+//const store = useWebSocketStore();
+//const { isPlayer, messages, users, room, lobbyUsers } = storeToRefs(store);
+//const { sendMessage, startGame } = store;
 const uneStore = useUneStore();
 const { gameType, gameStarted } = storeToRefs(uneStore);
 

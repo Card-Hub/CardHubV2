@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { storeToRefs } from "pinia";
+import { CahType } from "~/types";
 
-import { useBaseStore } from "~/stores/baseStore";
-import { useCahStore } from "~/stores/cahStore";
-// get players from store
+
 const baseStore = useBaseStore();
 const { isPlayer, messages, users, room, user, currentAvatar } = storeToRefs(baseStore);
+
 const cahStore = useCahStore();
 const {} = storeToRefs(cahStore);
 
@@ -19,33 +19,18 @@ const getPrimeIcon = (name: string) => {
   return new URL(`../../assets/icons/primeIcons/${ name }.svg`, import.meta.url);
 };
 
-// uncomment these out later
-// const {  cards, users, room } = storeToRefs(store);
-// const { cards } = storeToRefs(store);
+const whiteCards = ref<CahCard[]>([
+  { text: 'Hello', type: CahType.White },
+  { text: 'UR mom', type: CahType.White },
+  { text: 'uhhhh', type: CahType.White }
+]);
 
-
-const dealerCards = ref<StandardCard[]>([
-  { Id: 1, Suit: "hearts", Value: "Jack" },
-  { Id: 2, Suit: "hearts", Value: "Ace" }]);
-//reverse dealer cards
-dealerCards.value.reverse();
-
-// const players = ref<BlackJackPlayer[]>([
-//   {Name: "lyssie", Avatar: "lyssie", Afk: false, Hand: [{Id: 1, Suit: "hearts", Value: "Jack"}, {Id: 2, Suit: "hearts", Value: "Ace"}], CurrentScore: 21, TotalMoney: 100, CurrentBet: 10, HasBet: true, NotPlaying: false, Busted: false, Winner: false, StillPlaying: true, Standing: false},
-//   {Name: "juno", Avatar: "juno", Afk: false,Hand: [{Id: 1, Suit: "hearts", Value: "Jack"}, {Id: 2, Suit: "hearts", Value: "Ace"}], CurrentScore: 21, TotalMoney: 100, CurrentBet: 10, HasBet: true, NotPlaying: false, Busted: false, Winner: false, StillPlaying: true, Standing: false},
-//   {Name: "oli", Avatar: "oli", Afk: false,Hand: [{Id: 1, Suit: "hearts", Value: "Jack"}, {Id: 2, Suit: "hearts", Value: "Ace"}], CurrentScore: 21, TotalMoney: 100, CurrentBet: 10, HasBet: true, NotPlaying: false, Busted: false, Winner: false, StillPlaying: true, Standing: false},
-//   {Name: "liam", Avatar: "liam", Afk: false,Hand: [{Id: 1, Suit: "hearts", Value: "Jack"}, {Id: 2, Suit: "hearts", Value: "Ace"}], CurrentScore: 21, TotalMoney: 100, CurrentBet: 10, HasBet: true, NotPlaying: false, Busted: false, Winner: false, StillPlaying: true, Standing: false},
-//   {Name: "andy", Avatar: "andy", Afk: false,Hand: [{Id: 1, Suit: "hearts", Value: "Jack"}, {Id: 2, Suit: "hearts", Value: "Ace"}], CurrentScore: 21, TotalMoney: 100, CurrentBet: 10, HasBet: true, NotPlaying: false, Busted: false, Winner: false, StillPlaying: true, Standing: false},
-//   {Name: "alex", Avatar: "alex", Afk: false,Hand: [{Id: 1, Suit: "hearts", Value: "Jack"}, {Id: 2, Suit: "hearts", Value: "Ace"}], CurrentScore: 21, TotalMoney: 100, CurrentBet: 10, HasBet: true, NotPlaying: false, Busted: false, Winner: false, StillPlaying: true, Standing: false},
-//   {Name: "ruby", Avatar: "ruby",Afk: false, Hand: [{Id: 1, Suit: "hearts", Value: "Jack"}, {Id: 2, Suit: "hearts", Value: "Ace"}], CurrentScore: 21, TotalMoney: 100, CurrentBet: 10, HasBet: true, NotPlaying: false, Busted: false, Winner: false, StillPlaying: true, Standing: false},
-//   {Name: "fairy", Avatar: "fairy", Afk: false,Hand: [{Id: 1, Suit: "hearts", Value: "Jack"}, {Id: 2, Suit: "hearts", Value: "Ace"}], CurrentScore: 21, TotalMoney: 100, CurrentBet: 10, HasBet: true, NotPlaying: false, Busted: false, Winner: false, StillPlaying: true, Standing: false},
-// ]);
+const blackCard = ref<CahCard>({ text: 'Hello', type: CahType.Black });
 
 const currentPlayer = ref<string>("lyssie");
 const dealersTurn = ref<boolean>(false);
 
-//const currentColor = ref<string>("red");
-// const { currentColor, players, currentPlayer, discardPile  } = storeToRefs(uneStore);
+
 const getCardStyle = (index: number) => {
   let randomX = index * 50;
   let randomY = index * 3;
@@ -70,39 +55,6 @@ const getPlayerIcon = (player: string) => {
   return new URL(`../../assets/icons/avatars/${ player }.png`, import.meta.url);
 };
 
-
-const getPlayerIconStyle = (index: number) => {
-  const totalPlayers = players.value.length;
-  let xpos = 0;
-  let ypos = 0;
-
-  if (totalPlayers === 2) {
-    xpos = index === 0 ? 50 : -51;
-    ypos = index === 0 ? -350 : 350;
-  } else if (totalPlayers === 3) {
-    xpos = index === 0 ? 151 : index === 1 ? -276 : 251;
-    ypos = index === 0 ? -350 : index === 1 ? 350 : 350;
-  } else if (totalPlayers === 4) {
-    xpos = index === 0 ? 150 : index === 1 ? -456 : index === 2 ? -56 : 356;
-    ypos = index === 0 ? -350 : index === 1 ? 0 : index === 2 ? 350 : 0;
-  } else if (totalPlayers === 5) {
-    xpos = index === 0 ? 225 : index === 1 ? -475 : index === 2 ? -251 : index === 3 ? 151 : 375;
-    ypos = index === 0 ? -300 : index === 1 ? 0 : index === 2 ? 300 : index === 3 ? 300 : 0;
-  } else if (totalPlayers === 6) {
-    xpos = index === 0 ? 500 : index === 1 ? -70 : index === 2 ? -525 : index === 3 ? -300 : index === 4 ? 60 : 325;
-    ypos = index === 0 ? -300 : index === 1 ? -300 : index === 2 ? 0 : index === 3 ? 300 : index === 4 ? 300 : 0;
-  } else if (totalPlayers === 7) {
-    xpos = index === 0 ? 550 : index === 1 ? -25 : index === 2 ? -425 : index === 3 ? -530 : index === 4 ? -350 : index === 5 ? 0 : 265;
-    ypos = index === 0 ? -300 : index === 1 ? -300 : index === 2 ? -150 : index === 3 ? 150 : index === 4 ? 300 : index === 5 ? 300 : 0;
-  } else if (totalPlayers === 8) {
-    xpos = index === 0 ? 600 : index === 1 ? 30 : index === 2 ? -375 : index === 3 ? -475 : index === 4 ? -300 : index === 5 ? 50 : index === 6 ? 265 : 150;
-    ypos = index === 0 ? -300 : index === 1 ? -300 : index === 2 ? -150 : index === 3 ? 150 : index === 4 ? 300 : index === 5 ? 300 : index === 6 ? 150 : -150;
-  }
-  return {
-    transform: `translate(${ xpos }%, ${ ypos }%)`
-  };
-};
-
 const isCurrentPlayer = (player: string) => {
   if (currentPlayer.value != "") {
     if (player.toLowerCase() === currentPlayer.value.toLowerCase()) {
@@ -114,6 +66,13 @@ const isCurrentPlayer = (player: string) => {
   }
 };
 
+const cardBlackStyle = () => {
+  return {
+    transform: `translate(0%, 0%) rotate(0deg)`,
+    zIndex: 1
+  };
+};
+
 const getCARD = () => {
   return new URL(`../../assets/icons/standardDeck/diamonds.svg`, import.meta.url);
 };
@@ -122,31 +81,18 @@ const getCARD = () => {
 <template>
   <div class="gameboard-container">
     <div class="gameboard">
-      <div class="player-icons">
-        <div class="player-icon" v-for="(player, index) in players" :key="index"
-             :style="{ ...getPlayerIconStyle(index), ...isCurrentPlayer(player.Name) }">
-          <img :src="getPlayerIcon(player.Avatar)" alt="Player Icon" class="player-icon-img"/>
-          <p class="player-name"> {{ player.Name }} </p>
-        </div>
+<!--      <div class="player-icons">-->
+<!--        <div class="player-icon" v-for="(player, index) in players" :key="index"-->
+<!--             :style="{ ...getPlayerIconStyle(index), ...isCurrentPlayer(player.Name) }">-->
+<!--          <img :src="getPlayerIcon(player.Avatar)" alt="Player Icon" class="player-icon-img"/>-->
+<!--          <p class="player-name"> {{ player.Name }} </p>-->
+<!--        </div>-->
+<!--      </div>-->
+      
+      <div>
+        <CahDisplay :card="blackCard" :style="cardBlackStyle()" />
+        <CahDisplay v-for="(card, index) in whiteCards" :key="index" :card="card" :style="cardStyle(index)" />
       </div>
-      <div class="game-table rounded-tr-full shadow-lg">
-        <div class="card-pile">
-          <div v-if="dealersTurn">
-
-          </div>
-          <div class="!dealersTurn"></div>
-          <StandardnoshadowCard :card="dealerCards[0]" class="standardCardDisplay"/>
-          <StandardnoshadowCard :card="dealerCards[1]" class="standardCardDisplay"/>
-          <div class="deck-card flex justify-center items-center bg-zinc-800 rounded-md shadow-md mb-2">
-            <img :src="getCARD()" alt="game icon" class="une-logo"/>
-          </div>
-        </div>
-        <div class="blank-card relative w-20 h-32 m-2 bg-zinc-800 rounded-md shadow-md p-2">
-          <img :src="getCARD()" alt="game icon" class="une-logo"/>
-        </div>
-      </div>
-
-
     </div>
   </div>
 

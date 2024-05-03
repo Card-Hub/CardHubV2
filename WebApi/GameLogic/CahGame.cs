@@ -95,14 +95,14 @@ public class CahGame
             }
         }
 
-        _pickingTimeLimit = TimeSpan.FromSeconds(5);
-        _pickingTimer = new Timer(_pickingTimeLimit);
-        _pickingTimer.Elapsed += OnPickingTimeElapsed;
-        _pickingTimer.Elapsed += (_, _) => PickingFinished?.Invoke(this, EventArgs.Empty);
-
-        _judgingTimeLimit = TimeSpan.FromSeconds(5);
-        _judgingTimer = new Timer(_judgingTimeLimit);
-        _judgingTimer.Elapsed += OnJudgingTimeElapsed;
+        // _pickingTimeLimit = TimeSpan.FromSeconds(5);
+        // _pickingTimer = new Timer(_pickingTimeLimit);
+        // _pickingTimer.Elapsed += OnPickingTimeElapsed;
+        // _pickingTimer.Elapsed += (_, _) => PickingFinished?.Invoke(this, EventArgs.Empty);
+        //
+        // _judgingTimeLimit = TimeSpan.FromSeconds(5);
+        // _judgingTimer = new Timer(_judgingTimeLimit);
+        // _judgingTimer.Elapsed += OnJudgingTimeElapsed;
     }
 
     public bool AddPlayer(string playerName)
@@ -139,10 +139,10 @@ public class CahGame
 
     public object InitiatePicking()
     {
-        lock (_lock)
-        {
-            _pickingTimer.Start();
-        }
+        // lock (_lock)
+        // {
+        //     _pickingTimer.Start();
+        // }
 
         CurrentBlackCard = _blackDeck.Draw();
         _pickAmount = CurrentBlackCard.PickAmount;
@@ -197,10 +197,10 @@ public class CahGame
     // All players have picked their cards
     public async Task AllPlayersMoved()
     {
-        lock (_lock)
-        {
-            _pickingTimer.Stop();
-        }
+        // lock (_lock)
+        // {
+        //     _pickingTimer.Stop();
+        // }
 
         var nonCzarPlayers = GetNonCzarPlayers();
         foreach (var playerName in nonCzarPlayers)
@@ -212,10 +212,10 @@ public class CahGame
         // await _hubContext.Clients.Client(_playerOrder.Current())
         //     .SendAsync("StartTimer", _judgingTimeLimit.Seconds);
         
-        lock (_lock)
-        {
-            _judgingTimer.Start();
-        }
+        // lock (_lock)
+        // {
+        //     _judgingTimer.Start();
+        // }
     }
 
     // Some players did not pick their cards in time
@@ -254,10 +254,10 @@ public class CahGame
         _players[playerSelected].AddWonCard(CurrentBlackCard!);
         _playerOrder.SetNextCurrent();
 
-        lock (_lock)
-        {
-            _judgingTimer.Stop();
-        }
+        // lock (_lock)
+        // {
+        //     _judgingTimer.Stop();
+        // }
 
         return true;
     }

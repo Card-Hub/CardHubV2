@@ -1,32 +1,28 @@
 <script setup lang="ts">
-import {defineComponent, ref, onMounted} from "vue";
-
-import StandardCardDisplay from "~/components/Card/StandardCardDisplay.vue";
+import Dialog from "primevue/dialog";
+import { ref } from "vue";
+import { storeToRefs } from "pinia";
+import { useFullscreen } from "@vueuse/core";
+import newPlayer from "assets/audio/soundEffects/newPlayer.mp4";
+import drawCard from "../../assets/audio/soundEffects/drawCard.mp4";
+import newMessage from "../../assets/audio/soundEffects/newMessage.mp4";
+import playCard from "../../assets/audio/soundEffects/playCard.mp4";
+import sendMessage from "../../assets/audio/soundEffects/sendMessage.mp4";
 
 import toast from "@/utils/toast";
 
-import { type ConfigurableDocument, type MaybeElementRef, useFullscreen } from '@vueuse/core';
-
-// fullscreen
 const { isFullscreen, enter, exit } = useFullscreen();
-const el = ref(null)
-const { toggle } = useFullscreen(el)
+const el = ref(null);
+const { toggle } = useFullscreen(el);
 
 const getPrimeIcon = (name: string) => {
-  return new URL(`../../assets/icons/primeIcons/${name}.svg`, import.meta.url);
-}
+  return new URL(`../../assets/icons/primeIcons/${ name }.svg`, import.meta.url);
+};
 
 // https://primevue.org/dialog
-import Dialog from 'primevue/dialog';
-import Chat from "~/components/Chat.vue";
-import CahRules from "~/components/gameRules/CahRules.vue";
 const rulesVisible = ref(false); // for popup dialog
 const chatVisible = ref(false); // for popup dialog https://primevue.org/avatar/ for chat notification
-
-// convert user to CahPlayer
-import {storeToRefs} from "pinia";
-import { useBaseStore} from "~/stores/baseStore";
-import { useCahStore } from "~/stores/cahStore";
+const settingsVisible = ref(false); // for popup dialog
 
 const baseStore = useBaseStore();
 const { isPlayer, messages, users, room, user, currentAvatar } = storeToRefs(baseStore);
@@ -35,9 +31,13 @@ const { isPlayer, messages, users, room, user, currentAvatar } = storeToRefs(bas
 const getUserIcon = () => {
   // iterate through players to find the user's avatar
   let userIcon = "";
-  users.value.forEach(p => { if (p.name === user.value) { userIcon = p.avatar; } });
+  users.value.forEach(p => {
+    if (p.name === user.value) {
+      userIcon = p.avatar;
+    }
+  });
 
-  return new URL(`../../assets/icons/avatars/${currentAvatar.value}.png`, import.meta.url);
+  return new URL(`../../assets/icons/avatars/${ currentAvatar.value }.png`, import.meta.url);
   // return new URL(`../../assets/icons/avatars/lyssie.png`, import.meta.url);
 };
 
@@ -47,6 +47,67 @@ const handleExit = async () => {
 
   // redirect to join page
   await navigateTo("/join");
+};
+
+const enum CahType {
+  White,
+  Black
+}
+
+const selectCard = (card: CahCard) => {
+  // send card to server
+  console.log(card);
+  // musicPlayCard();
+};
+
+const hand = ref([
+  { text: "Hello", type: CahType.White },
+  { text: "UR mom", type: CahType.White },
+  { text: "uhhhh", type: CahType.White }
+]);
+
+const bgVolume = ref(0.5);
+const seVolume = ref(0.5);
+const seDC = new Audio(drawCard);
+const seNM = new Audio(newMessage);
+const seNP = new Audio(newPlayer);
+const sePC = new Audio(playCard);
+const seSM = new Audio(sendMessage);
+
+
+const musicDrawCard = () => {
+  seDC.volume = seVolume.value;
+  seDC.play();
+};
+const musicNewMessage = () => {
+  seNM.volume = seVolume.value;
+  seNM.play();
+};
+const musicPlayCard = () => {
+  sePC.volume = seVolume.value;
+  sePC.play();
+};
+const musicSendMessage = () => {
+  seSM.volume = seVolume.value;
+  seSM.play();
+};
+
+const updateSEVolume = () => {
+  seDC.volume = seVolume.value;
+  seNM.volume = seVolume.value;
+  seNP.volume = seVolume.value;
+  sePC.volume = seVolume.value;
+  seSM.volume = seVolume.value;
+};
+
+const seVolumeDown = () => {
+  seVolume.value = 0;
+  updateSEVolume();
+};
+
+const seVolumeUp = () => {
+  seVolume.value = 1;
+  updateSEVolume();
 };
 </script>
 
@@ -62,12 +123,25 @@ const handleExit = async () => {
       </div>
 
       <div class="left-div flex flex-row-reverse place-items-center gap-2">
-        <img :src="getPrimeIcon('expand')" class="size-10" @click="toggle" />
+        <img :src="getPrimeIcon('expand')" class="size-10" @click="toggle"/>
+
+        <i class="pi pi-fw pi-cog" style="font-size: 2rem" @click="settingsVisible = true"></i>
+        <Dialog v-model="settingsVisible" class="w-auto h-auto" header="Settings" :visible="settingsVisible" @update:visible="settingsVisible = $event">
+          <h1 class="text-center">Sound Effects</h1> <br>
+          <div class="flex flex-row justify-content-center align-middle">
+            <i class="pi pi-fw pi-volume-down" style="font-size: 2rem" @click="seVolumeDown"></i>
+            <div class="content-around">
+              <Slider v-model="seVolume" :min="0" :max="1" :step="0.1" class="w-96" @change="updateSEVolume"/>
+            </div>
+            <i class="pi pi-fw pi-volume-up" style="font-size: 2rem" @click="seVolumeUp"></i>
+          </div><br>
+        </Dialog>
 
         <div class="card">
           <i class="pi pi-fw pi-info-circle" style="font-size: 2rem" @click="rulesVisible = true"></i>
-          <Dialog v-model="rulesVisible" header="Rules" class="w-[900px] h-[900px]" :visible="rulesVisible" @update:visible="rulesVisible = $event">
-            <CahRules />
+          <Dialog v-model="rulesVisible" header="Rules" class="w-[900px] h-[900px]" :visible="rulesVisible"
+                  @update:visible="rulesVisible = $event">
+            <CahRules/>
             <div class="flex justify-content-end gap-2">
               <!--            <Button type="button" label="Exit" @click="rulesVisible = false"></Button>-->
             </div>
@@ -76,12 +150,29 @@ const handleExit = async () => {
 
         <div class="">
           <i class="pi pi-fw pi-comment" style="font-size: 2rem" @click="chatVisible = true"></i>
-          <Dialog v-model="chatVisible" class="w-[900px] h-[900px]" header="Chat" :visible="chatVisible" @update:visible="chatVisible = $event">
+          <Dialog v-model="chatVisible" class="w-[900px] h-[900px]" header="Chat" :visible="chatVisible"
+                  @update:visible="chatVisible = $event">
             <Chat/>
           </Dialog>
         </div>
 
         <!--      <i class="pi pi-fw pi-eye" @click="!sideScroll" style="font-size: 2.5rem"></i>-->
+      </div>
+    </div>
+    
+    <div class="hand-view">
+      <div class="cards-container">
+        <div class="cards-and-buttons">
+          <div class="cards">
+            <CahDisplay class="standardCardDisplay"
+                 v-for="card in hand"
+                 :key="card.text"
+                 :card="card"
+                 :isSelected="false"
+                 @click="selectCard(card)"
+            />
+          </div>
+        </div>
       </div>
     </div>
 
@@ -137,6 +228,7 @@ const handleExit = async () => {
   /*display: flex;*/
   /*flex-direction: row-reverse;*/
 }
+
 .playerview-une-container {
   width: 100%;
   height: 100vh;
@@ -153,11 +245,13 @@ const handleExit = async () => {
   grid-template-columns: 1fr 1fr;
   height: 60%;
 }
+
 .cards {
   /*background-color: green;*/
   display: grid;
   grid-template-columns: 1fr 1fr;
 }
+
 .standardCardDisplay {
   /*background-color: pink;*/
   height: 100%;
@@ -177,12 +271,13 @@ const handleExit = async () => {
   justify-content: center;
   text-align: center;
   /*justify-content: center;*/
-  border-radius:4px;
+  border-radius: 4px;
   border-style: solid;
   border-width: 2px;
   padding: 10px;
 
 }
+
 .winner-inner {
   border-style: solid;
   border-width: 4px;
@@ -193,6 +288,7 @@ const handleExit = async () => {
   /*text-align: center;*/
   align-items: center; /*height*/
 }
+
 .select-color {
   position: absolute;
   top: 50%;
@@ -208,12 +304,13 @@ const handleExit = async () => {
   /*justify-content: center;*/
   text-align: center;
   justify-content: center;
-  border-radius:4px;
+  border-radius: 4px;
   border-style: solid;
   border-width: 2px;
   padding: 12px;
   border-color: var(--cardhub-red);
 }
+
 .select-color h2 {
   margin-top: 0;
 }

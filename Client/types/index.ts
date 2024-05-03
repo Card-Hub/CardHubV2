@@ -4,7 +4,7 @@ declare global {
     
     interface Card {
         Id: number
-        Value: string
+        Value?: string
     }
     
     interface StandardCard extends Card {
@@ -84,9 +84,14 @@ declare global {
         name: string;
         avatar: string;
     }
+
+    interface PlayerMessage {
+        name: string;
+        message: string;
+    }
 }
 
-export const enum CahType {
+export enum CahType {
     White,
     Black
 }

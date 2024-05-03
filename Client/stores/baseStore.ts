@@ -94,6 +94,7 @@ export const useBaseStore = defineStore("base", () => {
             }
 
             isPlayer.value = true;
+            user.value = user1;
             return true;
         } catch (e) {
             log("Error in TryConnectPlayer", e);

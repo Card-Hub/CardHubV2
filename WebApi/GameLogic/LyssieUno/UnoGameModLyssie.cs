@@ -454,6 +454,9 @@ public async Task SelectWild(string connStr, UnoColorLyssie color) {
       {
         GameboardConnStr // adds this to the end of all the others
       }; 
+      // debug
+      Console.WriteLine("All ConnStrs:");
+      foreach (string connStr in allConnStrs) { Console.WriteLine(connStr); }
       // shallow copy - the list is different but the objects are references and can be messed with
       return allConnStrs;
     }

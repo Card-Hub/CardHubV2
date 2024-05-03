@@ -45,6 +45,12 @@ public class BlackJackHub : Hub
         await Groups.AddToGroupAsync(ContextId, roomId);
     }
 
+    public async Task DrawCardBlackJackHub()
+    {
+        if (!TryGetGame(out var game)) return;
+        game.DrawCard(ContextId);
+    }
+
     public async Task StartGame()
     {
         if (!TryGetGame(out var game)) return;
@@ -52,10 +58,12 @@ public class BlackJackHub : Hub
         game.StartGame();
         
         await Clients.Group(GetRoomId()).SendAsync("GameStarted");
-        // foreach (var (player, cards) in playerHands)
-        // {
-        //     await Clients.Client(player).SendAsync("ReceiveCards", cards);
-        // }
+
+    }
+
+    public async Task BetBlackJackHub(int amt) {
+        if (!TryGetGame(out var game)) return;
+        game.TakeBet(ContextId, amt);
     }
 
     public async Task Ping() => await Clients.Caller.SendAsync("Pong");

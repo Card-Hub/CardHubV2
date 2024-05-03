@@ -112,7 +112,7 @@ const findPlayerByID = (userConn: string) => {
         <span v-if="findPlayerByName(user)?.Busted == true">
             You Lose!
         </span>
-        <span v-if="currentPlayer !== user &&  allPlayersHaveBet === true">{{ findPlayerByID(user) }} is playing...
+        <span v-if="currentPlayer !== user &&  allPlayersHaveBet === true">{{ findPlayerByName(user) }} is playing...
         </span>
         <span v-if="allPlayersHaveBet === false">
             Everyone Take Bets!

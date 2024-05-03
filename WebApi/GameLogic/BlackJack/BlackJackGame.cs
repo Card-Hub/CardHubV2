@@ -69,6 +69,7 @@ public class BlackJackGame : IBaseGame<StandardCard>
             PlayerOrder.NextTurn();
             //give promt to frontend to take bets
             state = "TakingBets";
+            Console.WriteLine("\n\nim here now changing state to taking bets\n\n");
             // await _messenger.SendFrontendJson(GetAllConnStrsIncGameboard(), GetGameState());
             return true;
         }
@@ -152,6 +153,8 @@ public class BlackJackGame : IBaseGame<StandardCard>
     public bool GivingCards(){
         if (state == "GivingCards"){
             BlackJackJsonState.AllPlayersHaveBet = true;
+            BlackJackJsonState.Update(this);
+            _messenger.SendFrontendJson(GetAllConnStrsIncGameboard(), GetGameState());
             foreach (KeyValuePair<string, BlackJackPlayer> player in Players)
                 if (player.Key != "Dealer" && player.Value.NotPlaying == false)
                     DrawCard(player.Key);
@@ -164,6 +167,8 @@ public class BlackJackGame : IBaseGame<StandardCard>
             state = "CheckingForQuickWinners";
             CheckForWinnersOrLosers();//may want a wait or something here for like 2 seconds.
             // await _messenger.SendFrontendJson(GetAllConnStrsIncGameboard(), GetGameState());
+            BlackJackJsonState.Update(this);
+            _messenger.SendFrontendJson(GetAllConnStrsIncGameboard(), GetGameState());
             return true;//now the round either end or they draw cards. end round done, drwing cards not done.
         }
         Console.WriteLine("The state is not in \"GivingCards\"");
@@ -190,11 +195,15 @@ public class BlackJackGame : IBaseGame<StandardCard>
     }
     public bool TakeBet(string connStr, int amt){
         if (state == "TakingBets") {
+
+            Console.WriteLine(connStr,"\n\nInBlackjackGame taking bet\n\n");
             if (Players[connStr].HasBet == false) {
             // if (Players[connStr].TotalMoney >= amt){
                 Players[connStr].TotalMoney -= amt;
                 Players[connStr].CurrentBet = amt;
                 Players[connStr].HasBet = true;
+                BlackJackJsonState.Update(this);
+                _messenger.SendFrontendJson(GetAllConnStrsIncGameboard(), GetGameState());
                 if (Players[connStr].TotalMoney < 1) {
                     Players[connStr].HasBet = true;
                     Players[connStr].NotPlaying = true;
@@ -237,6 +246,7 @@ public class BlackJackGame : IBaseGame<StandardCard>
             PlayerOrder.AddPlayer(connStr);
             Players[connStr] = new BlackJackPlayer(playerName);
             Players[connStr].TotalMoney = 100;
+            Players[connStr].strConn = connStr;
             return true;
         }
         return false;
@@ -350,6 +360,7 @@ public class BlackJackGame : IBaseGame<StandardCard>
     //
     {//need to iterate over player turn here too
         if (state == "GivingCards"){
+            Console.WriteLine("\n\nDrawing cards for players\n\n");
             Players[connStr].TakeCard(Deck.Draw());
             PlayerOrder.NextTurn();
             return true;
@@ -358,6 +369,8 @@ public class BlackJackGame : IBaseGame<StandardCard>
             if (currentPlayer == connStr && Players[connStr].Busted == false && Players[connStr].Winner == false && Players[connStr].StillPlaying == true && Players[connStr].NotPlaying == false) {//eventually it will be dealers turn. and that will be a block.
                 Players[connStr].TakeCard(Deck.Draw());
                 CheckForWinnersOrLosers();//checks all players which is weird when i just need to check single bust. may fix later
+                BlackJackJsonState.Update(this);
+                _messenger.SendFrontendJson(GetAllConnStrsIncGameboard(), GetGameState());
                 return true;
             } else//need to send json struct here
                 Console.WriteLine("Its not your turn! Current players turn is", currentPlayer);

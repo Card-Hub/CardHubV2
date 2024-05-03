@@ -8,8 +8,8 @@ namespace WebApi.Hubs;
 // stubbed out
 
 public class BlackJackMessenger : iUnoMessenger {
-  IHubContext<BaseHub> Context;
-  public BlackJackMessenger(IHubContext<BaseHub> context) {
+  IHubContext<BlackJackHub> Context;
+  public BlackJackMessenger(IHubContext<BlackJackHub> context) {
     this.Context = context;
   }
 

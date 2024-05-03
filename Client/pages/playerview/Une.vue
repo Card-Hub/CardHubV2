@@ -126,7 +126,7 @@
   const getUserIcon = () => {
     // iterate through players to find the user's avatar
     let userIcon = "";
-    players.value.forEach(p => { if (p.Name === user.value) { userIcon = p.Avatar; } });
+    users.value.forEach(p => { if (p.name === user.value) { userIcon = p.avatar; } });
     
     return new URL(`../../assets/icons/avatars/${userIcon}.png`, import.meta.url);
   };

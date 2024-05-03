@@ -5,8 +5,7 @@ import {
     type HubConnection,
     HubConnectionState
 } from "@microsoft/signalr";
-import { computed, type Ref } from "vue";
-import { GameType } from "~/types";
+import { computed } from "vue";
 import { useBaseStore } from "~/stores/baseStore";
 
 
@@ -26,7 +25,6 @@ export const useCahStore = defineStore("cah", () => {
     const isGameConnected = computed<boolean>(() => gameConnection.value !== null && gameConnection.value.state === HubConnectionState.Connected);
 
 
-
     function registerHandlersCah(gameConnection: HubConnection): void {
         if (gameConnection === null) return;
         console.log("Registering Cah handlers");
@@ -43,6 +41,13 @@ export const useCahStore = defineStore("cah", () => {
         });
     }
 
+    const startGame = async (): Promise<void> => {
+        if (!isGameConnected) return;
+        if (gameStarted.value) return;
+
+        await gameConnection.value?.invoke("StartGame");
+    }
+
     const ping = async (): Promise<void> => {
         if (!isGameConnected) return;
         await gameConnection.value?.invoke("Ping");
@@ -53,6 +58,6 @@ export const useCahStore = defineStore("cah", () => {
     // https://pinia.vuejs.org/core-concepts/
     return {
         isGameConnected, gameStarted,
-        registerHandlersCah, ping
+        registerHandlersCah, ping, startGame
     };
 });

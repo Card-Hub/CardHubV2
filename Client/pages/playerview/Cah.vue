@@ -1,32 +1,24 @@
 <script setup lang="ts">
-import {defineComponent, ref, onMounted} from "vue";
-
-import StandardCardDisplay from "~/components/Card/StandardCardDisplay.vue";
-
 import toast from "@/utils/toast";
+import { ref } from "vue";
+import { storeToRefs } from "pinia";
+import Dialog from "primevue/dialog";
 
-import { type ConfigurableDocument, type MaybeElementRef, useFullscreen } from '@vueuse/core';
 
-// fullscreen
-const { isFullscreen, enter, exit } = useFullscreen();
-const el = ref(null)
-const { toggle } = useFullscreen(el)
-
-const getPrimeIcon = (name: string) => {
-  return new URL(`../../assets/icons/primeIcons/${name}.svg`, import.meta.url);
-}
-
-// https://primevue.org/dialog
-import Dialog from 'primevue/dialog';
-import Chat from "~/components/Chat.vue";
-import CahRules from "~/components/gameRules/CahRules.vue";
 const rulesVisible = ref(false); // for popup dialog
 const chatVisible = ref(false); // for popup dialog https://primevue.org/avatar/ for chat notification
 
+// fullscreen
+const { isFullscreen, enter, exit } = useFullscreen();
+const el = ref(null);
+const { toggle } = useFullscreen(el);
+
+const getPrimeIcon = (name: string) => {
+  return new URL(`../../assets/icons/primeIcons/${ name }.svg`, import.meta.url);
+};
+
 // convert user to CahPlayer
-import {storeToRefs} from "pinia";
-import { useBaseStore} from "~/stores/baseStore";
-import { useCahStore } from "~/stores/cahStore";
+
 
 const baseStore = useBaseStore();
 const { isPlayer, messages, users, room, user, currentAvatar } = storeToRefs(baseStore);
@@ -35,9 +27,13 @@ const { isPlayer, messages, users, room, user, currentAvatar } = storeToRefs(bas
 const getUserIcon = () => {
   // iterate through players to find the user's avatar
   let userIcon = "";
-  users.value.forEach(p => { if (p.name === user.value) { userIcon = p.avatar; } });
+  users.value.forEach(p => {
+    if (p.name === user.value) {
+      userIcon = p.avatar;
+    }
+  });
 
-  return new URL(`../../assets/icons/avatars/${currentAvatar.value}.png`, import.meta.url);
+  return new URL(`../../assets/icons/avatars/${ currentAvatar.value }.png`, import.meta.url);
   // return new URL(`../../assets/icons/avatars/lyssie.png`, import.meta.url);
 };
 
@@ -62,12 +58,13 @@ const handleExit = async () => {
       </div>
 
       <div class="left-div flex flex-row-reverse place-items-center gap-2">
-        <img :src="getPrimeIcon('expand')" class="size-10" @click="toggle" />
+        <img :src="getPrimeIcon('expand')" class="size-10" @click="toggle"/>
 
         <div class="card">
           <i class="pi pi-fw pi-info-circle" style="font-size: 2rem" @click="rulesVisible = true"></i>
-          <Dialog v-model="rulesVisible" header="Rules" class="w-[900px] h-[900px]" :visible="rulesVisible" @update:visible="rulesVisible = $event">
-            <CahRules />
+          <Dialog v-model="rulesVisible" header="Rules" class="w-[900px] h-[900px]" :visible="rulesVisible"
+                  @update:visible="rulesVisible = $event">
+            <CahRules/>
             <div class="flex justify-content-end gap-2">
               <!--            <Button type="button" label="Exit" @click="rulesVisible = false"></Button>-->
             </div>
@@ -76,56 +73,14 @@ const handleExit = async () => {
 
         <div class="">
           <i class="pi pi-fw pi-comment" style="font-size: 2rem" @click="chatVisible = true"></i>
-          <Dialog v-model="chatVisible" class="w-[900px] h-[900px]" header="Chat" :visible="chatVisible" @update:visible="chatVisible = $event">
+          <Dialog v-model="chatVisible" class="w-[900px] h-[900px]" header="Chat" :visible="chatVisible"
+                  @update:visible="chatVisible = $event">
             <Chat/>
           </Dialog>
         </div>
-
-        <!--      <i class="pi pi-fw pi-eye" @click="!sideScroll" style="font-size: 2.5rem"></i>-->
       </div>
     </div>
 
-<!--    <div class="w-full margin-auto">-->
-<!--      <h1 class="text-center">-->
-<!--      <span v-if="currentPlayer === user && winner != user">-->
-<!--          Your Turn!-->
-<!--      </span>-->
-<!--        <span v-if="winner == user">-->
-<!--          You Won!-->
-<!--      </span>-->
-<!--        <span v-if="currentPlayer !== user && winner === ''">{{ currentPlayer }} is playing...-->
-<!--      </span>-->
-<!--        <span v-if="currentPlayer !== user && winner !== ''">-->
-<!--        {{ winner }} won!-->
-<!--      </span>-->
-<!--      </h1>-->
-<!--    </div>-->
-    
-    
-    <!--<div class=" w-full flex overflow-x-auto border-2 border-solid border-[#960E16] border-radius-4 justify-center">
-      <UNOCardDisplay class="uneCard flex-none"
-          v-for="card in myCards"
-                        :key="card.Id"
-                        :card="card"
-                        :isSelected="false"
-          @click="playCard(JSON.stringify(card))"
-          />
-        </div>-->
-    <!--<div v-if="currentPlayer === user && false">
-    </div>-->
-    
-    <!--  winner -->
-<!--    <div v-if="winner!=''" class="winner">-->
-<!--      <div class="winner-inner">-->
-<!--      <span v-if="winner == user">-->
-<!--          You Won!-->
-<!--      </span>-->
-<!--        <span v-if="currentPlayer !== user && winner !== ''">-->
-<!--        {{ winner }} won!-->
-<!--      </span>-->
-<!--      </div>-->
-<!--    </div>-->
-    
   </div>
 
 
@@ -137,6 +92,7 @@ const handleExit = async () => {
   /*display: flex;*/
   /*flex-direction: row-reverse;*/
 }
+
 .playerview-une-container {
   width: 100%;
   height: 100vh;
@@ -153,11 +109,13 @@ const handleExit = async () => {
   grid-template-columns: 1fr 1fr;
   height: 60%;
 }
+
 .cards {
   /*background-color: green;*/
   display: grid;
   grid-template-columns: 1fr 1fr;
 }
+
 .standardCardDisplay {
   /*background-color: pink;*/
   height: 100%;
@@ -177,12 +135,13 @@ const handleExit = async () => {
   justify-content: center;
   text-align: center;
   /*justify-content: center;*/
-  border-radius:4px;
+  border-radius: 4px;
   border-style: solid;
   border-width: 2px;
   padding: 10px;
 
 }
+
 .winner-inner {
   border-style: solid;
   border-width: 4px;
@@ -193,6 +152,7 @@ const handleExit = async () => {
   /*text-align: center;*/
   align-items: center; /*height*/
 }
+
 .select-color {
   position: absolute;
   top: 50%;
@@ -208,12 +168,13 @@ const handleExit = async () => {
   /*justify-content: center;*/
   text-align: center;
   justify-content: center;
-  border-radius:4px;
+  border-radius: 4px;
   border-style: solid;
   border-width: 2px;
   padding: 12px;
   border-color: var(--cardhub-red);
 }
+
 .select-color h2 {
   margin-top: 0;
 }

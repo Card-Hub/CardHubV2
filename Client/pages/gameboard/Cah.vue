@@ -2,13 +2,11 @@
 import { ref } from "vue";
 import { storeToRefs } from "pinia";
 
-import { useBaseStore } from "~/stores/baseStore";
-import { useCahStore } from "~/stores/cahStore";
-// get players from store
 const baseStore = useBaseStore();
 const { isPlayer, messages, users, room, user, currentAvatar } = storeToRefs(baseStore);
+
 const cahStore = useCahStore();
-const {} = storeToRefs(cahStore);
+const { startGame } = storeToRefs(cahStore);
 
 
 const { isFullscreen, enter, exit } = useFullscreen();
@@ -24,22 +22,6 @@ const getPrimeIcon = (name: string) => {
 // const { cards } = storeToRefs(store);
 
 
-const dealerCards = ref<StandardCard[]>([
-  { Id: 1, Suit: "hearts", Value: "Jack" },
-  { Id: 2, Suit: "hearts", Value: "Ace" }]);
-//reverse dealer cards
-dealerCards.value.reverse();
-
-// const players = ref<BlackJackPlayer[]>([
-//   {Name: "lyssie", Avatar: "lyssie", Afk: false, Hand: [{Id: 1, Suit: "hearts", Value: "Jack"}, {Id: 2, Suit: "hearts", Value: "Ace"}], CurrentScore: 21, TotalMoney: 100, CurrentBet: 10, HasBet: true, NotPlaying: false, Busted: false, Winner: false, StillPlaying: true, Standing: false},
-//   {Name: "juno", Avatar: "juno", Afk: false,Hand: [{Id: 1, Suit: "hearts", Value: "Jack"}, {Id: 2, Suit: "hearts", Value: "Ace"}], CurrentScore: 21, TotalMoney: 100, CurrentBet: 10, HasBet: true, NotPlaying: false, Busted: false, Winner: false, StillPlaying: true, Standing: false},
-//   {Name: "oli", Avatar: "oli", Afk: false,Hand: [{Id: 1, Suit: "hearts", Value: "Jack"}, {Id: 2, Suit: "hearts", Value: "Ace"}], CurrentScore: 21, TotalMoney: 100, CurrentBet: 10, HasBet: true, NotPlaying: false, Busted: false, Winner: false, StillPlaying: true, Standing: false},
-//   {Name: "liam", Avatar: "liam", Afk: false,Hand: [{Id: 1, Suit: "hearts", Value: "Jack"}, {Id: 2, Suit: "hearts", Value: "Ace"}], CurrentScore: 21, TotalMoney: 100, CurrentBet: 10, HasBet: true, NotPlaying: false, Busted: false, Winner: false, StillPlaying: true, Standing: false},
-//   {Name: "andy", Avatar: "andy", Afk: false,Hand: [{Id: 1, Suit: "hearts", Value: "Jack"}, {Id: 2, Suit: "hearts", Value: "Ace"}], CurrentScore: 21, TotalMoney: 100, CurrentBet: 10, HasBet: true, NotPlaying: false, Busted: false, Winner: false, StillPlaying: true, Standing: false},
-//   {Name: "alex", Avatar: "alex", Afk: false,Hand: [{Id: 1, Suit: "hearts", Value: "Jack"}, {Id: 2, Suit: "hearts", Value: "Ace"}], CurrentScore: 21, TotalMoney: 100, CurrentBet: 10, HasBet: true, NotPlaying: false, Busted: false, Winner: false, StillPlaying: true, Standing: false},
-//   {Name: "ruby", Avatar: "ruby",Afk: false, Hand: [{Id: 1, Suit: "hearts", Value: "Jack"}, {Id: 2, Suit: "hearts", Value: "Ace"}], CurrentScore: 21, TotalMoney: 100, CurrentBet: 10, HasBet: true, NotPlaying: false, Busted: false, Winner: false, StillPlaying: true, Standing: false},
-//   {Name: "fairy", Avatar: "fairy", Afk: false,Hand: [{Id: 1, Suit: "hearts", Value: "Jack"}, {Id: 2, Suit: "hearts", Value: "Ace"}], CurrentScore: 21, TotalMoney: 100, CurrentBet: 10, HasBet: true, NotPlaying: false, Busted: false, Winner: false, StillPlaying: true, Standing: false},
-// ]);
 
 const currentPlayer = ref<string>("lyssie");
 const dealersTurn = ref<boolean>(false);
@@ -148,9 +130,8 @@ const getCARD = () => {
 
 
     </div>
+    <Button @click="startGame">Start CAH</Button>
   </div>
-
-
 </template>
 
 <style scoped>

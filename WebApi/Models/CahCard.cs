@@ -64,7 +64,8 @@ public class CahCard
     {
         get
         {
-            if (Type != CahCardType.Black) throw new InvalidOperationException("Pick amount is only for black cards");
+            // if (Type != CahCardType.Black) throw new InvalidOperationException("Pick amount is only for black cards");
+            if (Type != CahCardType.Black) return -1;
             
             // If the card has no underscores, it's a regular black card with a pick amount of 1
             var underscores = Text.Count(c => c == '_');

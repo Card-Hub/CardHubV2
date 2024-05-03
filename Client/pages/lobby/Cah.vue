@@ -1,17 +1,15 @@
 <script setup lang="ts">
 
-import { storeToRefs } from "pinia";
-import AvatarSelection from "~/components/AvatarSelection.vue";
 import dialog from 'primevue/dialog';
-import Chat from "~/components/Chat.vue";
 import { GameType } from "~/types";
+import { ref, computed } from "vue";
+import { storeToRefs } from "pinia";
 import {useBaseStore} from "~/stores/baseStore";
 import {useCahStore} from "~/stores/cahStore";
 
+
 const { $gameToString } = useNuxtApp();
 
-import { ref, computed } from "vue";
-import CahDisplay from "~/components/Card/CahDisplay.vue";
 const baseStore = useBaseStore();
 const { isPlayer, messages, users, room, currentAvatar } = storeToRefs(baseStore);
 const {  } = baseStore;

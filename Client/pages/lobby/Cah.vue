@@ -17,18 +17,28 @@ const { isPlayer, messages, users, room, currentAvatar } = storeToRefs(baseStore
 const {  } = baseStore;
 
 const cahStore = useCahStore();
+const { gameStarted } = storeToRefs(cahStore);
 const { ping } = cahStore;
 
 
 const visible = ref(false);
 
+watch(gameStarted, (value) => {
+  if (value) {
+    if (isPlayer.value) {
+      playerStart();
+    } else {
+      gameboardStart();
+    }
+  }
+});
+
 const gameboardStart = async () => {
-  // startGame();
-  await navigateTo("/gameboard/" + $gameToString(GameType.Cah));
+  await navigateTo(`/gameboard/${ $gameToString(GameType.Cah) }`);
 }
 
 const playerStart = () => {
-  return navigateTo("/playerview/" + $gameToString(GameType.Cah));
+  return navigateTo(`/playerview/${ $gameToString(GameType.Cah) }`);
 }
 
 const getIcon = (avatar: string) => {
@@ -56,8 +66,6 @@ const getIconGivenName = (name: string) => {
 
 const kickPlayer = (user: BasePlayer) => {
   console.log("Kicking player: " + user.name);
-  // send message to server to kick player
-  // BOOT PLAYER HERE
   kickPlayer(user);
 }
 

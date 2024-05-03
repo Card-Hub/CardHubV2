@@ -1,38 +1,32 @@
 <script setup lang="ts">
-import {type ConfigurableDocument, type MaybeElementRef, useFullscreen } from '@vueuse/core';
-import {defineComponent, ref, onMounted, type ComputedRef, type Ref, computed} from "vue";
-import {storeToRefs} from "pinia";
+import { ref } from "vue";
+import { storeToRefs } from "pinia";
 
-import {useBaseStore} from "~/stores/baseStore";
-import {useCahStore} from "~/stores/cahStore";
+import { useBaseStore } from "~/stores/baseStore";
+import { useCahStore } from "~/stores/cahStore";
 // get players from store
 const baseStore = useBaseStore();
 const { isPlayer, messages, users, room, user, currentAvatar } = storeToRefs(baseStore);
 const cahStore = useCahStore();
-const { } = storeToRefs(cahStore);
-
-//convert users to CahPlayer
+const {} = storeToRefs(cahStore);
 
 
-
-//fulscreen
 const { isFullscreen, enter, exit } = useFullscreen();
-const el = ref(null)
-const { toggle } = useFullscreen(el)
+const el = ref(null);
+const { toggle } = useFullscreen(el);
 
 const getPrimeIcon = (name: string) => {
-  return new URL(`../../assets/icons/primeIcons/${name}.svg`, import.meta.url);
-}
+  return new URL(`../../assets/icons/primeIcons/${ name }.svg`, import.meta.url);
+};
 
 // uncomment these out later
 // const {  cards, users, room } = storeToRefs(store);
 // const { cards } = storeToRefs(store);
 
 
-
 const dealerCards = ref<StandardCard[]>([
-  {Id: 1, Suit: "hearts", Value: "Jack"},
-  {Id: 2, Suit: "hearts", Value: "Ace"}]);
+  { Id: 1, Suit: "hearts", Value: "Jack" },
+  { Id: 2, Suit: "hearts", Value: "Ace" }]);
 //reverse dealer cards
 dealerCards.value.reverse();
 
@@ -57,7 +51,7 @@ const getCardStyle = (index: number) => {
   let randomY = index * 3;
 
   return {
-    transform: `translate(${randomX}px, ${randomY}px)`,
+    transform: `translate(${ randomX }px, ${ randomY }px)`
   };
 };
 
@@ -67,13 +61,13 @@ const cardStyle = (num: number) => {
   let randomRotation = 0;
 
   return {
-    transform: `translate(${randomX}px, ${randomY}px) rotate(${randomRotation}deg)`,
-    zIndex: num,
+    transform: `translate(${ randomX }px, ${ randomY }px) rotate(${ randomRotation }deg)`,
+    zIndex: num
   };
 };
 
 const getPlayerIcon = (player: string) => {
-  return new URL(`../../assets/icons/avatars/${player}.png`, import.meta.url);
+  return new URL(`../../assets/icons/avatars/${ player }.png`, import.meta.url);
 };
 
 
@@ -105,7 +99,7 @@ const getPlayerIconStyle = (index: number) => {
     ypos = index === 0 ? -300 : index === 1 ? -300 : index === 2 ? -150 : index === 3 ? 150 : index === 4 ? 300 : index === 5 ? 300 : index === 6 ? 150 : -150;
   }
   return {
-    transform: `translate(${xpos}%, ${ypos}%)`,
+    transform: `translate(${ xpos }%, ${ ypos }%)`
   };
 };
 
@@ -113,8 +107,8 @@ const isCurrentPlayer = (player: string) => {
   if (currentPlayer.value != "") {
     if (player.toLowerCase() === currentPlayer.value.toLowerCase()) {
       return {
-        border: 'red 3px solid',
-        boxShadow: '0 0 10px #D60E26',
+        border: "red 3px solid",
+        boxShadow: "0 0 10px #D60E26"
       };
     }
   }
@@ -147,7 +141,7 @@ const getCARD = () => {
             <img :src="getCARD()" alt="game icon" class="une-logo"/>
           </div>
         </div>
-        <div class = "blank-card relative w-20 h-32 m-2 bg-zinc-800 rounded-md shadow-md p-2" >
+        <div class="blank-card relative w-20 h-32 m-2 bg-zinc-800 rounded-md shadow-md p-2">
           <img :src="getCARD()" alt="game icon" class="une-logo"/>
         </div>
       </div>

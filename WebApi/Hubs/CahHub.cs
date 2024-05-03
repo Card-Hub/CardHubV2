@@ -56,6 +56,13 @@ public class CahHub : Hub<ICahClient>
 
         await Groups.AddToGroupAsync(ContextId, roomId);
     }
+    
+    public async Task RemovePlayer()
+    {
+        if (!TryGetGame(out var game)) return;
+        // game.RemovePlayer(ContextId);
+        await Groups.RemoveFromGroupAsync(ContextId, GetRoomId());
+    }
 
     private void TimerTest(object? sender, EventArgs e)
     {

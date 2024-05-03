@@ -1,39 +1,38 @@
 <script setup lang="ts">
-import { defineComponent, ref, onMounted } from "vue";
+import dialog from "primevue/dialog";
+import { navigateTo } from "nuxt/app";
 import { storeToRefs } from "pinia";
-import AvatarSelection from "~/components/AvatarSelection.vue";
-import Chat from "~/components/Chat.vue";
-import {useBaseStore} from "~/stores/baseStore";
+import { ref } from "vue";
+import { useBaseStore } from "~/stores/baseStore";
 import { useBlackJackStore } from "~/stores/blackJackStore";
 import { GameType } from "~/types";
+
+
 const { $gameToString } = useNuxtApp();
 
-
-
 const baseStore = useBaseStore();
+const { isPlayer, users, room, currentAvatar } = storeToRefs(baseStore);
+
 const store = useBlackJackStore();
-const { isPlayer, messages, users, room, currentAvatar } = storeToRefs(baseStore);
 const { gameStarted } = storeToRefs(store);
-const { pingblackjack } = store;
-// will allow for a popup of the chat
-import dialog from 'primevue/dialog';
-import {navigateTo} from "nuxt/app";
+const { ping } = store;
+
+
 const visible = ref(false);
 
 const gameboardStart = async () => {
   await navigateTo("/gameboard/" + $gameToString(GameType.BlackJack));
-}
+};
 
 const playerStart = () => {
   return navigateTo("/playerview/" + $gameToString(GameType.BlackJack));
-}
+};
 
 const getIcon = (avatar: string) => {
   if (avatar == "" || avatar == null) {
     return new URL(`../../assets/icons/avatars/lyssie.png`, import.meta.url);
-  }
-  else {
-    return new URL(`../../assets/icons/avatars/${avatar}.png`, import.meta.url);
+  } else {
+    return new URL(`../../assets/icons/avatars/${ avatar }.png`, import.meta.url);
   }
 };
 
@@ -42,13 +41,13 @@ const getIconGivenName = (name: string) => {
     // console.log(value);
     if (user.name == name) {
       return getIcon(user.avatar);
-    }else{
+    } else {
       return getIcon("lyssie");
     }
   });
   // if that fails
   return getIcon("lyssie");
-}
+};
 
 const blackJackPlayers = computed(() => users.value.map((user) => {
   return {
@@ -64,8 +63,8 @@ const blackJackPlayers = computed(() => users.value.map((user) => {
     Winner: false,
     StillPlaying: true,
     Standing: false,
-    Name: user.name,
-  }
+    Name: user.name
+  };
 }));
 
 const kickPlayer = (lobbyUser: LobbyUser) => {
@@ -73,14 +72,14 @@ const kickPlayer = (lobbyUser: LobbyUser) => {
   // send message to server to kick player
   // BOOT PLAYER HERE
   // kickPlayer(lobbyUser);
-}
+};
 
 const convertBase = (player: BlackJackPlayer) => {
   return {
     name: player.Name,
     avatar: player.Avatar
-  }
-}
+  };
+};
 
 </script>
 
@@ -89,12 +88,13 @@ const convertBase = (player: BlackJackPlayer) => {
     <div v-if="isPlayer" class="m-8">
 
       <div class="flex justify-between">
-        <h1 >
+        <h1>
           {{ $gameToString(GameType.BlackJack) }}
         </h1>
         <div class="justify-left">
           <i class="pi pi-fw pi-comment" style="font-size: 2rem" @click="visible = true"></i>
-          <Dialog v-model="visible" class="w-[900px] h-[900px]" header="Chat" :visible="visible" @update:visible="visible = $event">
+          <Dialog v-model="visible" class="w-[900px] h-[900px]" header="Chat" :visible="visible"
+                  @update:visible="visible = $event">
             <Chat/>
           </Dialog>
         </div>
@@ -105,7 +105,7 @@ const convertBase = (player: BlackJackPlayer) => {
       </p>
 
       <AvatarSelection class="align-center"/>
-      <div v-if="gameStarted" >
+      <div v-if="gameStarted">
         <NuxtLink to="/gameboard/blackjack" class="mt-5">
           <!--          <Button>Join Game</Button>-->
         </NuxtLink>
@@ -119,19 +119,24 @@ const convertBase = (player: BlackJackPlayer) => {
           <svgo-logo-wordmark class="w-20 h-20 ml-4 mt-2" :fontControlled="false" filled/>
         </div>
         <div class="flex-1 overflow-hidden relative">
-          <SvgoStandardDeckDiamonds class="suit w-80 h-80 absolute z-0 -left-24 rotate-[-39deg]" :fontControlled="false" filled/>
-          <SvgoStandardDeckClubs class="suit w-80 h-80 absolute z-0 top-20 -right-20 rotate-[240deg]" :fontControlled="false" filled/>
-          <SvgoStandardDeckHearts class="suit w-80 h-80 absolute z-0 -bottom-40 -right-10" :fontControlled="false" filled/>
-          <SvgoStandardDeckSpades class="suit w-80 h-80 absolute z-0 bottom-12 -left-24 rotate-[-20deg]" :fontControlled="false" filled/>
+          <SvgoStandardDeckDiamonds class="suit w-80 h-80 absolute z-0 -left-24 rotate-[-39deg]" :fontControlled="false"
+                                    filled/>
+          <SvgoStandardDeckClubs class="suit w-80 h-80 absolute z-0 top-20 -right-20 rotate-[240deg]"
+                                 :fontControlled="false" filled/>
+          <SvgoStandardDeckHearts class="suit w-80 h-80 absolute z-0 -bottom-40 -right-10" :fontControlled="false"
+                                  filled/>
+          <SvgoStandardDeckSpades class="suit w-80 h-80 absolute z-0 bottom-12 -left-24 rotate-[-20deg]"
+                                  :fontControlled="false" filled/>
 
           <div class="m-8 flex flex-col gap-4">
-            <div v-for="user in blackJackPlayers" class="rounded-full flex card items-center justify-content h-16 w-full justify-between">
+            <div v-for="user in blackJackPlayers"
+                 class="rounded-full flex card items-center justify-content h-16 w-full justify-between">
               <!--<i class="pi pi-user mx-4 text-neutral-300" style="font-size: 1.5rem"></i>-->
               <div class="flex flex-row  items-center">
                 <img :src="getIcon(user.Avatar)" alt="avatar Icon" class="lobby-player-icon-img">
                 <span class="text-2xl text-neutral-300 ">{{ user.Name }} </span>
               </div>
-              <Button class="kick-btn" @click="kickPlayer(user)"> Kick </Button>
+              <Button class="kick-btn" @click="kickPlayer(user)"> Kick</Button>
             </div>
           </div>
         </div>
@@ -153,7 +158,7 @@ const convertBase = (player: BlackJackPlayer) => {
       </div>
       <div class="flex flex-col w-1/3">
         <div class="chat-box">
-          <Chat />
+          <Chat/>
         </div>
 
       </div>
@@ -163,21 +168,18 @@ const convertBase = (player: BlackJackPlayer) => {
     </div>
   </div>
 
-  <div>
-    <Button @click="pingblackjack">Ping</Button>
-  </div>
-
+  <Button @click="ping">Ping</Button>
 </template>
 
 <style scoped>
 
 .card {
-  background: rgba( 255, 255, 255, 0.1 );
-  box-shadow: 0 8px 32px 0 rgba( 74, 1, 29, 0.15);
-  backdrop-filter: blur( 20px );
-  -webkit-backdrop-filter: blur( 20px );
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(74, 1, 29, 0.15);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-radius: 28px;
-  border: 1px solid rgba( 255, 255, 255, 0.10 );
+  border: 1px solid rgba(255, 255, 255, 0.10);
 }
 
 .suit {

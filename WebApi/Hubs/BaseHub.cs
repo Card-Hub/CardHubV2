@@ -70,6 +70,7 @@ public interface IBaseClient
 {
     Task ReceiveMessage(PlayerMessage message);
     Task ReceiveAvatars(IEnumerable<BasePlayer> avatars);
+    Task Kicked();
 }
 
 public class BaseHub : Hub<IBaseClient>
@@ -133,6 +134,17 @@ public class BaseHub : Hub<IBaseClient>
         await Clients.Group(ContextRoomId).ReceiveAvatars(baseRoom.GetAvatars());
         Console.WriteLine("Avatar sent");
     }
+    
+    // public async Task KickPlayer(string connectionId)
+    // {
+    //     if (!TryGetRoom(out var baseRoom)) return;
+    //     
+    //     var player = baseRoom.Users.FirstOrDefault(user => user.ConnectionId == connectionId);
+    //     if (player is null) return;
+    //     
+    //     baseRoom.Users.Remove(player);
+    //     await Clients.Client(connectionId).SendAsync("Kicked");
+    // }
 
     
     #region Helpers

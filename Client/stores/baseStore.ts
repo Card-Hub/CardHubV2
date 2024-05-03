@@ -187,14 +187,30 @@ export const useBaseStore = defineStore("base", () => {
     };
 
     const closeConnection = async (): Promise<void> => {
-        if (baseConnection.value === null) return;
-        await baseConnection.value.stop();
+        if (baseConnection.value !== null) {
+            await baseConnection.value.stop();
+        }
+        if (gameConnection.value !== null) {
+            await gameConnection.value.stop();
+        }
     };
+
+    function $reset() {
+        baseConnection.value = null;
+        gameConnection.value = null;
+        isPlayer.value = null;
+        gameType.value = null;
+        messages.value = [];
+        users.value = [];
+        user.value = "";
+        room.value = "";
+    }
+
 
     // Must return all state properties
     // https://pinia.vuejs.org/core-concepts/
     return {
         baseConnection, gameConnection, isBaseConnected, isPlayer, messages, users, user, room, currentAvatar, gameType,
-        tryConnectGameboard, tryConnectPlayer, sendMessage, closeConnection, sendAvatar, kickPlayer
+        tryConnectGameboard, tryConnectPlayer, sendMessage, closeConnection, sendAvatar, kickPlayer, $reset
     };
 });

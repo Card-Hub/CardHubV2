@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import {useUneStore} from "~/stores/uneStore";
-import {type ConfigurableDocument, type MaybeElementRef, useFullscreen } from '@vueuse/core';
-import {defineComponent, ref, onMounted, type ComputedRef, type Ref, computed} from "vue";
-import {storeToRefs} from "pinia";
+import { ref } from "vue";
+import { storeToRefs } from "pinia";
 
 
 import StandardnoshadowCard from "~/components/noShadowCard/StandardnoshadowCard.vue";
@@ -10,22 +8,22 @@ import StandardCardDisplay from "~/components/Card/StandardCardDisplay.vue";
 
 const store = useBlackJackStore();
 
-const {players, currentPlayer, winners, losers, stalemates, user, allPlayersHaveBet} = storeToRefs(store);
+const { players, currentPlayer, winners, losers, stalemates, user, allPlayersHaveBet } = storeToRefs(store);
 
 // const {startGame} = store;
 
 //fulscreen
 const { isFullscreen, enter, exit } = useFullscreen();
-const el = ref(null)
-const { toggle } = useFullscreen(el)
+const el = ref(null);
+const { toggle } = useFullscreen(el);
 
 const getPrimeIcon = (name: string) => {
-  return new URL(`../../assets/icons/primeIcons/${name}.svg`, import.meta.url);
-}
+  return new URL(`../../assets/icons/primeIcons/${ name }.svg`, import.meta.url);
+};
 
 const dealerCards = ref<StandardCard[]>([
-  {Id: 1, Suit: "hearts", Value: "Jack"},
-  {Id: 2, Suit: "hearts", Value: "Ace"}]);
+  { Id: 1, Suit: "hearts", Value: "Jack" },
+  { Id: 2, Suit: "hearts", Value: "Ace" }]);
 //reverse dealer cards
 dealerCards.value.reverse();
 
@@ -39,7 +37,7 @@ const getCardStyle = (index: number) => {
   let randomY = index * 3;
 
   return {
-    transform: `translate(${randomX}px, ${randomY}px)`,
+    transform: `translate(${ randomX }px, ${ randomY }px)`
   };
 };
 
@@ -49,13 +47,13 @@ const cardStyle = (num: number) => {
   let randomRotation = 0;
 
   return {
-    transform: `translate(${randomX}px, ${randomY}px) rotate(${randomRotation}deg)`,
-    zIndex: num,
+    transform: `translate(${ randomX }px, ${ randomY }px) rotate(${ randomRotation }deg)`,
+    zIndex: num
   };
 };
 
 const getPlayerIcon = (player: string) => {
-  return new URL(`../../assets/icons/avatars/${player}.png`, import.meta.url);
+  return new URL(`../../assets/icons/avatars/${ player }.png`, import.meta.url);
 };
 
 
@@ -87,7 +85,7 @@ const getPlayerIconStyle = (index: number) => {
     ypos = index === 0 ? -300 : index === 1 ? -300 : index === 2 ? -150 : index === 3 ? 150 : index === 4 ? 300 : index === 5 ? 300 : index === 6 ? 150 : -150;
   }
   return {
-    transform: `translate(${xpos}%, ${ypos}%)`,
+    transform: `translate(${ xpos }%, ${ ypos }%)`
   };
 };
 
@@ -95,8 +93,8 @@ const isCurrentPlayer = (player: string) => {
   if (currentPlayer.value != "") {
     if (player.toLowerCase() === currentPlayer.value.toLowerCase()) {
       return {
-        border: 'red 3px solid',
-        boxShadow: '0 0 10px #D60E26',
+        border: "red 3px solid",
+        boxShadow: "0 0 10px #D60E26"
       };
     }
   }
@@ -105,7 +103,7 @@ const isCurrentPlayer = (player: string) => {
 const getCARD = () => {
   return new URL(`../../assets/icons/standardDeck/diamonds.svg`, import.meta.url);
 };
-  </script>
+</script>
 
 <template>
   <div class="gameboard-container">
@@ -118,21 +116,21 @@ const getCARD = () => {
         </div>
       </div>
       <div class="game-table rounded-tr-full shadow-lg">
-            <div class="card-pile">
-              <!--div v-if="dealersTurn">
-                
-              </div-->
-              <div class="!dealersTurn"></div>
-              <StandardnoshadowCard :card="dealerCards[0]" class="standardCardDisplay"/>
-              <StandardnoshadowCard :card="dealerCards[1]" class="standardCardDisplay"/>
-              <div class="deck-card flex justify-center items-center bg-zinc-800 rounded-md shadow-md mb-2">
-                <img :src="getCARD()" alt="game icon" class="une-logo"/>
-              </div>
-            </div>
-            <div class = "blank-card relative w-20 h-32 m-2 bg-zinc-800 rounded-md shadow-md p-2" >
-              <img :src="getCARD()" alt="game icon" class="une-logo"/>
-            </div>
+        <div class="card-pile">
+          <!--div v-if="dealersTurn">
+
+          </div-->
+          <div class="!dealersTurn"></div>
+          <StandardnoshadowCard :card="dealerCards[0]" class="standardCardDisplay"/>
+          <StandardnoshadowCard :card="dealerCards[1]" class="standardCardDisplay"/>
+          <div class="deck-card flex justify-center items-center bg-zinc-800 rounded-md shadow-md mb-2">
+            <img :src="getCARD()" alt="game icon" class="une-logo"/>
           </div>
+        </div>
+        <div class="blank-card relative w-20 h-32 m-2 bg-zinc-800 rounded-md shadow-md p-2">
+          <img :src="getCARD()" alt="game icon" class="une-logo"/>
+        </div>
+      </div>
 
 
     </div>

@@ -14,11 +14,11 @@ const baseStore = useBaseStore();
 const { tryConnectGameboard } = baseStore;
 
 const blackJackStore = useBlackJackStore();
-const { registerHandlers } = blackJackStore;
+const { registerHandlersBlackJack } = blackJackStore;
 
 
 const connectGameboard = async (): Promise<void> => {
-  const isConnected = await tryConnectGameboard(GameType.BlackJack, registerHandlers);
+  const isConnected = await tryConnectGameboard(GameType.BlackJack, registerHandlersBlackJack);
   if (!isConnected) return;
   await navigateTo({ path: "/lobby/blackjack" });
 };

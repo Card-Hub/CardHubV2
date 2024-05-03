@@ -8,10 +8,11 @@ import { GameType } from "~/types";
 
 const { $api, $gameToString } = useNuxtApp();
 
+const blackJackStore = useBlackJackStore();
 const cahStore = useCahStore();
-const { registerHandlersCah } = cahStore;
-
 const uneStore = useUneStore();
+const { registerHandlersBlackJack } = blackJackStore;
+const { registerHandlersCah } = cahStore;
 const { registerHandlersUne } = uneStore;
 
 const store = useBaseStore();
@@ -35,6 +36,9 @@ const connectPlayer = async (): Promise<void> => {
 
   let callback: any;
   switch (type) {
+    case GameType.BlackJack:
+      callback = registerHandlersBlackJack;
+      break;
     case GameType.Cah:
       callback = registerHandlersCah;
       break;

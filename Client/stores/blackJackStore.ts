@@ -56,10 +56,18 @@ export const useBlackJackStore = defineStore("blackjack", () => {
     await gameConnection.value.invoke("betBlackJackHub", bet);
   }
 
-  const ping = async (): Promise<void> => {
+  const pingblackjack = async (): Promise<void> => {
     if (!isGameConnected) return;
     await gameConnection.value?.invoke("PingBlackJack");
   };
+
+  watch(gameConnection, async (newValue, oldValue) => {
+    log("before watcher424242");
+    if (newValue === null) return;
+    log("after watcher424242");
+
+    registerHandlers();
+  });
 
   const registerHandlers = (): void => {
     if (gameConnection.value === null) return;
@@ -71,7 +79,7 @@ export const useBlackJackStore = defineStore("blackjack", () => {
     gameConnection.value.on("PongBlackJack", () => {
       log("Received pong from blackjack");
     });
-  }
+  };
 
   const parseJson = async (json: string) => {
       const parsed = JSON.parse(json);
@@ -91,6 +99,7 @@ export const useBlackJackStore = defineStore("blackjack", () => {
       drawBlackJackCard,
       parseJson,
       registerHandlers,
+      pingblackjack,
       gameType,
       players,
       currentPlayer,

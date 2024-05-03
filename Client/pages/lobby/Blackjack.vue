@@ -14,7 +14,7 @@ const baseStore = useBaseStore();
 const store = useBlackJackStore();
 const { isPlayer, messages, users, room, currentAvatar } = storeToRefs(baseStore);
 const { gameStarted } = storeToRefs(store);
-// const { startGame } = store;
+const { pingblackjack } = store;
 // will allow for a popup of the chat
 import dialog from 'primevue/dialog';
 import {navigateTo} from "nuxt/app";
@@ -162,6 +162,11 @@ const convertBase = (player: BlackJackPlayer) => {
       Error: No user type found
     </div>
   </div>
+
+  <div>
+    <Button @click="pingblackjack">Ping</Button>
+  </div>
+
 </template>
 
 <style scoped>

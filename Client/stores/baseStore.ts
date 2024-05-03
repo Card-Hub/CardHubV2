@@ -125,7 +125,8 @@ export const useBaseStore = defineStore("base", () => {
                 baseConnection.value = joinConnection;
                 registerBaseHandlers();
             } else {
-                callback?.();
+                gameConnection.value = joinConnection
+                // callback?.();
             }
 
             joinConnection.onclose(() => {

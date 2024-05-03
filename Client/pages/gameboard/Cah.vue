@@ -4,6 +4,7 @@ import { storeToRefs } from "pinia";
 
 import { useBaseStore } from "~/stores/baseStore";
 import { useCahStore } from "~/stores/cahStore";
+import CahDisplay from "~/components/Card/CahDisplay.vue";
 // get players from store
 const baseStore = useBaseStore();
 const { isPlayer, messages, users, room, user, currentAvatar } = storeToRefs(baseStore);
@@ -19,27 +20,16 @@ const getPrimeIcon = (name: string) => {
   return new URL(`../../assets/icons/primeIcons/${ name }.svg`, import.meta.url);
 };
 
-// uncomment these out later
-// const {  cards, users, room } = storeToRefs(store);
-// const { cards } = storeToRefs(store);
+const enum CahType {
+  White,
+  Black
+}
 
-
-const dealerCards = ref<StandardCard[]>([
-  { Id: 1, Suit: "hearts", Value: "Jack" },
-  { Id: 2, Suit: "hearts", Value: "Ace" }]);
-//reverse dealer cards
-dealerCards.value.reverse();
-
-// const players = ref<BlackJackPlayer[]>([
-//   {Name: "lyssie", Avatar: "lyssie", Afk: false, Hand: [{Id: 1, Suit: "hearts", Value: "Jack"}, {Id: 2, Suit: "hearts", Value: "Ace"}], CurrentScore: 21, TotalMoney: 100, CurrentBet: 10, HasBet: true, NotPlaying: false, Busted: false, Winner: false, StillPlaying: true, Standing: false},
-//   {Name: "juno", Avatar: "juno", Afk: false,Hand: [{Id: 1, Suit: "hearts", Value: "Jack"}, {Id: 2, Suit: "hearts", Value: "Ace"}], CurrentScore: 21, TotalMoney: 100, CurrentBet: 10, HasBet: true, NotPlaying: false, Busted: false, Winner: false, StillPlaying: true, Standing: false},
-//   {Name: "oli", Avatar: "oli", Afk: false,Hand: [{Id: 1, Suit: "hearts", Value: "Jack"}, {Id: 2, Suit: "hearts", Value: "Ace"}], CurrentScore: 21, TotalMoney: 100, CurrentBet: 10, HasBet: true, NotPlaying: false, Busted: false, Winner: false, StillPlaying: true, Standing: false},
-//   {Name: "liam", Avatar: "liam", Afk: false,Hand: [{Id: 1, Suit: "hearts", Value: "Jack"}, {Id: 2, Suit: "hearts", Value: "Ace"}], CurrentScore: 21, TotalMoney: 100, CurrentBet: 10, HasBet: true, NotPlaying: false, Busted: false, Winner: false, StillPlaying: true, Standing: false},
-//   {Name: "andy", Avatar: "andy", Afk: false,Hand: [{Id: 1, Suit: "hearts", Value: "Jack"}, {Id: 2, Suit: "hearts", Value: "Ace"}], CurrentScore: 21, TotalMoney: 100, CurrentBet: 10, HasBet: true, NotPlaying: false, Busted: false, Winner: false, StillPlaying: true, Standing: false},
-//   {Name: "alex", Avatar: "alex", Afk: false,Hand: [{Id: 1, Suit: "hearts", Value: "Jack"}, {Id: 2, Suit: "hearts", Value: "Ace"}], CurrentScore: 21, TotalMoney: 100, CurrentBet: 10, HasBet: true, NotPlaying: false, Busted: false, Winner: false, StillPlaying: true, Standing: false},
-//   {Name: "ruby", Avatar: "ruby",Afk: false, Hand: [{Id: 1, Suit: "hearts", Value: "Jack"}, {Id: 2, Suit: "hearts", Value: "Ace"}], CurrentScore: 21, TotalMoney: 100, CurrentBet: 10, HasBet: true, NotPlaying: false, Busted: false, Winner: false, StillPlaying: true, Standing: false},
-//   {Name: "fairy", Avatar: "fairy", Afk: false,Hand: [{Id: 1, Suit: "hearts", Value: "Jack"}, {Id: 2, Suit: "hearts", Value: "Ace"}], CurrentScore: 21, TotalMoney: 100, CurrentBet: 10, HasBet: true, NotPlaying: false, Busted: false, Winner: false, StillPlaying: true, Standing: false},
-// ]);
+const whiteCards = ref<CahCard[]>([
+  { text: 'Hello', type: CahType.White },
+  { text: 'UR mom', type: CahType.White },
+  { text: 'uhhhh', type: CahType.White }
+]);
 
 const currentPlayer = ref<string>("lyssie");
 const dealersTurn = ref<boolean>(false);
@@ -122,29 +112,19 @@ const getCARD = () => {
 <template>
   <div class="gameboard-container">
     <div class="gameboard">
-      <div class="player-icons">
-        <div class="player-icon" v-for="(player, index) in players" :key="index"
-             :style="{ ...getPlayerIconStyle(index), ...isCurrentPlayer(player.Name) }">
-          <img :src="getPlayerIcon(player.Avatar)" alt="Player Icon" class="player-icon-img"/>
-          <p class="player-name"> {{ player.Name }} </p>
-        </div>
+<!--      <div class="player-icons">-->
+<!--        <div class="player-icon" v-for="(player, index) in players" :key="index"-->
+<!--             :style="{ ...getPlayerIconStyle(index), ...isCurrentPlayer(player.Name) }">-->
+<!--          <img :src="getPlayerIcon(player.Avatar)" alt="Player Icon" class="player-icon-img"/>-->
+<!--          <p class="player-name"> {{ player.Name }} </p>-->
+<!--        </div>-->
+<!--      </div>-->
+      
+      <div>
+        <CahDisplay 
+        <CahDisplay v-for="(card, index) in whiteCards" :key="index" :card="card" :style="cardStyle(index)" />
       </div>
-      <div class="game-table rounded-tr-full shadow-lg">
-        <div class="card-pile">
-          <div v-if="dealersTurn">
-
-          </div>
-          <div class="!dealersTurn"></div>
-          <StandardnoshadowCard :card="dealerCards[0]" class="standardCardDisplay"/>
-          <StandardnoshadowCard :card="dealerCards[1]" class="standardCardDisplay"/>
-          <div class="deck-card flex justify-center items-center bg-zinc-800 rounded-md shadow-md mb-2">
-            <img :src="getCARD()" alt="game icon" class="une-logo"/>
-          </div>
-        </div>
-        <div class="blank-card relative w-20 h-32 m-2 bg-zinc-800 rounded-md shadow-md p-2">
-          <img :src="getCARD()" alt="game icon" class="une-logo"/>
-        </div>
-      </div>
+      
 
 
     </div>

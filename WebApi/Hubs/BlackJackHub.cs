@@ -51,6 +51,14 @@ public class BlackJackHub : Hub
         game.DrawCard(ContextId);
     }
 
+
+    public async Task StandBlackJackHub()
+    {
+        if (!TryGetGame(out var game)) return;
+        game.Stand(ContextId);
+    }
+
+
     public async Task StartGame()
     {
         if (!TryGetGame(out var game)) return;

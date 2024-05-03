@@ -93,6 +93,8 @@ public class BlackJackGame : IBaseGame<StandardCard>
             BlackJackJsonState.Losers.Clear();
             BlackJackJsonState.Stalemates.Clear();
             PlayerOrder.BackToFirstPlayer();
+            BlackJackJsonState.Update(this);
+            _messenger.SendFrontendJson(GetAllConnStrsIncGameboard(), GetGameState());
             StartRound();
             return true;
         }
@@ -108,6 +110,8 @@ public class BlackJackGame : IBaseGame<StandardCard>
                     Players[player.Key].Busted = true;
                     Players[player.Key].StillPlaying = false;
                     Players[player.Key].Standing = true;
+                    BlackJackJsonState.Update(this);
+                    _messenger.SendFrontendJson(GetAllConnStrsIncGameboard(), GetGameState());
                     if (PlayerOrder.GetCurrentPlayer() == player.Key && player.Key != "Dealer")
                         PlayerOrder.NextTurn();
                 }
@@ -115,6 +119,8 @@ public class BlackJackGame : IBaseGame<StandardCard>
                     Players[player.Key].Winner = true;
                     Players[player.Key].StillPlaying = false;
                     Players[player.Key].Standing = true;
+                    BlackJackJsonState.Update(this);
+                    _messenger.SendFrontendJson(GetAllConnStrsIncGameboard(), GetGameState());
                     if (PlayerOrder.GetCurrentPlayer() == player.Key && player.Key != "Dealer")
                         PlayerOrder.NextTurn();
                 } else
@@ -316,7 +322,7 @@ public class BlackJackGame : IBaseGame<StandardCard>
 
     public bool DealersTurn(){//dealer draws cards
         if (state == "DealersTurn") {
-
+            
             Console.WriteLine("im if statement dealersturn");
             int score = GetPlayerScoreFromGame("Dealer");
             int x = 0;
@@ -330,6 +336,8 @@ public class BlackJackGame : IBaseGame<StandardCard>
             Players["Dealer"].StillPlaying = false;
             // if (state == "DealersTurn")
             CheckForWinnersOrLosers();
+            BlackJackJsonState.Update(this);
+            _messenger.SendFrontendJson(GetAllConnStrsIncGameboard(), GetGameState());
             // state = "MakeListsAndPayPlayers";
             return true;
         }
@@ -345,6 +353,8 @@ public class BlackJackGame : IBaseGame<StandardCard>
             Players[connStr].Standing = true;
             PlayerOrder.NextTurn();
             CheckAllPlayersStanding();
+            BlackJackJsonState.Update(this);
+            _messenger.SendFrontendJson(GetAllConnStrsIncGameboard(), GetGameState());
             // Console.WriteLine("\n\nin stand function\n\n");
             if (state == "DealersTurn")
                 DealersTurn();

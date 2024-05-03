@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { defineProps } from 'vue';
 import StandardCardDisplay from './Card/StandardCardDisplay.vue';
-import UNOCardDisplay from "~/components/Card/UNOCardDisplay.vue";
+import UNOCardDisplay from "~/components/Card/UNECardDisplay.vue";
 
 const props = defineProps(['selectedCard']);
 

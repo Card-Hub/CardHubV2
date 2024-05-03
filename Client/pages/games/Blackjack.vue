@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import PlayerHand from "~/components/PlayerHand.vue";
 import { ref, computed } from 'vue';
-import UNOCardDisplay from "~/components/Card/UNOCardDisplay.vue";
+import UNOCardDisplay from "~/components/Card/UNECardDisplay.vue";
 import StandardCardDisplay from "~/components/Card/StandardCardDisplay.vue";
 
 import { storeToRefs } from "pinia";

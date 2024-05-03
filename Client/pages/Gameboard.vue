@@ -4,7 +4,7 @@ import { storeToRefs } from "pinia";
 import { useWebSocketStore } from "~/stores/webSocketStore";
 
 import SelectedCard from "~/components/SelectedCard.vue";
-import UNOCardDisplay from "~/components/Card/UNOCardDisplay.vue";
+import UNOCardDisplay from "~/components/Card/UNECardDisplay.vue";
 import StandardCardDisplay from "~/components/Card/StandardCardDisplay.vue";
 
 const store = useWebSocketStore();

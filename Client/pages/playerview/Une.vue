@@ -15,8 +15,8 @@
     return new URL(`../../assets/icons/primeIcons/${name}.svg`, import.meta.url);
   }
 
-  import UNOCardDisplay from "~/components/Card/UNOCardDisplay.vue";
-  import UnoRules from "~/components/gameRules/UnoRules.vue";
+  import UNOCardDisplay from "~/components/Card/UNECardDisplay.vue";
+  import UnoRules from "~/components/gameRules/UneRules.vue";
   
   // https://primevue.org/dialog
   import Dialog from 'primevue/dialog';

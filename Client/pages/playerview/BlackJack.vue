@@ -24,7 +24,7 @@ const getPrimeIcon = (name: string) => {
 // https://primevue.org/dialog
 import Dialog from 'primevue/dialog';
 import Chat from "~/components/Chat.vue";
-import UnoRules from "~/components/gameRules/UnoRules.vue";
+import UnoRules from "~/components/gameRules/UneRules.vue";
 import PokerRules from "~/components/gameRules/PokerRules.vue";
 import BlackjackRules from "~/components/gameRules/BlackjackRules.vue"; // for popup dialog
 const rulesVisible = ref(false); // for popup dialog

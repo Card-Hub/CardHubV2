@@ -66,9 +66,11 @@ export const useBlackJackStore = defineStore("blackjack", () => {
         await gameConnection.value.invoke("DrawCardBlackJackHub");
     };
 
+
+    
+
     const standBlackJackPlayer = async (): Promise<void> => {
         if (gameConnection.value === null) return;
-
         console.log("player has stood");
         await gameConnection.value.invoke("StandBlackJackHub");
     };

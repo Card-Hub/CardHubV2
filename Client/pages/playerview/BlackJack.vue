@@ -69,8 +69,6 @@ const findPlayerByID = (userConn: string) => {
 </script>
  
 <template>
-  <p class="text-white"> fg{{  findPlayerByName(user)  }}</p>
-  <p class="text-white"> yeye{{players}}</p>
   <div class="playerview-une-container w-full p-6">
     <div class="flex flex-row justify-between">
       <div class="user-info flex place-items-center gap-3 bg-gray-600">
@@ -112,7 +110,9 @@ const findPlayerByID = (userConn: string) => {
         <span v-if="findPlayerByName(user)?.Busted == true">
             You Lose!
         </span>
-        <span v-if="currentPlayer !== user &&  allPlayersHaveBet === true">{{ findPlayerByName(user) }} is playing...
+        <span v-if="currentPlayer !== findPlayerByName(user)?.strConn &&  allPlayersHaveBet === true">{{ findPlayerByID(currentPlayer)?.Name }} is playing...
+        </span>
+        <span v-if="currentPlayer === findPlayerByName(user)?.strConn &&  allPlayersHaveBet === true">It's your turn...
         </span>
         <span v-if="allPlayersHaveBet === false">
             Everyone Take Bets!
@@ -126,14 +126,13 @@ const findPlayerByID = (userConn: string) => {
         <div>
           
         </div>
-    
-        <div class="cards-outer">
-            <!--div class="cards">
-              <StandardnoshadowCard :card="findPlayerByName('Dealer')?.Hand[0]" class="standardCardDisplay"/>
-              <StandardnoshadowCard :card="findPlayerByName('Dealer')?.Hand[1]" class="standardCardDisplay"/>  
-            </div-->
+        <div>
+          <div v-if = "allPlayersHaveBet === true" class="flex flex-row">
+              <div v-for = "card1 in findPlayerByName(user)?.Hand">
+              <StandardnoshadowCard :card="card1" class="standardCardDisplay"/>
+            </div>
+         </div>
         </div>
-
         <div class="content-center stat-box">
             <ul class="">
               <li>
@@ -151,8 +150,8 @@ const findPlayerByID = (userConn: string) => {
 
       <div class="buttons">
         <Button class="font-bold button shadow" @click="showBetPopup" :disabled="findPlayerByName(user)?.HasBet">Bet</Button><!--will just invoke function-->
-        <Button class="font-bold button shadow" @click="hit" :disabled="currentPlayer != user || allPlayersHaveBet == false || findPlayerByName(user)?.Standing || !findPlayerByName(user)?.HasBet">Hit</Button><!--will just invoke function-->
-        <Button class="font-bold button shadow" @click="stand" :disabled="currentPlayer != user || allPlayersHaveBet == false || findPlayerByName(user)?.Standing || !findPlayerByName(user)?.HasBet">Stand</Button><!--will just invoke function-->
+        <Button class="font-bold button shadow" @click="hit" :disabled="currentPlayer != findPlayerByName(user)?.strConn || allPlayersHaveBet == false || findPlayerByName(user)?.Standing || !findPlayerByName(user)?.HasBet">Hit</Button><!--will just invoke function-->
+        <Button class="font-bold button shadow" @click="stand" :disabled="currentPlayer != findPlayerByName(user)?.strConn || allPlayersHaveBet == false || findPlayerByName(user)?.Standing || !findPlayerByName(user)?.HasBet">Stand</Button><!--will just invoke function-->
       </div>
 <!--      <div class="footer">-->
 <!--      </div>-->
@@ -160,7 +159,7 @@ const findPlayerByID = (userConn: string) => {
 
   <div v-if="showingBetPopup" class="select-color">
     <h2>Select amount to bet</h2>
-      <InputNumber v-model="amtToBet" inputId="horizontal-buttons" showButtons buttonLayout="horizontal" :step="1" class="">
+      <InputNumber :min="5" :max="100" v-model="amtToBet" inputId="horizontal-buttons" showButtons buttonLayout="horizontal" :step="1" class="">
         <template #incrementbuttonicon>
             <span class="pi pi-plus" />
         </template>

@@ -27,7 +27,8 @@ export const useBlackJackStore = defineStore("blackjack", () => {
     const losers = ref<string[]>([]);
     const stalemates = ref<string[]>([]);
     const gameStarted = ref<boolean>(false);
-    const allPlayersHaveBet = ref<boolean | null>(false);
+    const allPlayersHaveBet = ref<boolean>(false);
+    const dealersTurn = ref<boolean>(false);
     const currentPlayer = ref<string>("");
 
 
@@ -66,9 +67,11 @@ export const useBlackJackStore = defineStore("blackjack", () => {
         await gameConnection.value.invoke("DrawCardBlackJackHub");
     };
 
+
+    
+
     const standBlackJackPlayer = async (): Promise<void> => {
         if (gameConnection.value === null) return;
-
         console.log("player has stood");
         await gameConnection.value.invoke("StandBlackJackHub");
     };
@@ -96,6 +99,7 @@ export const useBlackJackStore = defineStore("blackjack", () => {
         stalemates.value = parsed.Stalemates;
         allPlayersHaveBet.value = parsed.AllPlayersHaveBet;
         gameStarted.value = parsed.GameStarted;
+        dealersTurn.value = parsed.DealersTurn;
     };
 
     return {
@@ -114,6 +118,7 @@ export const useBlackJackStore = defineStore("blackjack", () => {
         stalemates,
         allPlayersHaveBet,
         gameStarted,
+        dealersTurn,
         user
     };
 });

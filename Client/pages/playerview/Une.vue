@@ -124,7 +124,7 @@ const canPressUne = computed(() => {
   const getWinnerIcon = (player: string) => {
     // iterate through players to find the winner's avatar
     let winnerIcon = "";
-    players.value.forEach(p => { if (p.Name == player) { winnerIcon = p.Avatar; } });
+    users.value.forEach(p => { if (p.name == player) { winnerIcon = p.avatar; } });
     
     return new URL(`../../assets/icons/avatars/${winnerIcon}.png`, import.meta.url);
   };

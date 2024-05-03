@@ -3,13 +3,16 @@ import { ref } from "vue";
 import { storeToRefs } from "pinia";
 
 
+
 import StandardnoshadowCard from "~/components/noShadowCard/StandardnoshadowCard.vue";
 import StandardCardDisplay from "~/components/Card/StandardCardDisplay.vue";
 
 const store = useBlackJackStore();
+const baseStore = useBlackJackStore();
 
-const { players, currentPlayer, winners, losers, stalemates, user, allPlayersHaveBet } = storeToRefs(store);
 
+const { winners, losers, stalemates, user} = storeToRefs(store);
+const {currentPlayer, players, dealersTurn, allPlayersHaveBet } = storeToRefs(store);
 // const {startGame} = store;
 
 //fulscreen
@@ -27,11 +30,6 @@ const dealerCards = ref<StandardCard[]>([
 //reverse dealer cards
 dealerCards.value.reverse();
 
-// const currentPlayer = ref<string>("lyssie");
-// const dealersTurn = ref<boolean>(false);
-
-//const currentColor = ref<string>("red");
-// const { currentColor, players, currentPlayer, discardPile  } = storeToRefs(uneStore);
 const getCardStyle = (index: number) => {
   let randomX = index * 50;
   let randomY = index * 3;
@@ -89,6 +87,11 @@ const getPlayerIconStyle = (index: number) => {
   };
 };
 
+const findPlayerByID = (userConn: string) => {
+      return players.value.find(player => player.strConn === userConn);
+};
+
+
 const isCurrentPlayer = (player: string) => {
   if (currentPlayer.value != "") {
     if (player.toLowerCase() === currentPlayer.value.toLowerCase()) {
@@ -117,19 +120,38 @@ const getCARD = () => {
       </div>
       <div class="game-table rounded-tr-full shadow-lg">
         <div class="card-pile">
-          <!--div v-if="dealersTurn">
-
-          </div-->
-          <div class="!dealersTurn"></div>
-          <StandardnoshadowCard :card="dealerCards[0]" class="standardCardDisplay"/>
-          <StandardnoshadowCard :card="dealerCards[1]" class="standardCardDisplay"/>
-          <div class="deck-card flex justify-center items-center bg-zinc-800 rounded-md shadow-md mb-2">
+          <div class="!dealersTurn">
+            <div v-if ="!dealersTurn && allPlayersHaveBet">
+              <StandardnoshadowCard :card="findPlayerByID('Dealer')?.Hand[0]" class="standardCardDisplay"/>
+            </div>
+          </div>
+            <div v-if ="dealersTurn">
+              <div v-if = "allPlayersHaveBet === true" class="flex flex-row">
+                <div v-for = "card1 in findPlayerByID('Dealer')?.Hand">
+                  <StandardnoshadowCard :card="card1" class="standardCardDisplay"/>
+                </div>
+              </div>
+            </div>
+          <div v-if ="!dealersTurn" class="deck-card flex justify-center items-center bg-zinc-800 rounded-md shadow-md mb-2">
             <img :src="getCARD()" alt="game icon" class="une-logo"/>
           </div>
         </div>
-        <div class="blank-card relative w-20 h-32 m-2 bg-zinc-800 rounded-md shadow-md p-2">
+        <div v-if ="!dealersTurn" class="blank-card relative w-20 h-32 m-2 bg-zinc-800 rounded-md shadow-md p-2">
           <img :src="getCARD()" alt="game icon" class="une-logo"/>
         </div>
+      </div>
+
+      <div v-for = "winner1 in winners">
+        Winners
+        {{winner1}}
+      </div>
+      <div v-for = "loser1 in losers">
+        Losers
+        {{loser1}}
+      </div>
+      <div v-for = "stalemates1 in stalemates">
+        Stalemates
+        {{stalemates1}}
       </div>
 
 

@@ -55,8 +55,8 @@ const stand = () => {
 }
 
 const getUserIcon = () => {
-  // return new URL('../../assets/icons/avatars/${ user.value.name }.png`, import.meta.url);
-  return new URL(`../../assets/icons/avatars/lyssie.png`, import.meta.url);
+  return new URL(`../../assets/icons/avatars/${ user.value }.png`, import.meta.url);
+  // return new URL(`../../assets/icons/avatars/lyssie.png`, import.meta.url);
 };
 
 const findPlayerByName = (userConn: string) => {
@@ -97,7 +97,7 @@ const findPlayerByID = (userConn: string) => {
         </div>
 
       </div>
-    </div>all
+    </div>
     
     <div class="w-full margin-auto">
       <h1 class="text-center">

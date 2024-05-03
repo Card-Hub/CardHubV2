@@ -115,7 +115,7 @@ const getCARD = () => {
     <div class="gameboard">
       <div class="player-icons">
         <div class="player-icon" v-for="(player, index) in users" :key="index"
-             :style="{ ...getPlayerIconStyle(index), ...isCurrentPlayer(player.Name) }">
+             :style="{ ...getPlayerIconStyle(index), ...isCurrentPlayer(player.name) }">
           <img :src="getPlayerIcon(player.avatar)" alt="Player Icon" class="player-icon-img"/>
           <p class="player-name"> {{ player.name }} </p>
         </div>

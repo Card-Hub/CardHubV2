@@ -1,6 +1,9 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
 import { useBaseStore } from "~/stores/baseStore";
+import {
+  HubConnectionState
+} from "@microsoft/signalr";
 
 export const useBlackJackStore = defineStore("blackjack", () => {
   // Debugging purposes
@@ -9,6 +12,8 @@ export const useBlackJackStore = defineStore("blackjack", () => {
       const modifiedArgs = args.map(arg => `${ LOG_PREFIX }${ arg }`);
       console.log.apply(console, modifiedArgs);
   };
+
+  const isGameConnected = computed<boolean>(() => gameConnection.value !== null && gameConnection.value.state === HubConnectionState.Connected);
   const store = useBaseStore();
   const gameJson = ref<string>("");
   const { $api } = useNuxtApp();
@@ -51,12 +56,20 @@ export const useBlackJackStore = defineStore("blackjack", () => {
     await gameConnection.value.invoke("betBlackJackHub", bet);
   }
 
+  const ping = async (): Promise<void> => {
+    if (!isGameConnected) return;
+    await gameConnection.value?.invoke("PingBlackJack");
+  };
 
   const registerHandlers = (): void => {
     if (gameConnection.value === null) return;
       gameConnection.value.on("ReceiveJSON", (blackJackJson: string) => {
         gameJson.value = blackJackJson;
         parseJson(gameJson.value);
+    });
+
+    gameConnection.value.on("PongBlackJack", () => {
+      log("Received pong from blackjack");
     });
   }
 

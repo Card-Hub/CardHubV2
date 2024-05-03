@@ -151,8 +151,12 @@ export const useBaseStore = defineStore("base", () => {
                     baseConnection.value = joinConnection;
                 } else {
                     gameConnection.value = joinConnection;
+                    gameConnection.value.on("PongBlackJack", () => {
+                        log("Received pong from blackjack123");
+                      });
                 }
             }
+
             return true;
         } catch (e) {
             log("Error in joinRoom", e);

@@ -47,6 +47,7 @@ public class BlackJackGame : IBaseGame<StandardCard>
 
     public void StartGame()//waiting for palyers to join here before we continue, gameB will decide when to start the round
     {
+        BlackJackJsonState.GameStarted = true;
         // AddPlayer("Dealer", "Dealer");
         // Players["Dealer"].HasBet= true;
         state = "Started";

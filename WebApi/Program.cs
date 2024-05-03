@@ -53,8 +53,9 @@ builder.Services.AddSingleton<GameService>();
 builder.Services.AddTransient<CahGame>();
 builder.Services.AddSingleton<CahFactory>();
 builder.Services.AddSingleton<IDictionary<string, CahGame>>(_ => new ConcurrentDictionary<string, CahGame>());
-//builder.Services.AddSingleton<IDictionary<string, BlackJackMessenger>>();
+builder.Services.AddSingleton<IDictionary<string, BlackJackGame>>(_ => new ConcurrentDictionary<string, BlackJackGame>());
 builder.Services.AddSingleton<BlackJackMessenger>();
+
 
 
 

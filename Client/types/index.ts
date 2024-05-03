@@ -62,7 +62,7 @@ declare global {
         Winner: boolean
         StillPlaying: boolean
         Standing: boolean
-        PickingWildColor: boolean;
+        Name: string;
     }
 
     interface CahCard {

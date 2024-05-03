@@ -2,29 +2,30 @@
 import { defineComponent, ref, onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import AvatarSelection from "~/components/AvatarSelection.vue";
-import {useUneStore} from "~/stores/uneStore";
-import {useWebSocketStore} from "~/stores/webSocketStore";
 import Chat from "~/components/Chat.vue";
-
-const store = useWebSocketStore();
-const { isPlayer, messages, users, room, lobbyUsers } = storeToRefs(store);
-const { sendMessage, startGame } = store;
-const uneStore = useUneStore();
-const { gameType, gameStarted } = storeToRefs(uneStore);
+import {useBaseStore} from "~/stores/baseStore";
+import { useBlackJackStore } from "~/stores/blackJackStore";
+import { GameType } from "~/types";
+const { $gameToString } = useNuxtApp();
 
 
+
+const baseStore = useBaseStore();
+const store = useBlackJackStore();
+const { isPlayer, messages, users, room, currentAvatar } = storeToRefs(baseStore);
+const { gameStarted } = storeToRefs(store);
+// const { startGame } = store;
 // will allow for a popup of the chat
 import dialog from 'primevue/dialog';
 import {navigateTo} from "nuxt/app";
 const visible = ref(false);
 
-const gameboardStart = () => {
-  startGame();
-  navigateTo("/gameboard/blackjack");
+const gameboardStart = async () => {
+  await navigateTo("/gameboard/" + $gameToString(GameType.BlackJack));
 }
 
 const playerStart = () => {
-  return navigateTo("/playerview/blackjack");
+  return navigateTo("/playerview/" + $gameToString(GameType.BlackJack));
 }
 
 const getIcon = (avatar: string) => {
@@ -37,10 +38,10 @@ const getIcon = (avatar: string) => {
 };
 
 const getIconGivenName = (name: string) => {
-  lobbyUsers.value.forEach(function (user: LobbyUser) {
+  users.value.forEach(function (user: BasePlayer) {
     // console.log(value);
-    if (user.Name == name) {
-      return getIcon(user.Avatar);
+    if (user.name == name) {
+      return getIcon(user.avatar);
     }else{
       return getIcon("lyssie");
     }
@@ -49,12 +50,38 @@ const getIconGivenName = (name: string) => {
   return getIcon("lyssie");
 }
 
+const blackJackPlayers = computed(() => users.value.map((user) => {
+  return {
+    Avatar: user.avatar,
+    strConn: "",
+    Hand: [],
+    CurrentScore: 0,
+    TotalMoney: 0,
+    CurrentBet: 0,
+    HasBet: false,
+    NotPlaying: false,
+    Busted: false,
+    Winner: false,
+    StillPlaying: true,
+    Standing: false,
+    Name: user.name,
+  }
+}));
+
 const kickPlayer = (lobbyUser: LobbyUser) => {
   console.log("Kicking player: " + lobbyUser.Name);
   // send message to server to kick player
   // BOOT PLAYER HERE
   // kickPlayer(lobbyUser);
 }
+
+const convertBase = (player: BlackJackPlayer) => {
+  return {
+    name: player.Name,
+    avatar: player.Avatar
+  }
+}
+
 </script>
 
 <template>
@@ -63,7 +90,7 @@ const kickPlayer = (lobbyUser: LobbyUser) => {
 
       <div class="flex justify-between">
         <h1 >
-          Poker
+          {{ $gameToString(GameType.BlackJack) }}
         </h1>
         <div class="justify-left">
           <i class="pi pi-fw pi-comment" style="font-size: 2rem" @click="visible = true"></i>
@@ -79,7 +106,7 @@ const kickPlayer = (lobbyUser: LobbyUser) => {
 
       <AvatarSelection class="align-center"/>
       <div v-if="gameStarted" >
-        <NuxtLink to="/gameboard/poker" class="mt-5">
+        <NuxtLink to="/gameboard/blackjack" class="mt-5">
           <!--          <Button>Join Game</Button>-->
         </NuxtLink>
         <Button class="mt-5" @click="playerStart" v-if="gameStarted">Join Game</Button>
@@ -98,21 +125,22 @@ const kickPlayer = (lobbyUser: LobbyUser) => {
           <SvgoStandardDeckSpades class="suit w-80 h-80 absolute z-0 bottom-12 -left-24 rotate-[-20deg]" :fontControlled="false" filled/>
 
           <div class="m-8 flex flex-col gap-4">
-            <div v-for="lobbyUser in lobbyUsers as LobbyUser[]" class="rounded-full flex card items-center justify-content h-16 w-full justify-between">
+            <div v-for="user in blackJackPlayers" class="rounded-full flex card items-center justify-content h-16 w-full justify-between">
               <!--<i class="pi pi-user mx-4 text-neutral-300" style="font-size: 1.5rem"></i>-->
               <div class="flex flex-row  items-center">
-                <img :src="getIcon(lobbyUser.Avatar)" alt="avatar Icon" class="lobby-player-icon-img">
-                <span class="text-2xl text-neutral-300 ">{{ lobbyUser.Name }} </span>
+                <img :src="getIcon(user.Avatar)" alt="avatar Icon" class="lobby-player-icon-img">
+                <span class="text-2xl text-neutral-300 ">{{ user.Name }} </span>
               </div>
-              <Button class="kick-btn" @click="kickPlayer(lobbyUser)"> Kick </Button>
+              <Button class="kick-btn" @click="kickPlayer(user)"> Kick </Button>
             </div>
           </div>
         </div>
       </div>
       <div class="flex justify-center w-1/3">
         <div class="flex flex-col items-center">
-          <h1 class="text-6xl">
-            {{ gameType }}
+          <h1 class="text-4xl">
+            <!--{{ GameType.BlackJack }}-->
+            BlackJack
           </h1>
           <p class="mt-24 text-xl">
             Room Code

@@ -1,9 +1,14 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
-// import { useWebSocketStore } from "~/stores/webSocketStore";
 import { useBaseStore } from "~/stores/baseStore";
 
 export const useBlackJackStore = defineStore("blackjack", () => {
+  // Debugging purposes
+  const LOG_PREFIX = "Black - ";
+  const log = function (...args: any[]) {
+      const modifiedArgs = args.map(arg => `${ LOG_PREFIX }${ arg }`);
+      console.log.apply(console, modifiedArgs);
+  };
   const store = useBaseStore();
   const gameJson = ref<string>("");
   const { $api } = useNuxtApp();
@@ -12,10 +17,10 @@ export const useBlackJackStore = defineStore("blackjack", () => {
   const winners = ref<string[]>([]);
   const losers = ref<string[]>([]);
   const stalemates = ref<string[]>([]);
-  const allPlayersHaveBet = ref<boolean | null>(null);
+  const gameStarted = ref<boolean | null>(false);
+  const allPlayersHaveBet = ref<boolean | null>(false);
 
   if (players.value != null) {
-    console.log("loggig players");
     console.log(players.value);
   }
   const currentPlayer = ref<string>("");
@@ -64,6 +69,7 @@ export const useBlackJackStore = defineStore("blackjack", () => {
       losers.value = parsed.Losers,
       stalemates.value = parsed.Stalemates,
       allPlayersHaveBet.value = parsed.AllPlayersHaveBet
+      gameStarted.value = parsed.GameStarted
   }
 
   return {
@@ -71,6 +77,7 @@ export const useBlackJackStore = defineStore("blackjack", () => {
       standBlackJackPlayer,
       drawBlackJackCard,
       parseJson,
+      registerHandlers,
       gameType,
       players,
       currentPlayer,
@@ -78,6 +85,7 @@ export const useBlackJackStore = defineStore("blackjack", () => {
       losers,
       stalemates,
       allPlayersHaveBet,
+      gameStarted,
       user
   };
 });

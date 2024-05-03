@@ -1,25 +1,28 @@
 <script setup lang="ts">
-import PlayerHand from "~/components/PlayerHand.vue";
+// import PlayerHand from "~/components/PlayerHand.vue";
 import { ref, computed } from 'vue';
-import UNOCardDisplay from "~/components/Card/UNECardDisplay.vue";
 import StandardCardDisplay from "~/components/Card/StandardCardDisplay.vue";
-
+import { GameType } from "~/types";
 import { storeToRefs } from "pinia";
-import { useWebSocketStore } from "~/stores/webSocketStore";
 import BlackjackRules from "~/components/gameRules/BlackjackRules.vue";
 
-const store = useWebSocketStore();
-const { connection, isConnected, messages, user, room } = storeToRefs(store);
-const { tryCreateRoom, tryJoinRoom, sendGameType } = store;
+import {useBaseStore} from "~/stores/baseStore";
+import {useBlackJackStore} from "~/stores/blackJackStore";
+
+
+const baseStore = useBaseStore();
+const { tryConnectGameboard } = baseStore;
+
+const blackJackStore = useBlackJackStore();
+const { registerHandlers } = blackJackStore;
+
 
 const connectGameboard = async (): Promise<void> => {
-  const isRoomCreated = await tryCreateRoom();
-  if (isRoomCreated) {
-    sendGameType('BlackJack');
-    // await navigateTo('/playerview');
-    await navigateTo("/lobby/blackjack");
-  }
+  const isConnected = await tryConnectGameboard(GameType.BlackJack, registerHandlers);
+  if (!isConnected) return;
+  await navigateTo({ path: "/lobby/blackjack" });
 };
+
 
 // create standard deck of cards
 const standardDeck = [];

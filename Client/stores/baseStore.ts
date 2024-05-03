@@ -81,8 +81,8 @@ export const useBaseStore = defineStore("base", () => {
     const tryConnectPlayer = async (user: string, room: string): Promise<GameType | null> => {
         try {
             const gameType = await $api<GameType>(`game/verifycode/${ room }`, { method: "GET" });
-            if (!gameType) {
-                log("Invalid room code");
+            if (gameType === null || gameType === undefined) {
+                log(`Invalid room code (gametype): ${ gameType }`);
                 return null;
             }
 

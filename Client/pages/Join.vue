@@ -23,7 +23,7 @@ const isValidRoomCode = computed(() => {
 
 const connectPlayer = async (): Promise<void> => {
   const gameType = await tryConnectPlayer(user.value, room.value);
-  if (gameType) {
+  if (gameType !== null && gameType !== undefined) {
     await navigateTo(`/lobby/${ $gameToString(gameType) }`);
     return;
   }

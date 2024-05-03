@@ -69,7 +69,7 @@ const cahPlayers = computed(() => users.value.map((user) => {
     Score: 0,
     Hand: [],
     IsCzar: false,
-    isWinner: false
+    IsWinner: false
   }
 }));
 

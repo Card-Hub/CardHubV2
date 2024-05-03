@@ -74,7 +74,7 @@ public class BlackJackHub : Hub
     {
         return Context.Items.TryGetValueAs(Room, out string roomName)
             ? roomName
-            : throw new InvalidOperationException("Cah Room id not found");
+            : throw new InvalidOperationException("BlackJack Room id not found");
     }
     
     #endregion

@@ -1,11 +1,9 @@
 <script setup lang="ts">
 import {defineComponent, ref, onMounted} from "vue";
-//impor
 import {storeToRefs} from "pinia";
-import {useWebSocketStore} from "~/stores/webSocketStore";
 import StandardCardDisplay from "~/components/Card/StandardCardDisplay.vue";
 import StandardnoshadowCard from "~/components/noShadowCard/StandardnoshadowCard.vue";
-
+import { useBlackJackStore } from "~/stores/blackJackStore";
 // fullscreen
 const { isFullscreen, enter, exit } = useFullscreen();
 const el = ref(null)
@@ -14,7 +12,7 @@ const { toggle } = useFullscreen(el)
 const store = useBlackJackStore();
 
 const { drawBlackJackCard, standBlackJackPlayer, betBlackJackPlayer } = store;
-const {players, currentPlayer, winners, losers, stalemates, user, allPlayersHaveBet} = storeToRefs(store);
+const {players, currentPlayer, user, allPlayersHaveBet} = storeToRefs(store);
 // const player = findPlayerByName(user);
 
 const getPrimeIcon = (name: string) => {
@@ -30,7 +28,7 @@ import BlackjackRules from "~/components/gameRules/BlackjackRules.vue"; // for p
 const rulesVisible = ref(false); // for popup dialog
 const chatVisible = ref(false); // for popup dialog https://primevue.org/avatar/ for chat notification
 const showingBetPopup = ref< boolean>(false);
-const amtToBet = ref<number | null>(null);
+const amtToBet = ref<number>(0);
 
 
 const showBetPopup = () => {
@@ -57,7 +55,7 @@ const getUserIcon = () => {
 };
 
 const findPlayerByName = (userConn: string) => {
-      return players.value.find(player => player.strConn === user);
+      return players.value.find(player => player.strConn === user.value);
 };
 
 </script>

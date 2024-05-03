@@ -64,32 +64,35 @@ public class UnoGameModLyssie
 
   public async Task StartGame()
   {
-    // Build deck, shuffle
-    _deck = _deckBuilder.Build(Settings);
-    _deck.Shuffle();
-    _playerOrder.ShufflePlayers();
+    if (!GameStarted) { // protection against this running twice?? lol
 
-    foreach (var player in _playerOrder.GetPlayers(LyssiePlayerStatus.Active))
-    {
-        var drawnCards = _deck.Draw(2);
-        _players[player].AddCards(drawnCards);
-    }
+      // Build deck, shuffle
+      _deck = _deckBuilder.Build(Settings);
+      _deck.Shuffle();
+      _playerOrder.ShufflePlayers();
 
-    var counter = 0;
-    while (counter++ < 10)
-    {
-        var topCard = _deck.Draw();
-        _discardPile.Push(topCard);
-        if (topCard.ColorEnum == UnoColorLyssie.Black) continue;
-        break;
+      foreach (var player in _playerOrder.GetPlayers(LyssiePlayerStatus.Active))
+      {
+          var drawnCards = _deck.Draw(2);
+          _players[player].AddCards(drawnCards);
+      }
+
+      var counter = 0;
+      while (counter++ < 10)
+      {
+          var topCard = _deck.Draw();
+          _discardPile.Push(topCard);
+          if (topCard.ColorEnum == UnoColorLyssie.Black) continue;
+          break;
+      }
+      _CurrentColor = _discardPile.Peek().ColorEnum;
+      GameStarted = true;
+        //await _hubContext.Clients.Client(Gameboard).SendAsync("ReceiveCards", _discardPile);
+        //await InitiateTurn();
+      // get list of all in room
+      Console.WriteLine("In Uno StartGame");
+      await _messenger.SendFrontendJson(GetAllConnStrsIncGameboard(), GetGameState());
     }
-    _CurrentColor = _discardPile.Peek().ColorEnum;
-    GameStarted = true;
-      //await _hubContext.Clients.Client(Gameboard).SendAsync("ReceiveCards", _discardPile);
-      //await InitiateTurn();
-    // get list of all in room
-    Console.WriteLine("In Uno StartGame");
-    await _messenger.SendFrontendJson(GetAllConnStrsIncGameboard(), GetGameState());
   }
 
   public bool AddPlayer(string playerName, string connStr)

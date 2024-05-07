@@ -75,9 +75,7 @@ const items = ref([
         <h1 class="text-7xl">Blackjack</h1>
         <h3>Game Description: </h3>
         <p> In this classic card game, your goal is to beat the dealer's hand without going over 21. You'll be dealt two cards initially and have the option to 'hit' to receive another card or 'stand' to keep your current hand. The dealer will also be dealt cards, one face up and one face down. Be careful though - if your hand total exceeds 21, you'll 'bust' and lose the round. But if you manage to get closer to 21 than the dealer without busting, you win! Get ready to test your luck and skills in this exciting game of blackjack! </p>
-        <NuxtLink href="/lobby">
-          <Button class="play" label="Secondary" severity="secondary" @click="connectGameboard"> Play BlackJack </Button>
-        </NuxtLink>
+        <Button class="play" label="Secondary" severity="secondary" @click="connectGameboard"> Play BlackJack </Button>
       </div>
 
       <!--      <div class="column">-->

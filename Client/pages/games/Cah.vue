@@ -59,9 +59,7 @@ const items = ref([
         <div>
           <p>Copyright 2024 Cards Against Humanity LLC. Used within license terms.</p>
         </div>
-        <NuxtLink href="/lobby">
-          <Button class="play" label="Secondary" severity="secondary" @click="connectGameboard"> Play CAH </Button>
-        </NuxtLink>
+        <Button class="play" label="Secondary" severity="secondary" @click="connectGameboard"> Play CAH </Button>
       </div>
 
     </div>
